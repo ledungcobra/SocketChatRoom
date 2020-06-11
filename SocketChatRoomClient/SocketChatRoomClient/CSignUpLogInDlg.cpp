@@ -1,12 +1,13 @@
-
+﻿
 // SocketChatRoomClientDlg.cpp : implementation file
 //
 
 #include "pch.h"
 #include "framework.h"
 #include "SocketChatRoomClient.h"
-#include "SocketChatRoomClientDlg.h"
+#include "CSignUpLogInDlg.h"
 #include "afxdialogex.h"
+#include "CPublicChatDialog.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -15,62 +16,67 @@
 
 // CAboutDlg dialog used for App About
 
-class CAboutDlg : public CDialogEx
-{
-public:
-	CAboutDlg();
+//class CAboutDlg : public CDialogEx
+//{
+//public:
+//	CAboutDlg();
+//
+//// Dialog Data
+//#ifdef AFX_DESIGN_TIME
+//	enum { IDD = IDD_ABOUTBOX };
+//#endif
+//
+//	protected:
+//	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+//
+//// Implementation
+//protected:
+//	DECLARE_MESSAGE_MAP()
+//public:
+//	afx_msg void OnBnClickedLogin();
+//};
+//
+//CAboutDlg::CAboutDlg() : CDialogEx(IDD_ABOUTBOX)
+//{
+//}
+//
+//void CAboutDlg::DoDataExchange(CDataExchange* pDX)
+//{
+//	CDialogEx::DoDataExchange(pDX);
+//}
+//
+//BEGIN_MESSAGE_MAP(CAboutDlg, CDialogEx)
+//
+//END_MESSAGE_MAP()
+//
+//
+//// CSocketChatRoomClientDlg dialog
 
-// Dialog Data
-#ifdef AFX_DESIGN_TIME
-	enum { IDD = IDD_ABOUTBOX };
-#endif
-
-	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-
-// Implementation
-protected:
-	DECLARE_MESSAGE_MAP()
-};
-
-CAboutDlg::CAboutDlg() : CDialogEx(IDD_ABOUTBOX)
-{
-}
-
-void CAboutDlg::DoDataExchange(CDataExchange* pDX)
-{
-	CDialogEx::DoDataExchange(pDX);
-}
-
-BEGIN_MESSAGE_MAP(CAboutDlg, CDialogEx)
-END_MESSAGE_MAP()
 
 
-// CSocketChatRoomClientDlg dialog
-
-
-
-CSocketChatRoomClientDlg::CSocketChatRoomClientDlg(CWnd* pParent /*=nullptr*/)
-	: CDialogEx(IDD_SOCKETCHATROOMCLIENT_DIALOG, pParent)
+CSignUpLogInDlg::CSignUpLogInDlg(CWnd* pParent /*=nullptr*/)
+	: CDialogEx(ID_LOGIN_SIGNUP_DIALOG, pParent)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
 
-void CSocketChatRoomClientDlg::DoDataExchange(CDataExchange* pDX)
+void CSignUpLogInDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
 }
 
-BEGIN_MESSAGE_MAP(CSocketChatRoomClientDlg, CDialogEx)
+BEGIN_MESSAGE_MAP(CSignUpLogInDlg, CDialogEx)
 	ON_WM_SYSCOMMAND()
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
+	ON_BN_CLICKED(IDC_BUTTON2, &CSignUpLogInDlg::OnBnClickedSignUp)
+	ON_BN_CLICKED(IDC_BUTTON1, &CSignUpLogInDlg::OnBnClickedLogIn)
 END_MESSAGE_MAP()
 
 
 // CSocketChatRoomClientDlg message handlers
 
-BOOL CSocketChatRoomClientDlg::OnInitDialog()
+BOOL CSignUpLogInDlg::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 
@@ -104,12 +110,12 @@ BOOL CSocketChatRoomClientDlg::OnInitDialog()
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }
 
-void CSocketChatRoomClientDlg::OnSysCommand(UINT nID, LPARAM lParam)
+void CSignUpLogInDlg::OnSysCommand(UINT nID, LPARAM lParam)
 {
 	if ((nID & 0xFFF0) == IDM_ABOUTBOX)
 	{
-		CAboutDlg dlgAbout;
-		dlgAbout.DoModal();
+		/*CAboutDlg dlgAbout;
+		dlgAbout.DoModal();*/
 	}
 	else
 	{
@@ -121,7 +127,7 @@ void CSocketChatRoomClientDlg::OnSysCommand(UINT nID, LPARAM lParam)
 //  to draw the icon.  For MFC applications using the document/view model,
 //  this is automatically done for you by the framework.
 
-void CSocketChatRoomClientDlg::OnPaint()
+void CSignUpLogInDlg::OnPaint()
 {
 	if (IsIconic())
 	{
@@ -148,8 +154,29 @@ void CSocketChatRoomClientDlg::OnPaint()
 
 // The system calls this function to obtain the cursor to display while the user drags
 //  the minimized window.
-HCURSOR CSocketChatRoomClientDlg::OnQueryDragIcon()
+HCURSOR CSignUpLogInDlg::OnQueryDragIcon()
 {
 	return static_cast<HCURSOR>(m_hIcon);
 }
 
+
+
+
+
+void CSignUpLogInDlg::OnBnClickedSignUp()
+{
+	// TODO: Add your control notification handler code here
+	AfxMessageBox(_T("Lỗi"));
+
+}
+
+
+void CSignUpLogInDlg::OnBnClickedLogIn()
+{
+	// TODO: Add your control notification handler code here
+	CPublicChatDialog dialog(nullptr, CString("ABC"));
+	auto a = dialog.DoModal();
+	if (a == IDOK) {
+		
+	}
+}

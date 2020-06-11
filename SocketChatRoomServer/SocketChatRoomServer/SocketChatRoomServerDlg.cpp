@@ -15,35 +15,35 @@
 
 // CAboutDlg dialog used for App About
 
-class CAboutDlg : public CDialogEx
-{
-public:
-	CAboutDlg();
-
-// Dialog Data
-#ifdef AFX_DESIGN_TIME
-	enum { IDD = IDD_ABOUTBOX };
-#endif
-
-	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-
-// Implementation
-protected:
-	DECLARE_MESSAGE_MAP()
-};
-
-CAboutDlg::CAboutDlg() : CDialogEx(IDD_ABOUTBOX)
-{
-}
-
-void CAboutDlg::DoDataExchange(CDataExchange* pDX)
-{
-	CDialogEx::DoDataExchange(pDX);
-}
-
-BEGIN_MESSAGE_MAP(CAboutDlg, CDialogEx)
-END_MESSAGE_MAP()
+//class CAboutDlg : public CDialogEx
+//{
+//public:
+//	CAboutDlg();
+//
+//// Dialog Data
+//#ifdef AFX_DESIGN_TIME
+//	enum { IDD = IDD_ABOUTBOX };
+//#endif
+//
+//	protected:
+//	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+//
+//// Implementation
+//protected:
+//	DECLARE_MESSAGE_MAP()
+//};
+//
+//CAboutDlg::CAboutDlg() : CDialogEx(IDD_ABOUTBOX)
+//{
+//}
+//
+//void CAboutDlg::DoDataExchange(CDataExchange* pDX)
+//{
+//	CDialogEx::DoDataExchange(pDX);
+//}
+//
+//BEGIN_MESSAGE_MAP(CAboutDlg, CDialogEx)
+//END_MESSAGE_MAP()
 
 
 // CSocketChatRoomServerDlg dialog
@@ -59,12 +59,15 @@ CSocketChatRoomServerDlg::CSocketChatRoomServerDlg(CWnd* pParent /*=nullptr*/)
 void CSocketChatRoomServerDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
+	DDX_Control(pDX, IDC_BUTTON1, mBTNSWITCH);
+	DDX_Control(pDX, IDC_LIST1, mListBox);
 }
 
 BEGIN_MESSAGE_MAP(CSocketChatRoomServerDlg, CDialogEx)
 	ON_WM_SYSCOMMAND()
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
+	ON_BN_CLICKED(IDC_BUTTON1, &CSocketChatRoomServerDlg::OnBnClickedSwitch)
 END_MESSAGE_MAP()
 
 
@@ -101,6 +104,8 @@ BOOL CSocketChatRoomServerDlg::OnInitDialog()
 
 	// TODO: Add extra initialization here
 
+	mListBox.AddString(_T("ABC"));
+
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }
 
@@ -108,8 +113,8 @@ void CSocketChatRoomServerDlg::OnSysCommand(UINT nID, LPARAM lParam)
 {
 	if ((nID & 0xFFF0) == IDM_ABOUTBOX)
 	{
-		CAboutDlg dlgAbout;
-		dlgAbout.DoModal();
+		/*CAboutDlg dlgAbout;
+		dlgAbout.DoModal();*/
 	}
 	else
 	{
@@ -153,3 +158,13 @@ HCURSOR CSocketChatRoomServerDlg::OnQueryDragIcon()
 	return static_cast<HCURSOR>(m_hIcon);
 }
 
+
+
+void CSocketChatRoomServerDlg::OnBnClickedSwitch()
+{
+	// TODO: Add your control notification handler code here
+
+	mBTNSWITCH.SetWindowTextW(_T("TURN OFF"));
+	
+	
+}

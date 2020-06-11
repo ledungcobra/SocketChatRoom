@@ -6,11 +6,11 @@
 
 
 // CSocketChatRoomClientDlg dialog
-class CSocketChatRoomClientDlg : public CDialogEx
+class CSignUpLogInDlg : public CDialogEx
 {
 // Construction
 public:
-	CSocketChatRoomClientDlg(CWnd* pParent = nullptr);	// standard constructor
+	CSignUpLogInDlg(CWnd* pParent = nullptr);	// standard constructor
 
 // Dialog Data
 #ifdef AFX_DESIGN_TIME
@@ -31,4 +31,7 @@ protected:
 	afx_msg void OnPaint();
 	afx_msg HCURSOR OnQueryDragIcon();
 	DECLARE_MESSAGE_MAP()
+public:
+	afx_msg void OnBnClickedSignUp();
+	afx_msg void OnBnClickedLogIn();
 };

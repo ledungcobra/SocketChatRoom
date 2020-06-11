@@ -5,7 +5,7 @@
 #include "pch.h"
 #include "framework.h"
 #include "SocketChatRoomClient.h"
-#include "SocketChatRoomClientDlg.h"
+#include "CSignUpLogInDlg.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -40,6 +40,11 @@ CSocketChatRoomClientApp theApp;
 
 BOOL CSocketChatRoomClientApp::InitInstance()
 {
+
+#ifdef _DEBUG
+	if (!AllocConsole())
+		AfxMessageBox(_T("Failed to create the console!"), MB_ICONEXCLAMATION);
+#endif
 	// InitCommonControlsEx() is required on Windows XP if an application
 	// manifest specifies use of ComCtl32.dll version 6 or later to enable
 	// visual styles.  Otherwise, any window creation will fail.
@@ -71,7 +76,7 @@ BOOL CSocketChatRoomClientApp::InitInstance()
 	// such as the name of your company or organization
 	SetRegistryKey(_T("Local AppWizard-Generated Applications"));
 
-	CSocketChatRoomClientDlg dlg;
+	CSignUpLogInDlg dlg;
 	m_pMainWnd = &dlg;
 	INT_PTR nResponse = dlg.DoModal();
 	if (nResponse == IDOK)
