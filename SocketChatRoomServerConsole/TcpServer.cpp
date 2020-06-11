@@ -60,6 +60,7 @@ TcpServer::~TcpServer() // destructor
 	}
 
 	WSACleanup();
+	getchar();
 
 
 }
