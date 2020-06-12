@@ -183,6 +183,7 @@
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="ClientSocket.h" />
     <ClInclude Include="CPublicChatDialog.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="pch.h" />
@@ -190,8 +191,10 @@
     <ClInclude Include="SocketChatRoomClient.h" />
     <ClInclude Include="CSignUpLogInDlg.h" />
     <ClInclude Include="targetver.h" />
+    <ClInclude Include="User.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="ClientSocket.cpp" />
     <ClCompile Include="CPublicChatDialog.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -201,6 +204,7 @@
     </ClCompile>
     <ClCompile Include="SocketChatRoomClient.cpp" />
     <ClCompile Include="CSignUpLogInDlg.cpp" />
+    <ClCompile Include="User.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="SocketChatRoomClient.rc" />

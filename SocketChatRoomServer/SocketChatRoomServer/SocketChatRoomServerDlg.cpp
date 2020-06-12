@@ -61,6 +61,7 @@ void CSocketChatRoomServerDlg::DoDataExchange(CDataExchange* pDX)
 	CDialogEx::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_BUTTON1, mBTNSWITCH);
 	DDX_Control(pDX, IDC_LIST1, mListBox);
+	DDX_Control(pDX, IDC_EDIT1, mEdtLog);
 }
 
 BEGIN_MESSAGE_MAP(CSocketChatRoomServerDlg, CDialogEx)
@@ -104,17 +105,26 @@ BOOL CSocketChatRoomServerDlg::OnInitDialog()
 
 	// TODO: Add extra initialization here
 
-	mListBox.AddString(_T("ABC"));
+	_server = new TcpServer("127.0.0.1", 54000, MessageReceived);
+
 
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }
 
 void CSocketChatRoomServerDlg::OnSysCommand(UINT nID, LPARAM lParam)
 {
-	if ((nID & 0xFFF0) == IDM_ABOUTBOX)
+	if ((nID & 0xFFF0) == SC_CLOSE)
 	{
-		/*CAboutDlg dlgAbout;
-		dlgAbout.DoModal();*/
+		auto i = AfxMessageBox(_T("Do you wanna disconnect to this server"),1,1);
+		if (i == IDOK) {
+			//
+			OnDestroy();
+			
+		}
+		else {
+			AfxMessageBox(_T("May chon cai chet "));
+		}
+		
 	}
 	else
 	{
@@ -163,7 +173,23 @@ HCURSOR CSocketChatRoomServerDlg::OnQueryDragIcon()
 void CSocketChatRoomServerDlg::OnBnClickedSwitch()
 {
 	// TODO: Add your control notification handler code here
+	if (_isRunning == false) {
+		if (_server->Init()) {
 
+			_server->Run();
+			_isRunning = true;
+			CString currentText;
+			mEdtLog.GetWindowTextW(currentText);
+			currentText += "\r\nServer is running";
+
+		}
+		
+	}
+	else {
+
+
+	}
+	
 	mBTNSWITCH.SetWindowTextW(_T("TURN OFF"));
 	
 	
