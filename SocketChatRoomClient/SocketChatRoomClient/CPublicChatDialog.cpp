@@ -31,6 +31,8 @@ void CPublicChatDialog::DoDataExchange(CDataExchange* pDX)
 }
 
 
+
+
 BOOL CPublicChatDialog::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();

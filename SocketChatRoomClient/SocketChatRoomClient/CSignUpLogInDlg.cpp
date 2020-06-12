@@ -176,9 +176,15 @@ void CSignUpLogInDlg::OnBnClickedLogIn()
 
 	
 	// TODO: Add your control notification handler code here
-	CPublicChatDialog dialog(nullptr, CString("ABC"));
-	EndDialog(IDOK);
-	auto a = dialog.DoModal();
+	//CPublicChatDialog dialog(nullptr, CString("ABC"));
+
+	//TEST
+	//EndDialog(IDOK);
+	CDialog dialog;
+
+	dialog.Create(IDD_PUBLIC_CHAT);
+	dialog.ShowWindow(SW_SHOWNORMAL);
+	
 
 	
 }

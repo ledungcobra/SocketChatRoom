@@ -32,4 +32,5 @@ public:
 	afx_msg void OnLbnSelchangePublicChat();
 
 	CListBox mActiveUsersList;
+
 };
