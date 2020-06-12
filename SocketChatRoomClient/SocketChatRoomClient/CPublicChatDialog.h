@@ -21,7 +21,7 @@ protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 
 	DECLARE_MESSAGE_MAP()
-	virtual void OnDestroy();
+
 	BOOL CPublicChatDialog::OnInitDialog();
 private :
 	CString _username;
@@ -31,5 +31,5 @@ public:
 	
 	afx_msg void OnLbnSelchangePublicChat();
 
-	CListBox mActiveUsersList2;
+	CListBox mActiveUsersList;
 };

@@ -173,10 +173,13 @@ void CSignUpLogInDlg::OnBnClickedSignUp()
 
 void CSignUpLogInDlg::OnBnClickedLogIn()
 {
+
+	
 	// TODO: Add your control notification handler code here
 	CPublicChatDialog dialog(nullptr, CString("ABC"));
+	EndDialog(IDOK);
 	auto a = dialog.DoModal();
-	if (a == IDOK) {
-		
-	}
+
+	
 }
+

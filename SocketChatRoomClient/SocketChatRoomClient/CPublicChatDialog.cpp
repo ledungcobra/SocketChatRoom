@@ -27,31 +27,27 @@ void CPublicChatDialog::DoDataExchange(CDataExchange* pDX)
 	CDialogEx::DoDataExchange(pDX);
 
 
-	DDX_Control(pDX, IDD_LIST2, mActiveUsersList2);
+	DDX_Control(pDX, IDD_LIST2, mActiveUsersList);
 }
 
-void CPublicChatDialog::OnDestroy()
-{
-	_cwprintf(_T("avcxasdasd"));
-}
 
 BOOL CPublicChatDialog::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
-	mActiveUsersList2.AddString(_T("1"));
-	mActiveUsersList2.AddString(_T("2dasjkhdjkasdhajksdh"));
-	mActiveUsersList2.AddString(_T("3dasjkhdjkasdhajksdh"));
-	mActiveUsersList2.AddString(_T("4dasjkhdjkasdhajksdh"));
-	mActiveUsersList2.AddString(_T("5dasjkhdjkasdhajksdh"));
-	mActiveUsersList2.AddString(_T("6dasjkhdjkasdhajksdh"));
-	mActiveUsersList2.AddString(_T("7321312"));
-	mActiveUsersList2.AddString(_T("8qeqwe1314524"));
-	mActiveUsersList2.AddString(_T("9qeqeqwe"));
-	mActiveUsersList2.AddString(_T("10eewewew"));
-	mActiveUsersList2.AddString(_T("11qewew"));
-	mActiveUsersList2.AddString(_T("12aaa"));
-	mActiveUsersList2.AddString(_T("13aaa"));
-	mActiveUsersList2.AddString(_T("15aaa"));
+	mActiveUsersList.AddString(_T("1"));
+	mActiveUsersList.AddString(_T("2dasjkhdjkasdhajksdh"));
+	mActiveUsersList.AddString(_T("3dasjkhdjkasdhajksdh"));
+	mActiveUsersList.AddString(_T("4dasjkhdjkasdhajksdh"));
+	mActiveUsersList.AddString(_T("5dasjkhdjkasdhajksdh"));
+	mActiveUsersList.AddString(_T("6dasjkhdjkasdhajksdh"));
+	mActiveUsersList.AddString(_T("7321312"));
+	mActiveUsersList.AddString(_T("8qeqwe1314524"));
+	mActiveUsersList.AddString(_T("9qeqeqwe"));
+	mActiveUsersList.AddString(_T("10eewewew"));
+	mActiveUsersList.AddString(_T("11qewew"));
+	mActiveUsersList.AddString(_T("12aaa"));
+	mActiveUsersList.AddString(_T("13aaa"));
+	mActiveUsersList.AddString(_T("15aaa"));
 	return 0; 
 }
 
