@@ -79,6 +79,10 @@ BOOL CSocketChatRoomServerDlg::OnInitDialog()
 	CDialogEx::OnInitDialog();
 
 	// Add "About..." menu item to system menu.
+#ifdef _DEBUG
+	if (!AllocConsole())
+		AfxMessageBox(_T("Failed to create the console!"), MB_ICONEXCLAMATION);
+#endif
 
 	// IDM_ABOUTBOX must be in the system command range.
 	ASSERT((IDM_ABOUTBOX & 0xFFF0) == IDM_ABOUTBOX);

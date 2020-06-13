@@ -4,6 +4,8 @@
 #include <string>
 #include <sstream>
 #include <thread>
+#include <vector>
+#include <map>
 #pragma comment (lib,"ws2_32.lib")
 
 class TcpServer;

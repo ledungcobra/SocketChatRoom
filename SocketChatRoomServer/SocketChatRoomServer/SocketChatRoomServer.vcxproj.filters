@@ -39,6 +39,12 @@
     <ClInclude Include="TcpServer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="FlagServerToClient.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FlagClientToServer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="SocketChatRoomServer.cpp">
@@ -54,6 +60,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="TcpServer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FlagServerToClient.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FlagClientToServer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
