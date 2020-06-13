@@ -291,8 +291,11 @@ void TcpServer::SendPacketRaw(SOCKET clientSocket, std::string packet)
 
 bool TcpServer::AnalyzeAndProcess(SOCKET clientSocket, std::string packet)
 {
-
-	int pos = packet.find('\0');
+	if (packet.empty() == true || packet[0] == '\r')
+	{
+		return true;
+	}
+	int pos = packet.find('\r');
 	std::string flag_head_str = packet.substr(0,pos);
 	int flag_num = stoi(flag_head_str);
 	FlagClientToServer flag = static_cast<FlagClientToServer>(flag_num);
