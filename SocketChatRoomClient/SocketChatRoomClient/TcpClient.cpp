@@ -56,7 +56,7 @@ bool TcpClient::AnalyzeAndProcess(std::string packet)
 		return true;
 	}
 	//TODO:
-	int pos = packet.find('\r');
+	int pos = packet.find('\0');
 	std::string flag_head_str = packet.substr(0, pos);
 	int flag_num = stoi(flag_head_str);
 	FlagServerToClient flag = static_cast<FlagServerToClient>(flag_num);
@@ -65,14 +65,11 @@ bool TcpClient::AnalyzeAndProcess(std::string packet)
 	switch (flag)
 	{
 	case FlagServerToClient::Send_Active_User:
-		_cwprintf(L"da nhan sign up");
-		SendPacketRaw( packet_send);
+
 		break;
 
 	case FlagServerToClient::Fail_Sign_Up:
-		_cwprintf(L"da nhan login ");
-		packet_send = "Hello there 2";
-		SendPacketRaw(packet_send);
+
 		break;
 
 	case FlagServerToClient::Fail_Login:
@@ -89,9 +86,11 @@ bool TcpClient::AnalyzeAndProcess(std::string packet)
 		break;
 
 	case FlagServerToClient::Send_File_Desc:
+
 		break;
 
 	case FlagServerToClient::Send_File_Content:
+
 		break;
 
 	}
@@ -171,6 +170,19 @@ void TcpClient::Run()
 		AfxBeginThread(ReceiveThreadFunc, this);
 	}
 	
+}
+
+std::vector<std::string> stringTokenizer(std::string input, char delim)
+{
+	std::vector <std::string> tokens;
+	std::stringstream check(input);
+	std::string intermediate;
+
+	while (getline(check, intermediate, delim))
+	{
+		tokens.push_back(intermediate);
+	}
+	return tokens;
 }
 
 

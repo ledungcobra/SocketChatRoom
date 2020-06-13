@@ -1,5 +1,6 @@
 ﻿#define _WIN32_WINNT _WIN32_WINNT_WIN10
 #include <iostream>
+#include <fstream>
 #include <WS2tcpip.h>
 #include <string>
 #include <sstream>
@@ -61,12 +62,10 @@
 class TcpServer
 {
 private:
-	std::vector<std::map<int, std::string>> _listUser; // Lưu đang on
+	std::vector<std::map<SOCKET, std::string>> _listUser; // Lưu đang on
 	int _port ;
 	std::string _ipAddress;
 	sockaddr_in _hint;
-	
-
 
 public:
 	//TODO:
@@ -81,6 +80,9 @@ public:
 	std::string ReceivePacket(SOCKET clientSocket);
 	bool Listen(); // Gọi receivePacket
 	void CloseServer();
-	bool IsValidUser(std::string username,std::string password); //TODO: shibe làm
+	bool IsExists(std::string username,std::string password); //TODO: shibe làm
 	void Run(); // Goị listen
+	void WriteUserInfo(std::string username, std::string password);
 };
+
+std::vector<std::string> stringTokenizer(std::string input, char delim);

@@ -42,3 +42,4 @@ private:
 
 };
 
+std::vector<std::string> stringTokenizer(std::string input, char delim);

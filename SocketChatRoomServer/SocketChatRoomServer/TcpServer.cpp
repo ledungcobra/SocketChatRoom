@@ -300,15 +300,47 @@ bool TcpServer::AnalyzeAndProcess(SOCKET clientSocket, std::string packet)
 	int flag_num = stoi(flag_head_str);
 	FlagClientToServer flag = static_cast<FlagClientToServer>(flag_num);
 
+	// biến tạm thời 
+
+
 	std::string packet_send = "Hello there"; // TODO:Dùng chung
 	switch (flag)
 	{
 	case FlagClientToServer::SignUp:
-		break;
+	{
+		std::vector<std::string> info;
+		info = stringTokenizer(packet,'\0');
+		if (IsExists(info[2], info[3]))
+		{
+			std::string backMess = std::to_string(static_cast<int>(FlagServerToClient::Fail_Sign_Up)) + '\0';
+			this->SendPacketRaw(clientSocket, backMess);
+		}
+		else
+		{
 
+			std::string backMess = std::to_string(static_cast<int>(FlagServerToClient::SignUp_Success)) + '\0';
+			this->SendPacketRaw(clientSocket, backMess);
+		}
+	}
+		break;
 	case FlagClientToServer::Login:
-		break;
+	{
+		std::vector<std::string> info;
+		info = stringTokenizer(packet, '\0');
+		if (IsExists(info[2], info[3]))
+		{
+			WriteUserInfo(info[2], info[3]);
+			std::string backMess = std::to_string(static_cast<int>(FlagServerToClient::Login_Success)) + '\0';
+			this->SendPacketRaw(clientSocket, backMess);
+		}
+		else
+		{
+			std::string backMess = std::to_string(static_cast<int>(FlagServerToClient::Fail_Login)) + '\0';
+			this->SendPacketRaw(clientSocket, backMess);
+		}
+	}
 
+	break;
 	case FlagClientToServer::LogOut:
 
 		break;
@@ -378,9 +410,28 @@ void TcpServer::CloseServer()
 	WSACleanup();
 }
 
-bool TcpServer::IsValidUser(std::string username, std::string password)
+bool TcpServer::IsExists(std::string username, std::string password)
 {
-
+	std::fstream file("data.bin", std::ios::in | std::ios::out);
+	std::vector<std::string> usersInfo;
+	if (file.is_open())
+	{
+		while (!file.eof())
+		{
+			char buffer[1000];
+			memset(buffer, 0, 1000);
+			file.getline(buffer, 1000);
+			std::string info(buffer);
+			usersInfo = stringTokenizer(info, ';');
+			if (usersInfo[0] == username && usersInfo[1] == password)
+			{
+				file.close();
+				return true;
+			}
+			usersInfo.clear();
+		}
+	}
+	file.close();
 	return false;
 }
 UINT ReceiveAndSend(LPVOID params) {
@@ -422,5 +473,27 @@ void TcpServer::Run()
 	AfxBeginThread(ListeningThreadFunc,this);
 }
 
+void TcpServer::WriteUserInfo(std::string username, std::string password)
+{
+	std::fstream file("data.bin", std::ios::in | std::ios::out);
+	if (file.is_open())
+	{
+		file << username << ";" << password << "\n";
+		file.close();
+	}
+}
+
+std::vector<std::string> stringTokenizer(std::string input, char delim)
+{
+	std::vector <std::string> tokens;
+	std::stringstream check(input);
+	std::string intermediate;
+
+	while (getline(check, intermediate, delim))
+	{
+		tokens.push_back(intermediate);
+	}
+	return tokens;
+}
 
 
