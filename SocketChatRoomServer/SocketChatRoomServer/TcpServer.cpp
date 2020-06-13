@@ -420,6 +420,7 @@ UINT ListeningThreadFunc(LPVOID param) {
 
 void TcpServer::Run()
 {
+	_isRunning = true;
 	AfxBeginThread(ListeningThreadFunc,this);
 }
 

@@ -109,8 +109,8 @@ BOOL CSocketChatRoomServerDlg::OnInitDialog()
 
 	// TODO: Add extra initialization here
 
-	//_server = new TcpServer("127.0.0.1", 54000, MessageReceived);
-
+	_server = new TcpServer();
+	_server->Run();
 
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }

@@ -36,14 +36,14 @@
     <ClInclude Include="User.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="TcpServer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="FlagServerToClient.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="FlagClientToServer.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TcpServer.h">
+      <Filter>Resource Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
