@@ -286,16 +286,72 @@ SOCKET TcpServer::CreateSocket()
 
 void TcpServer::SendPacketRaw(SOCKET clientSocket, std::string packet)
 {
+	send(clientSocket, packet.c_str(), (int)(packet.size() + 1), 0);
 }
 
-bool TcpServer::AnalyzeAndProcess(std::string packet)
+bool TcpServer::AnalyzeAndProcess(SOCKET clientSocket, std::string packet)
 {
+
+	int pos = packet.find('\0');
+	std::string flag_head_str = packet.substr(0,pos);
+	int flag_num = stoi(flag_head_str);
+	FlagClientToServer flag = static_cast<FlagClientToServer>(flag_num);
+
+	std::string packet_send = "Hello there"; // TODO:Dùng chung
+	switch (flag)
+	{
+	case FlagClientToServer::SignUp:
+		_cwprintf(L"da nhan sign up");
+		SendPacketRaw(clientSocket, packet_send);
+		break;
+
+	case FlagClientToServer::Login:
+		_cwprintf(L"da nhan login ");
+		packet_send = "Hello there 2";
+		SendPacketRaw(clientSocket, packet_send);
+		break;
+
+	case FlagClientToServer::LogOut:
+
+		break;
+
+	case FlagClientToServer::Disconnect_To_Server:
+
+		return false;
+		break;
+
+	case FlagClientToServer::Download_Request:
+
+		break;
+
+	case FlagClientToServer::PrivateChat:
+		break;
+
+	case FlagClientToServer::PublicChat:
+		break;
+
+	case FlagClientToServer::Send_File_Descriptor:
+		break;
+
+	case FlagClientToServer::Send_Content:
+		break;
+	}
+
 	return true;
 }
 
 std::string TcpServer::ReceivePacket(SOCKET clientSocket)
 {
-	return std::string();
+	//Tạo buffer
+	char* buffer = new char[6144];
+	//char buffer[6144]; //Tĩnh
+	ZeroMemory(buffer, 6144);
+	
+	//nhận tin nhắn
+	int bytesin = recv(clientSocket , buffer, 6144, 0);
+	std::string packet = std::string(buffer, bytesin);
+	delete[] buffer;
+	return packet;
 }
 
 bool TcpServer::Listen()
@@ -320,6 +376,14 @@ struct Param {
 
 void TcpServer::CloseServer()
 {
+	closesocket(this->_listeningSocket);
+	WSACleanup();
+}
+
+bool TcpServer::IsValidUser(std::string username, std::string password)
+{
+
+	return false;
 }
 UINT ReceiveAndSend(LPVOID params) {
 	Param* p = (Param*)params;
@@ -328,7 +392,7 @@ UINT ReceiveAndSend(LPVOID params) {
 		while (isConnect) {
 			
 			std::string packet = p->tcpServer->ReceivePacket(p->clientSocket);
-			isConnect = p->tcpServer->AnalyzeAndProcess(packet);
+			isConnect = p->tcpServer->AnalyzeAndProcess(p->clientSocket,packet);
 
 		}
 

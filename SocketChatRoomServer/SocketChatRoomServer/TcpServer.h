@@ -6,6 +6,8 @@
 #include <thread>
 #include <vector>
 #include <map>
+#include "FlagClientToServer.h"
+#include "FlagServerToClient.h"
 #pragma comment (lib,"ws2_32.lib")
 
 
@@ -60,7 +62,6 @@ class TcpServer
 {
 private:
 	std::vector<std::map<int, std::string>> _listUser; // Lưu đang on
-	
 	int _port ;
 	std::string _ipAddress;
 	sockaddr_in _hint;
@@ -76,10 +77,10 @@ public:
 	SOCKET CreateSocket(); //Tạo socket nghe
 	void SendPacketRaw(SOCKET clientSocket, std::string packet );
 	//TODO: Analyze gọi SendPacketRaw
-	bool AnalyzeAndProcess(std::string packet);
+	bool AnalyzeAndProcess(SOCKET clientSocket,std::string packet);
 	std::string ReceivePacket(SOCKET clientSocket);
 	bool Listen(); // Gọi receivePacket
 	void CloseServer();
-	bool IsValidUser(std::string username,std::string password);
+	bool IsValidUser(std::string username,std::string password); //TODO: shibe làm
 	void Run(); // Goị listen
 };
