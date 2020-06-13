@@ -304,14 +304,9 @@ bool TcpServer::AnalyzeAndProcess(SOCKET clientSocket, std::string packet)
 	switch (flag)
 	{
 	case FlagClientToServer::SignUp:
-		_cwprintf(L"da nhan sign up");
-		SendPacketRaw(clientSocket, packet_send);
 		break;
 
 	case FlagClientToServer::Login:
-		_cwprintf(L"da nhan login ");
-		packet_send = "Hello there 2";
-		SendPacketRaw(clientSocket, packet_send);
 		break;
 
 	case FlagClientToServer::LogOut:
