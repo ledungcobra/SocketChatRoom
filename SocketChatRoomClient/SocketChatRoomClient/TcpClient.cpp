@@ -1,6 +1,6 @@
 ﻿#include "pch.h"
 #include "TcpClient.h"
-
+TcpClient* TcpClient::_instance = NULL;
 TcpClient::TcpClient()
 {
 	this->_isActive = false;
@@ -127,4 +127,17 @@ void TcpClient::CloseConnection() // Close dùng trong analyze
 {
 	closesocket(this->_clientSocket);
 	WSACleanup();
+}
+
+TcpClient* TcpClient::GetInstance()
+{
+	if (_instance == NULL) {
+		_lock.acquire();
+		if (_instance == NULL) {
+			_instance = new TcpClient();
+		}
+		_lock.release();
+
+	}
+	return _instance;
 }

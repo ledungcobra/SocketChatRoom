@@ -8,7 +8,12 @@
 #include <map>
 #include "FlagClientToServer.h"
 #include "FlagServerToClient.h"
+#include "Lock.h"
 #pragma comment (lib,"ws2_32.lib")
+
+
+static Lock _lock;
+
 class TcpClient
 {
 private:
@@ -16,8 +21,10 @@ private:
 	std::string _serverIpaddress;
 	sockaddr_in _hint;
 public:
+	//TODO:
 	bool _isActive;
-	SOCKET _clientSocket;
+	bool _isRunning;
+	SOCKET _serverSocket;
 	TcpClient();
 	SOCKET CreateSocket();
 	void SendPacketRaw(SOCKET serverSocket, std::string packet);
@@ -25,5 +32,12 @@ public:
 	std::string ReceivePacket(SOCKET serverSocket);
 	bool Connect();
 	void CloseConnection();
+
+    static TcpClient *GetInstance();
+	void Run();
+private:
+    static TcpClient* _instance;
+
+
 };
 
