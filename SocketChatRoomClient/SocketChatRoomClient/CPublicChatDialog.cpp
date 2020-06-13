@@ -5,6 +5,8 @@
 #include "SocketChatRoomClient.h"
 #include "CPublicChatDialog.h"
 #include "afxdialogex.h"
+#include "TcpClient.h"
+#include "ConvertString.h"
 
 
 // CPublicChatDialog dialog
@@ -28,6 +30,7 @@ void CPublicChatDialog::DoDataExchange(CDataExchange* pDX)
 
 
 	DDX_Control(pDX, IDD_LIST2, mActiveUsersList);
+	DDX_Control(pDX, IDC_EDIT1, mEdtChat);
 }
 
 
@@ -36,26 +39,15 @@ void CPublicChatDialog::DoDataExchange(CDataExchange* pDX)
 BOOL CPublicChatDialog::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
-	mActiveUsersList.AddString(_T("1"));
-	mActiveUsersList.AddString(_T("2dasjkhdjkasdhajksdh"));
-	mActiveUsersList.AddString(_T("3dasjkhdjkasdhajksdh"));
-	mActiveUsersList.AddString(_T("4dasjkhdjkasdhajksdh"));
-	mActiveUsersList.AddString(_T("5dasjkhdjkasdhajksdh"));
-	mActiveUsersList.AddString(_T("6dasjkhdjkasdhajksdh"));
-	mActiveUsersList.AddString(_T("7321312"));
-	mActiveUsersList.AddString(_T("8qeqwe1314524"));
-	mActiveUsersList.AddString(_T("9qeqeqwe"));
-	mActiveUsersList.AddString(_T("10eewewew"));
-	mActiveUsersList.AddString(_T("11qewew"));
-	mActiveUsersList.AddString(_T("12aaa"));
-	mActiveUsersList.AddString(_T("13aaa"));
-	mActiveUsersList.AddString(_T("15aaa"));
+
+	
 	return 0; 
 }
 
 
 BEGIN_MESSAGE_MAP(CPublicChatDialog, CDialogEx)
 	ON_LBN_SELCHANGE(IDD_PUBLIC_CHAT, &CPublicChatDialog::OnLbnSelchangePublicChat)
+	ON_BN_CLICKED(IDC_BUTTON1, &CPublicChatDialog::OnBnClickedSend)
 END_MESSAGE_MAP()
 
 
@@ -65,4 +57,14 @@ END_MESSAGE_MAP()
 void CPublicChatDialog::OnLbnSelchangePublicChat()
 {
 	// TODO: Add your control notification handler code here
+}
+
+
+void CPublicChatDialog::OnBnClickedSend()
+{
+	CString message;
+	mEdtChat.GetWindowTextW(message);
+	TcpClient::GetInstance()->SendPacketRaw(ConvertString::ConvertCStringToString(message));
+
+
 }

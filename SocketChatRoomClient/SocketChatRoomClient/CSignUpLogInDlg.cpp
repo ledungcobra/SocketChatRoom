@@ -12,6 +12,7 @@
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
+#include "TcpClient.h"
 
 
 // CAboutDlg dialog used for App About
@@ -106,7 +107,7 @@ BOOL CSignUpLogInDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// Set small icon
 
 	// TODO: Add extra initialization here
-
+	TcpClient::GetInstance()->Run();
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }
 

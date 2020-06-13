@@ -33,4 +33,6 @@ public:
 
 	CListBox mActiveUsersList;
 
+	CEdit mEdtChat;
+	afx_msg void OnBnClickedSend();
 };

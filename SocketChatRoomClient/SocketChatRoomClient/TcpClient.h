@@ -1,4 +1,4 @@
-#define _WIN32_WINNT _WIN32_WINNT_WIN10
+﻿#define _WIN32_WINNT _WIN32_WINNT_WIN10
 #include <iostream>
 #include <WS2tcpip.h>
 #include <string>
@@ -27,9 +27,10 @@ public:
 	SOCKET _serverSocket;
 	TcpClient();
 	SOCKET CreateSocket();
-	void SendPacketRaw(SOCKET serverSocket, std::string packet);
-	bool AnalyzeAndProcess(SOCKET serverSocket, std::string packet);
-	std::string ReceivePacket(SOCKET serverSocket);
+	void SendPacketRaw( std::string packet);
+	//TODO: Thay đổi _isRunning nếu ngắt kết nối
+	bool AnalyzeAndProcess( std::string packet);
+	std::string ReceivePacket();
 	bool Connect();
 	void CloseConnection();
 
