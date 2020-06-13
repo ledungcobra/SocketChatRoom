@@ -109,7 +109,7 @@ BOOL CSocketChatRoomServerDlg::OnInitDialog()
 
 	// TODO: Add extra initialization here
 
-	_server = new TcpServer("127.0.0.1", 54000, MessageReceived);
+	//_server = new TcpServer("127.0.0.1", 54000, MessageReceived);
 
 
 	return TRUE;  // return TRUE  unless you set the focus to a control
@@ -177,7 +177,7 @@ HCURSOR CSocketChatRoomServerDlg::OnQueryDragIcon()
 void CSocketChatRoomServerDlg::OnBnClickedSwitch()
 {
 	// TODO: Add your control notification handler code here
-	if (_isRunning == false) {
+	/*if (_isRunning == false) {
 		if (_server->Init()) {
 
 			_server->Run();
@@ -194,7 +194,7 @@ void CSocketChatRoomServerDlg::OnBnClickedSwitch()
 
 	}
 	
-	mBTNSWITCH.SetWindowTextW(_T("TURN OFF"));
+	mBTNSWITCH.SetWindowTextW(_T("TURN OFF"));*/
 	
 	
 }

@@ -288,8 +288,9 @@ void TcpServer::SendPacketRaw(SOCKET clientSocket, std::string packet)
 {
 }
 
-void TcpServer::AnalyzeAndProcess(std::string packet)
+bool TcpServer::AnalyzeAndProcess(std::string packet)
 {
+	return true;
 }
 
 std::string TcpServer::ReceivePacket(SOCKET clientSocket)
@@ -312,11 +313,51 @@ bool TcpServer::Listen()
 
 }
 
+struct Param {
+	SOCKET clientSocket;
+	TcpServer* tcpServer;
+};
+
 void TcpServer::CloseServer()
 {
+}
+UINT ReceiveAndSend(LPVOID params) {
+	Param* p = (Param*)params;
+	bool isConnect = true;
+	if (p != NULL) {
+		while (isConnect) {
+			
+			std::string packet = p->tcpServer->ReceivePacket(p->clientSocket);
+			isConnect = p->tcpServer->AnalyzeAndProcess(packet);
+
+		}
+
+	}
+	return 0;
+
+
+}
+UINT ListeningThreadFunc(LPVOID param) {
+	TcpServer* server = (TcpServer*)param;
+	while (server->_isRunning) {
+		bool listen = server->Listen();
+
+		if (listen) {
+			SOCKET clientSock = accept(server->_listeningSocket, nullptr, nullptr);
+			Param* param = new Param;
+			param->tcpServer = server;
+			param->clientSocket = clientSock;
+
+			AfxBeginThread(ReceiveAndSend, param);//TODO:
+		}
+	}
+	return 0;
 }
 
 void TcpServer::Run()
 {
-	AfxBeginThread();
+	AfxBeginThread(ListeningThreadFunc,this);
 }
+
+
+

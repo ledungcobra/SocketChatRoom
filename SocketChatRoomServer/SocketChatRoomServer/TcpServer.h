@@ -60,19 +60,23 @@ class TcpServer
 {
 private:
 	std::vector<std::map<int, std::string>> _listUser; // Lưu đang on
-	SOCKET _listeningSocket;
+	
 	int _port ;
 	std::string _ipAddress;
 	sockaddr_in _hint;
-	bool _isRunning;
+	
 
 
 public:
+	//TODO:
+	SOCKET _listeningSocket;
+	bool _isRunning;
 	// Khởi tạo -> Run -> Listen -> receive -> analyzeAndProcess -> SendPacketRaw
 	TcpServer();
 	SOCKET CreateSocket(); //Tạo socket nghe
 	void SendPacketRaw(SOCKET clientSocket, std::string packet );
-	void AnalyzeAndProcess(std::string packet);
+	//TODO: Analyze gọi SendPacketRaw
+	bool AnalyzeAndProcess(std::string packet);
 	std::string ReceivePacket(SOCKET clientSocket);
 	bool Listen(); // Gọi receivePacket
 	void CloseServer();
