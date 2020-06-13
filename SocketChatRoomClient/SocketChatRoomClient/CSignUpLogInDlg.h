@@ -14,7 +14,7 @@ public:
 
 // Dialog Data
 #ifdef AFX_DESIGN_TIME
-	enum { IDD = IDD_SOCKETCHATROOMCLIENT_DIALOG };
+	enum { IDD = ID_LOGIN_SIGNUP_DIALOG	};
 #endif
 
 	protected:
@@ -34,4 +34,6 @@ protected:
 public:
 	afx_msg void OnBnClickedSignUp();
 	afx_msg void OnBnClickedLogIn();
+	CEdit mEdtUsername;
+	CEdit mEdtPassword;
 };

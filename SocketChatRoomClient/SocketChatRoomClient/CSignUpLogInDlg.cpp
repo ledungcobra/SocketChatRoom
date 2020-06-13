@@ -13,6 +13,7 @@
 #define new DEBUG_NEW
 #endif
 #include "TcpClient.h"
+#include "ConvertString.h"
 
 
 // CAboutDlg dialog used for App About
@@ -64,6 +65,8 @@ CSignUpLogInDlg::CSignUpLogInDlg(CWnd* pParent /*=nullptr*/)
 void CSignUpLogInDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
+	DDX_Control(pDX, IDC_EDIT1, mEdtUsername);
+	DDX_Control(pDX, IDC_EDIT2, mEdtPassword);
 }
 
 BEGIN_MESSAGE_MAP(CSignUpLogInDlg, CDialogEx)
@@ -166,8 +169,18 @@ HCURSOR CSignUpLogInDlg::OnQueryDragIcon()
 
 void CSignUpLogInDlg::OnBnClickedSignUp()
 {
-	// TODO: Add your control notification handler code here
-	AfxMessageBox(_T("Lỗi"));
+	// TODO:
+	std::string packet = "";
+	CString username;
+	CString password;
+	
+	mEdtUsername.GetWindowTextW(username);
+	mEdtPassword.GetWindowTextW(password);
+
+	packet += std::to_string(static_cast<int>(FlagClientToServer::SignUp)) + '\0' + ConvertString::ConvertCStringToString(username) + '\0' + ConvertString::ConvertCStringToString(password) + '\0';
+
+
+	TcpClient::GetInstance()->SendPacketRaw(packet);
 
 }
 
@@ -182,9 +195,20 @@ void CSignUpLogInDlg::OnBnClickedLogIn()
 	//TEST
 	//EndDialog(IDOK);
 	//dialog.ShowWindow(SW_NORMAL);
-	CPublicChatDialog*dialog = new CPublicChatDialog(nullptr,_T("ABC"));
-	dialog->Create(IDD_PUBLIC_CHAT);
-	dialog->ShowWindow(SW_SHOWNORMAL);
+	//CPublicChatDialog*dialog = new CPublicChatDialog(nullptr,_T("ABC"));
+	//dialog->Create(IDD_PUBLIC_CHAT);
+	//dialog->ShowWindow(SW_SHOWNORMAL);
+	std::string packet = "";
+	CString username;
+	CString password;
+
+	mEdtUsername.GetWindowTextW(username);
+	mEdtPassword.GetWindowTextW(password);
+
+	packet += std::to_string(static_cast<int>(FlagClientToServer::Login)) + '\0' + ConvertString::ConvertCStringToString(username) + '\0' + ConvertString::ConvertCStringToString(password) + '\0';
+
+
+	TcpClient::GetInstance()->SendPacketRaw(packet);
 	
 
 	

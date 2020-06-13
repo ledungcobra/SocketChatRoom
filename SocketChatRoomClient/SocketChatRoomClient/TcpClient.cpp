@@ -61,7 +61,7 @@ bool TcpClient::AnalyzeAndProcess(std::string packet)
 	int flag_num = stoi(flag_head_str);
 	FlagServerToClient flag = static_cast<FlagServerToClient>(flag_num);
 
-	std::string packet_send = "Hello there"; // TODO:Dùng chung
+	
 	switch (flag)
 	{
 	case FlagServerToClient::Send_Active_User:

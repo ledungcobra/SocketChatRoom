@@ -1,5 +1,6 @@
 ﻿#include "pch.h"
 #include "TcpServer.h"
+#include "ConvertString.h"
 //
 //SOCKET TcpServer::CreateSocket()
 //{
@@ -308,10 +309,13 @@ bool TcpServer::AnalyzeAndProcess(SOCKET clientSocket, std::string packet)
 	{
 	case FlagClientToServer::SignUp:
 	{
+		_cwprintf(ConvertString::ConvertStringToCString(packet));
 		std::vector<std::string> info;
 		info = stringTokenizer(packet,'\0');
-		if (IsExists(info[2], info[3]))
+		if (IsExists(info[1], info[2]))
 		{
+			//TODO:
+		
 			std::string backMess = std::to_string(static_cast<int>(FlagServerToClient::Fail_Sign_Up)) + '\0';
 			this->SendPacketRaw(clientSocket, backMess);
 		}
@@ -325,11 +329,13 @@ bool TcpServer::AnalyzeAndProcess(SOCKET clientSocket, std::string packet)
 		break;
 	case FlagClientToServer::Login:
 	{
+		//TODO:
+		_cwprintf(ConvertString::ConvertStringToCString(packet));
 		std::vector<std::string> info;
 		info = stringTokenizer(packet, '\0');
-		if (IsExists(info[2], info[3]))
+		if (IsExists(info[1], info[2]))
 		{
-			WriteUserInfo(info[2], info[3]);
+			WriteUserInfo(info[1], info[2]);
 			std::string backMess = std::to_string(static_cast<int>(FlagServerToClient::Login_Success)) + '\0';
 			this->SendPacketRaw(clientSocket, backMess);
 		}
