@@ -86,3 +86,4 @@ public:
 };
 
 std::vector<std::string> stringTokenizer(std::string input, char delim);
+std::istream& safeGetline(std::istream& is, std::string& t);

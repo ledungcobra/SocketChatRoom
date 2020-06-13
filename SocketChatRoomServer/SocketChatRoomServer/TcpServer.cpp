@@ -314,14 +314,12 @@ bool TcpServer::AnalyzeAndProcess(SOCKET clientSocket, std::string packet)
 		info = stringTokenizer(packet,'\0');
 		if (IsExists(info[1], info[2]))
 		{
-			//TODO:
-		
 			std::string backMess = std::to_string(static_cast<int>(FlagServerToClient::Fail_Sign_Up)) + '\0';
 			this->SendPacketRaw(clientSocket, backMess);
 		}
 		else
 		{
-
+			WriteUserInfo(info[1], info[2]);
 			std::string backMess = std::to_string(static_cast<int>(FlagServerToClient::SignUp_Success)) + '\0';
 			this->SendPacketRaw(clientSocket, backMess);
 		}
@@ -335,7 +333,6 @@ bool TcpServer::AnalyzeAndProcess(SOCKET clientSocket, std::string packet)
 		info = stringTokenizer(packet, '\0');
 		if (IsExists(info[1], info[2]))
 		{
-			WriteUserInfo(info[1], info[2]);
 			std::string backMess = std::to_string(static_cast<int>(FlagServerToClient::Login_Success)) + '\0';
 			this->SendPacketRaw(clientSocket, backMess);
 		}
@@ -418,24 +415,35 @@ void TcpServer::CloseServer()
 
 bool TcpServer::IsExists(std::string username, std::string password)
 {
-	std::fstream file("data.bin", std::ios::in | std::ios::out);
+	std::ifstream file;
+	file.open("data.bin", std::ifstream::binary);
 	std::vector<std::string> usersInfo;
 	if (file.is_open())
 	{
 		while (!file.eof())
 		{
-			char buffer[1000];
-			memset(buffer, 0, 1000);
-			file.getline(buffer, 1000);
-			std::string info(buffer);
-			usersInfo = stringTokenizer(info, ';');
-			if (usersInfo[0] == username && usersInfo[1] == password)
+			std::string buffer;
+			safeGetline(file, buffer);
+			usersInfo = stringTokenizer(buffer, ';');
+			if (!usersInfo.empty())
 			{
-				file.close();
-				return true;
+				if (usersInfo[0] == username && usersInfo[1] == password)
+				{
+					file.close();
+					return true;
+				}
+			}
+			else
+			{
+				return false;
 			}
 			usersInfo.clear();
 		}
+	}
+	else
+	{
+		std::ofstream file("data.bin", std::ofstream::binary);
+		file.close();
 	}
 	file.close();
 	return false;
@@ -481,10 +489,10 @@ void TcpServer::Run()
 
 void TcpServer::WriteUserInfo(std::string username, std::string password)
 {
-	std::fstream file("data.bin", std::ios::in | std::ios::out);
+	std::ofstream file("data.bin", std::ios::app);
 	if (file.is_open())
 	{
-		file << username << ";" << password << "\n";
+		file << username << ";" << password << std::endl;
 		file.close();
 	}
 }
@@ -503,3 +511,35 @@ std::vector<std::string> stringTokenizer(std::string input, char delim)
 }
 
 
+std::istream& safeGetline(std::istream& is, std::string& t)
+{
+	t.clear();
+
+	// The characters in the stream are read one-by-one using a std::streambuf.
+	// That is faster than reading them one-by-one using the std::istream.
+	// Code that uses streambuf this way must be guarded by a sentry object.
+	// The sentry object performs various tasks,
+	// such as thread synchronization and updating the stream state.
+
+	std::istream::sentry se(is, true);
+	std::streambuf* sb = is.rdbuf();
+
+	for (;;) {
+		int c = sb->sbumpc();
+		switch (c) {
+		case '\n':
+			return is;
+		case '\r':
+			if (sb->sgetc() == '\n')
+				sb->sbumpc();
+			return is;
+		case std::streambuf::traits_type::eof():
+			// Also handle the case when the last line has no line ending
+			if (t.empty())
+				is.setstate(std::ios::eofbit);
+			return is;
+		default:
+			t += (char)c;
+		}
+	}
+}
