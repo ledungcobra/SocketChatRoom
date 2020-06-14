@@ -333,16 +333,40 @@ bool TcpServer::AnalyzeAndProcess(SOCKET clientSocket, std::string packet)
 		_cwprintf(ConvertString::ConvertStringToCString(packet));
 		std::vector<std::string> info;
 		info = stringTokenizer(packet, '\0');
+
 		if (IsExists(info[1], info[2]))
 		{
-			std::string backMess = std::to_string(static_cast<int>(FlagServerToClient::Login_Success)) + '\0';
-			this->SendPacketRaw(clientSocket, backMess);
-			this->_listUser[clientSocket] = info[1] ;
-			this->UpdateUserList();
+			bool flag = 0; // đã có ai đăng nhập bằng tài khoản này chưa
 
-		
+			// kiểm tra xem tài khoản này đã có người đăng nhập trước đó
+			for (auto it = this->_listUser.begin(); it != this->_listUser.end(); ++it)
+				if (it->second == info[1])
+				{
+					std::string backMess = std::to_string(static_cast<int>(FlagServerToClient::Already_Login)) + '\0';
+					this->SendPacketRaw(clientSocket, backMess);
+					flag = 1; // đã có đăng nhập
+					break;
+				}
+
+			// tài khoản hợp lệ và không có ai dùng tài khoản này để đăng nhập trước đó
+
+			if (!flag)
+			{
+				std::string backMess = std::to_string(static_cast<int>(FlagServerToClient::Login_Success)) + '\0';
+				this->SendPacketRaw(clientSocket, backMess);
+				this->_listUser[clientSocket] = info[1];
+
+				std::string send_active_user = std::to_string(static_cast<int>(FlagServerToClient::Send_Active_User)) + '\0';
+				for (auto it = this->_listUser.begin(); it != this->_listUser.end(); it++)
+				{
+					send_active_user += it->second + '|';
+				}
+				send_active_user.pop_back();
+				send_active_user += '\0';
+				this->SendToAll(send_active_user);
+			}
 		}
-		else
+		else // không tồn tại tài khoản
 		{
 			std::string backMess = std::to_string(static_cast<int>(FlagServerToClient::Fail_Login)) + '\0';
 			this->SendPacketRaw(clientSocket, backMess);
@@ -364,7 +388,30 @@ bool TcpServer::AnalyzeAndProcess(SOCKET clientSocket, std::string packet)
 		break;
 
 	case FlagClientToServer::Download_Request:
+	{
+		_cwprintf(ConvertString::ConvertStringToCString(packet));
+		std::vector<std::string> info;
+		info = stringTokenizer(packet, '\0');
 
+		for (int i = 0; i < this->container.size(); i++)
+		{
+			std::vector<std::string> content = stringTokenizer((this->container[i]), '\0');
+			if (content[0] == info[1] && content[2] == info[2])
+			{
+				std::string backMess = std::to_string(static_cast<int>(FlagServerToClient::Send_File_Desc)) + '\0' + info[1] + '\0' + info[2] + '\0' + content[3] + '\0'; // sender + file name + content
+				SendPacketRaw(clientSocket, backMess);
+				if (content[1] == "ALL")
+				{
+
+				}
+				else
+				{
+					this->container.erase(this->container.begin() + i);
+				}
+				break;
+			}
+		}
+	}
 		break;
 
 	case FlagClientToServer::PrivateChat:
@@ -400,9 +447,108 @@ bool TcpServer::AnalyzeAndProcess(SOCKET clientSocket, std::string packet)
 		break;
 
 	case FlagClientToServer::Send_File_Descriptor:
+	{
+		_cwprintf(ConvertString::ConvertStringToCString(packet));
+		std::vector<std::string> info;
+		info = stringTokenizer(packet, '\0');
+
+		// lấy tên người gửi 
+
+		std::string sender;
+
+		for (auto it = this->_listUser.begin(); it != this->_listUser.end(); ++it)
+			if (it->first == clientSocket)
+			{
+				sender = it->second;
+				break;
+			}
+
+
+		// tách thông tin file
+
+		std::string backMess = std::to_string(static_cast<int>(FlagServerToClient::Send_File_Desc)) + '\0' + sender + '\0' + info[2] + '\0' + info[3] + '\0'; // sender + file name + filesize
+
+
+
+
+		// gửi thông tin của tin đi
+
+		if (info[1] == "ALL")
+		{
+			SendToAll(backMess);
+		}
+		else
+		{	
+			// lấy thông tin socket từ username
+
+			SOCKET receiver = NULL;
+
+			for (auto it = this->_listUser.begin(); it != this->_listUser.end(); ++it)
+				if (it->second == info[1])
+				{
+					receiver = it->first;
+					break;
+				}
+
+			if (receiver)
+			{
+				SendPacketRaw(receiver, backMess);
+			}
+
+		}
+	}
 		break;
 
 	case FlagClientToServer::Send_Content:
+	{
+		// tách thông tin file
+		_cwprintf(ConvertString::ConvertStringToCString(packet));
+		std::vector<std::string> info;
+		info = stringTokenizer(packet, '\0');
+
+		// lấy tên người gửi 
+
+		std::string sender;
+
+		for (auto it = this->_listUser.begin(); it != this->_listUser.end(); ++it)
+			if (it->first == clientSocket)
+			{
+				sender = it->second;
+				break;
+			}
+
+		// tách thông tin
+
+		std::string content = sender + '\0' + info[1] +'\0' + info[2] + '\0' + info[3] + '\0'; // sender + receiver + filename + content 
+
+		this->container.push_back(content);
+
+		//// gửi thông tin của tin đi
+
+		//if (info[1] == "ALL")
+		//{
+		//	SendToAll(backMess);
+		//}
+		//else
+		//{
+		//	// lấy thông tin socket từ username
+
+		//	SOCKET receiver = NULL;
+
+		//	for (auto it = this->_listUser.begin(); it != this->_listUser.end(); ++it)
+		//		if (it->second == info[1])
+		//		{
+		//			receiver = it->first;
+		//			break;
+		//		}
+
+		//	if (receiver)
+		//	{
+		//		SendPacketRaw(receiver, backMess);
+		//	}
+		//}
+
+	}
 		break;
 	}
 

@@ -66,6 +66,7 @@ private:
 	int _port ;
 	std::string _ipAddress;
 	sockaddr_in _hint;
+	std::vector<std::string> container;
 
 public:
 	//TODO:

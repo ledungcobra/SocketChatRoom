@@ -118,9 +118,14 @@ bool TcpClient::AnalyzeAndProcess(std::string packet)
 	case FlagServerToClient::Send_File_Desc:
 		
 		break;
-
 	case FlagServerToClient::Send_File_Content:
-
+		break;
+		//TODO:
+	case FlagServerToClient::Already_Login:
+		if (_signUpLogInDlg)
+			_signUpLogInDlg->FailLogin();
+		else
+			AfxMessageBox(L"Couldnt find Login Dialog");
 		break;
 
 	case FlagServerToClient::Send_Private_Message:
@@ -265,6 +270,8 @@ std::vector<std::string> stringTokenizer(std::string input, char delim)
 	}
 	return tokens;
 }
+
+
 
 
 
