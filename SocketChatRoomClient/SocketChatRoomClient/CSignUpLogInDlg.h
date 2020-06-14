@@ -3,6 +3,10 @@
 //
 
 #pragma once
+#define SIGNUP_SUCCESS_MSG WM_APP+1
+#define SIGNUP_FAIL_MSG WM_APP+2
+#define LOGIN_SUCCESS_MSG WM_APP+3
+#define LOGIN_FAIL_MSG WM_APP+4
 
 
 // CSocketChatRoomClientDlg dialog
@@ -39,5 +43,9 @@ public:
 	void FailSignUp();
 	void FailLogin();
 	void LoginSuccess();
-	void SignUpSuccess();
+	afx_msg LRESULT SignUpSuccess(WPARAM wParam, LPARAM lParam);
+	HWND GetHandleWindow() {
+		return GetSafeHwnd();
+
+	}
 };

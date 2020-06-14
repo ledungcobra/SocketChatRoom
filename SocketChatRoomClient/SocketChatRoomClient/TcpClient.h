@@ -56,6 +56,9 @@ public:
 	//CSignUpLogInDlg* GetSignUpLogInDlg();
 	void SetDialog(CDialog* dialog);
 
+
+
 };
+
 
 std::vector<std::string> stringTokenizer(std::string input, char delim);

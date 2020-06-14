@@ -9,7 +9,7 @@ class CPublicChatDialog : public CDialogEx
 	DECLARE_DYNAMIC(CPublicChatDialog)
 
 public:
-	CPublicChatDialog(CWnd* pParent,CString username);   // standard constructor
+	CPublicChatDialog(CWnd* pParent);//,CString username);   // standard constructor
 	virtual ~CPublicChatDialog();
 
 // Dialog Data
