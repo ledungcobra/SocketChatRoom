@@ -323,16 +323,7 @@ bool TcpServer::AnalyzeAndProcess(SOCKET clientSocket, std::string packet)
 			std::string backMess = std::to_string(static_cast<int>(FlagServerToClient::SignUp_Success)) + '\0';
 			this->SendPacketRaw(clientSocket, backMess);
 			this->_listUser[clientSocket] = info[1];
-
-			std::string send_active_user = std::to_string(static_cast<int>(FlagServerToClient::Send_Active_User)) + '\0';
-
-			for (auto it = this->_listUser.begin(); it != this->_listUser.end(); it++)
-			{
-				send_active_user += it->second + '|';
-			}
-			send_active_user.pop_back();
-			send_active_user += '\0';
-			this->SendToAll(send_active_user);
+			this->UpdateUserList();
 		}
 	}
 		break;
@@ -347,15 +338,9 @@ bool TcpServer::AnalyzeAndProcess(SOCKET clientSocket, std::string packet)
 			std::string backMess = std::to_string(static_cast<int>(FlagServerToClient::Login_Success)) + '\0';
 			this->SendPacketRaw(clientSocket, backMess);
 			this->_listUser[clientSocket] = info[1] ;
+			this->UpdateUserList();
 
-			std::string send_active_user = std::to_string(static_cast<int>(FlagServerToClient::Send_Active_User)) + '\0';
-			for (auto it = this->_listUser.begin(); it != this->_listUser.end(); it++)
-			{
-				send_active_user += it->second + '|';
-			}
-			send_active_user.pop_back();
-			send_active_user += '\0';
-			this->SendToAll(send_active_user);
+		
 		}
 		else
 		{
@@ -367,21 +352,15 @@ bool TcpServer::AnalyzeAndProcess(SOCKET clientSocket, std::string packet)
 	break;
 	case FlagClientToServer::LogOut:
 	{
-		std::string send_active_user = std::to_string(static_cast<int>(FlagServerToClient::Send_Active_User)) + '\0';
-		for (auto it = this->_listUser.begin(); it != this->_listUser.end(); it++)
-		{
-			send_active_user += it->second + '|';
-		}
-		send_active_user.pop_back();
-		send_active_user += '\0';
-		this->SendToAll(send_active_user);
 		this->_listUser.erase(clientSocket);
+		this->UpdateUserList();
 	}
 		break;
 
 	case FlagClientToServer::Disconnect_To_Server:
-
-		return false;
+		this->_listUser.erase(clientSocket);
+		closesocket(clientSocket);
+		this->UpdateUserList();
 		break;
 
 	case FlagClientToServer::Download_Request:
@@ -389,9 +368,35 @@ bool TcpServer::AnalyzeAndProcess(SOCKET clientSocket, std::string packet)
 		break;
 
 	case FlagClientToServer::PrivateChat:
+	{
+		_cwprintf(ConvertString::ConvertStringToCString(packet));
+		std::vector<std::string> info;
+		info = stringTokenizer(packet, '\0');
+		//info[1] là username người nhận, info[2] là nội dung tin nhắn
+		std::string private_msg = std::to_string(static_cast<int>(FlagServerToClient::Send_Private_Message)) + '\0'; //Gửi cờ 
+		private_msg += this->_listUser[clientSocket] + '\0' + info[2] +'\0';
+		SOCKET receiver;
+		for (auto it = this->_listUser.begin(); it != this->_listUser.end(); it++)
+		{
+			if (it->second == info[1])
+			{
+				receiver = it->first;
+			}
+		}
+		this->SendPacketRaw(receiver, private_msg);
+	}
 		break;
 
 	case FlagClientToServer::PublicChat:
+	{
+		_cwprintf(ConvertString::ConvertStringToCString(packet));
+		std::vector<std::string> info;
+		info = stringTokenizer(packet, '\0');
+		//info[1] là nội dung tin nhắn
+		std::string public_msg = std::to_string(static_cast<int>(FlagServerToClient::Send_Private_Message)) + '\0'; //Gửi cờ 
+		public_msg += this->_listUser[clientSocket] + '\0' + info[1] + '\0';
+		this->SendToAll(public_msg);
+	}
 		break;
 
 	case FlagClientToServer::Send_File_Descriptor:
@@ -619,3 +624,14 @@ std::istream& safeGetline(std::istream& is, std::string& t)
 	}
 }
 
+void TcpServer::UpdateUserList()
+{
+	std::string send_active_user = std::to_string(static_cast<int>(FlagServerToClient::Send_Active_User)) + '\0';
+	for (auto it = this->_listUser.begin(); it != this->_listUser.end(); it++)
+	{
+		send_active_user += it->second + '|';
+	}
+	send_active_user.pop_back();
+	send_active_user += '\0';
+	this->SendToAll(send_active_user);
+}

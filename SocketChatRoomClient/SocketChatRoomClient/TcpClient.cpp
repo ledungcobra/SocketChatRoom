@@ -121,6 +121,18 @@ bool TcpClient::AnalyzeAndProcess(std::string packet)
 
 		break;
 
+	case FlagServerToClient::Send_Private_Message:
+		std::vector<std::string> info;
+		info = stringTokenizer(packet, '\0');
+		//TODO: Hiện khung chat riêng và đẩy tin nhắn lên, info[1] là người gửi, info[2] là tin nhắn
+		break;
+	case FlagServerToClient::Send_Public_Message:
+	{
+		std::vector<std::string> info;
+		info = stringTokenizer(packet, '\0');
+		//TODO: Đẩy lên khung chat chung ( info[1] là tên người nhắn lên chat public, info[2] là nội dung)
+	}
+		break;
 	}
 
 	return true;
