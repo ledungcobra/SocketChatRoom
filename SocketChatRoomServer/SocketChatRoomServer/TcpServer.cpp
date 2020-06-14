@@ -330,6 +330,7 @@ bool TcpServer::AnalyzeAndProcess(SOCKET clientSocket, std::string packet)
 			{
 				send_active_user += it->second + '|';
 			}
+			Sleep(1000);
 			send_active_user.pop_back();
 			send_active_user += '\0';
 			this->SendToAll(send_active_user);
