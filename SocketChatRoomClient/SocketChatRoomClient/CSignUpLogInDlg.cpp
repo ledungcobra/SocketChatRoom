@@ -122,10 +122,19 @@ BOOL CSignUpLogInDlg::OnInitDialog()
 
 void CSignUpLogInDlg::OnSysCommand(UINT nID, LPARAM lParam)
 {
-	if ((nID & 0xFFF0) == IDM_ABOUTBOX)
+	if ((nID & 0xFFF0) == SC_CLOSE)
 	{
-		/*CAboutDlg dlgAbout;
-		dlgAbout.DoModal();*/
+		auto i = AfxMessageBox(_T("Do you wanna disconnect to this server"), 1, 1);
+		if (i == IDOK) {
+
+			std::string packet = "";
+			packet += std::to_string(static_cast<int>(FlagClientToServer::Disconnect_To_Server)) + '\0';
+			TcpClient::GetInstance()->SendPacketRaw(packet);
+			OnDestroy();
+
+		}
+
+
 	}
 	else
 	{
