@@ -8,6 +8,8 @@ enum class FlagServerToClient
 	Login_Success, //Đăng nhập thành công
 	SignUp_Success, //Đăng kí thành công
 	Send_File_Desc, //Gửi miêu tả file
-	Send_File_Content //Gửi content của file
+	Send_File_Content, //Gửi content của file
+	Already_Login // đã có người sử dụng tài khoản
+
 };
 

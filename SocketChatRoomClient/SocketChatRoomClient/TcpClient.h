@@ -12,7 +12,9 @@
 #include "CPrivateChatDialog.h"
 #include "CPublicChatDialog.h"
 #include "CSignUpLogInDlg.h"
+#include <fstream>
 #include <memory>
+#include "ConvertString.h"
 #pragma comment (lib,"ws2_32.lib")
 
 
@@ -53,7 +55,6 @@ public:
 	//CPrivateChatDialog* GetPrivateChatDialog();
 	//CSignUpLogInDlg* GetSignUpLogInDlg();
 	void SetDialog(CDialog* dialog);
-
 
 };
 

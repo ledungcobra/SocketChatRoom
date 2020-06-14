@@ -240,9 +240,10 @@ void CSignUpLogInDlg::LoginSuccess()
 	CPublicChatDialog* p = new CPublicChatDialog(nullptr,username);
 	auto client = TcpClient::GetInstance(); 
 	client->SetDialog(p);
-	ShowWindow(SW_HIDE);
+	ShowWindow(SW_HIDE);/*
 	p->Create(IDD_PUBLIC_CHAT);
-	p->ShowWindow(SW_SHOWNORMAL);
+	p->ShowWindow(SW_SHOWNORMAL);*/
+	p->DoModal();
 
 }
 
