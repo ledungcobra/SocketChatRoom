@@ -57,7 +57,7 @@
 
 
 CSignUpLogInDlg::CSignUpLogInDlg(CWnd* pParent /*=nullptr*/)
-	: CDialogEx(ID_LOGIN_SIGNUP_DIALOG, pParent)
+	: CDialogEx(IDD_LOGIN_SIGNUP_DIALOG, pParent)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
@@ -110,7 +110,9 @@ BOOL CSignUpLogInDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// Set small icon
 
 	// TODO: Add extra initialization here
+	TcpClient::GetInstance()->SetDialog(this);
 	TcpClient::GetInstance()->Run();
+
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }
 
@@ -178,9 +180,10 @@ void CSignUpLogInDlg::OnBnClickedSignUp()
 	mEdtPassword.GetWindowTextW(password);
 
 	packet += std::to_string(static_cast<int>(FlagClientToServer::SignUp)) + '\0' + ConvertString::ConvertCStringToString(username) + '\0' + ConvertString::ConvertCStringToString(password) + '\0';
-
-
 	TcpClient::GetInstance()->SendPacketRaw(packet);
+
+	
+
 
 }
 
@@ -212,5 +215,43 @@ void CSignUpLogInDlg::OnBnClickedLogIn()
 	
 
 	
+}
+
+void CSignUpLogInDlg::FailSignUp()
+{
+	AfxMessageBox(L"Sign Up unsuccessfully please check your username or password and try again");
+
+}
+
+void CSignUpLogInDlg::FailLogin()
+{
+	AfxMessageBox(L"Login unsuccessfully please check your username or password and try it again");
+}
+
+void CSignUpLogInDlg::LoginSuccess()
+{
+	//TODO:
+	CString username;
+	mEdtUsername.GetWindowTextW(username);
+	//EndDialog(IDOK);	
+	//CPublicChatDialog*dialog = new CPublicChatDialog(nullptr,_T("ABC"));
+//dialog->Create(IDD_PUBLIC_CHAT);
+//dialog->ShowWindow(SW_SHOWNORMAL);
+	CPublicChatDialog* p = new CPublicChatDialog(nullptr,username);
+	auto client = TcpClient::GetInstance(); 
+	client->SetDialog(p);
+	ShowWindow(SW_HIDE);
+	p->DoModal();
+
+}
+
+void CSignUpLogInDlg::SignUpSuccess()
+{
+	CString username;
+	mEdtUsername.GetWindowTextW(username);
+	CPublicChatDialog *p = new CPublicChatDialog(nullptr,username);
+	TcpClient::GetInstance()->SetDialog(p);
+	//EndDialog(IDOK);
+	p->DoModal();
 }
 

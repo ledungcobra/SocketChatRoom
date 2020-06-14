@@ -13,7 +13,7 @@
 
 IMPLEMENT_DYNAMIC(CPublicChatDialog, CDialogEx)
 
-CPublicChatDialog::CPublicChatDialog(CWnd* pParent,CString username)
+CPublicChatDialog::CPublicChatDialog(CWnd* pParent ,CString username)
 	: CDialogEx(IDD_PUBLIC_CHAT, pParent)
 {
 	this->_username = username;
@@ -28,7 +28,6 @@ void CPublicChatDialog::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
 
-
 	DDX_Control(pDX, IDD_LIST2, mActiveUsersList);
 	DDX_Control(pDX, IDC_EDIT1, mEdtChat);
 }
@@ -39,8 +38,7 @@ void CPublicChatDialog::DoDataExchange(CDataExchange* pDX)
 BOOL CPublicChatDialog::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
-
-	
+		
 	return 0; 
 }
 
@@ -65,6 +63,16 @@ void CPublicChatDialog::OnBnClickedSend()
 	CString message;
 	mEdtChat.GetWindowTextW(message);
 	TcpClient::GetInstance()->SendPacketRaw(ConvertString::ConvertCStringToString(message));
+	//TODO: update local message
 
 
+}
+
+void CPublicChatDialog::UpdateListActiveUsers(std::vector<std::string> listActiveUsers)
+{
+	mActiveUsersList.ResetContent();
+
+	for (int i = 0; i < listActiveUsers.size();i++) {
+		mActiveUsersList.InsertString(i,ConvertString::ConvertStringToCString(listActiveUsers.at(i)));
+	}
 }

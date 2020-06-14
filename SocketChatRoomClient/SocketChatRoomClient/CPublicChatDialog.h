@@ -1,5 +1,6 @@
 #pragma once
-
+#include<vector>
+#include <string>
 
 // CPublicChatDialog dialog
 
@@ -30,9 +31,8 @@ private :
 public:
 	
 	afx_msg void OnLbnSelchangePublicChat();
-
 	CListBox mActiveUsersList;
-
 	CEdit mEdtChat;
 	afx_msg void OnBnClickedSend();
+	void UpdateListActiveUsers(std::vector<std::string> listActiveUsers);
 };

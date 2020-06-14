@@ -14,7 +14,7 @@ public:
 
 // Dialog Data
 #ifdef AFX_DESIGN_TIME
-	enum { IDD = ID_LOGIN_SIGNUP_DIALOG	};
+	enum { IDD = IDD_LOGIN_SIGNUP_DIALOG	};
 #endif
 
 	protected:
@@ -36,4 +36,8 @@ public:
 	afx_msg void OnBnClickedLogIn();
 	CEdit mEdtUsername;
 	CEdit mEdtPassword;
+	void FailSignUp();
+	void FailLogin();
+	void LoginSuccess();
+	void SignUpSuccess();
 };

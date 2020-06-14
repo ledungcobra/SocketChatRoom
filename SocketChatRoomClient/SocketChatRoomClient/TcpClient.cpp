@@ -1,5 +1,6 @@
 ﻿#include "pch.h"
 #include "TcpClient.h"
+#include "resource.h"
 TcpClient* TcpClient::_instance = NULL;
 TcpClient::TcpClient()
 {
@@ -45,7 +46,10 @@ SOCKET TcpClient::CreateSocket()
 
 void TcpClient::SendPacketRaw(std::string packet)
 {
-	send(this->_serverSocket, packet.c_str(), (int)(packet.size() + 1), 0);
+	if (_isRunning) {
+		send(this->_serverSocket, packet.c_str(), (int)(packet.size() + 1), 0);
+	}
+	
 }
 
 bool TcpClient::AnalyzeAndProcess(std::string packet)
@@ -64,29 +68,53 @@ bool TcpClient::AnalyzeAndProcess(std::string packet)
 	
 	switch (flag)
 	{
-	case FlagServerToClient::Send_Active_User:
+	case FlagServerToClient::Send_Active_User:	{
+		std::vector<std::string> listActiveUsers = stringTokenizer(packet, '\0');
+		listActiveUsers.erase(listActiveUsers.begin());
+		if (_publicChatDialog) {
 
+			_publicChatDialog->UpdateListActiveUsers(listActiveUsers);
+			
+		}
+		else {
+			AfxMessageBox(L"Couldn't find Public Dialog");
+		}
+	}
 		break;
 
 	case FlagServerToClient::Fail_Sign_Up:
-
+		if(_signUpLogInDlg)
+			_signUpLogInDlg->FailSignUp();
+		else
+		AfxMessageBox(L"Couldn't find Sign Up Login dialog");
 		break;
 
 	case FlagServerToClient::Fail_Login:
-
+		if (_signUpLogInDlg)
+			_signUpLogInDlg->FailLogin();
+		else
+			AfxMessageBox(L"Couldnt find Sign Up Login Dialog");
 		break;
 
 	case FlagServerToClient::Login_Success:
+		if (_signUpLogInDlg)
+			_signUpLogInDlg->LoginSuccess();
+		else
+			AfxMessageBox(L"Couldn't find sign up login dialog");
 
+		//TODO:
 		return false;
 		break;
 
 	case FlagServerToClient::SignUp_Success:
-
+		if (_signUpLogInDlg)
+			dynamic_cast<CSignUpLogInDlg*>(_signUpLogInDlg)->SignUpSuccess();
+		else
+			AfxMessageBox(L"Couldn't find Sign Up login dialog");
 		break;
 
 	case FlagServerToClient::Send_File_Desc:
-
+		
 		break;
 
 	case FlagServerToClient::Send_File_Content:
@@ -116,6 +144,7 @@ std::string TcpClient::ReceivePacket()
 bool TcpClient::Connect()
 {
 	int connResult = connect(this->_serverSocket , (sockaddr*)&this->_hint, sizeof(this->_hint));
+
 	if (connResult == SOCKET_ERROR)
 	{
 		closesocket(this->_serverSocket); // Do la client nen truoc khi dong can don
@@ -169,6 +198,45 @@ void TcpClient::Run()
 
 		AfxBeginThread(ReceiveThreadFunc, this);
 	}
+	else {
+		AfxMessageBox(L"Connect to server fail");
+		_isRunning = false;
+	}
+	
+}
+
+//CPublicChatDialog* TcpClient::GetPublicChatDialog()
+//{
+//	return this->_publicChatDialog;
+//}
+//
+//CPrivateChatDialog* TcpClient::GetPrivateChatDialog()
+//{
+//	return this->_privateChatDialog;
+//}
+//
+//CSignUpLogInDlg* TcpClient::GetSignUpLogInDlg()
+//{
+//	return this->_signUpLogInDlg;
+//}
+
+void TcpClient::SetDialog(CDialog* dialog)
+{
+	const char* name = typeid(*dialog).name();
+	if (strcmp(name, "class CPublicChatDialog") == 0) {
+		
+		_publicChatDialog = dynamic_cast<CPublicChatDialog*> (dialog);
+	}
+	else if (strcmp(name, "class CSignUpLogInDlg") == 0) {
+		
+		_signUpLogInDlg = dynamic_cast<CSignUpLogInDlg*> (dialog);
+
+	}
+	else if (strcmp(name, "class CPrivateChatDialog") == 0) {
+
+		_privateChatDialog = dynamic_cast<CPrivateChatDialog*> (dialog);
+
+	}
 	
 }
 
@@ -184,5 +252,6 @@ std::vector<std::string> stringTokenizer(std::string input, char delim)
 	}
 	return tokens;
 }
+
 
 

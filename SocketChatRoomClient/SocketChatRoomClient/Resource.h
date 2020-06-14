@@ -7,8 +7,9 @@
 #define IDR_MAINFRAME                   128
 #define IDD_DIALOG1                     130
 #define IDD_PUBLIC_CHAT                 130
-#define ID_LOGIN_SIGNUP_DIALOG          132
+#define IDD_LOGIN_SIGNUP_DIALOG         132
 #define ID_PRIVATE_CHAT                 133
+#define ID_LOGIN_SIGNUP_DIALOG          135
 #define IDC_BUTTON1                     1000
 #define IDC_BUTTON2                     1001
 #define IDC_EDIT1                       1002
@@ -22,7 +23,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        135
+#define _APS_NEXT_RESOURCE_VALUE        136
 #define _APS_NEXT_COMMAND_VALUE         32771
 #define _APS_NEXT_CONTROL_VALUE         1011
 #define _APS_NEXT_SYMED_VALUE           101

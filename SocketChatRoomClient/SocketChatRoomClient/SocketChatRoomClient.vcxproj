@@ -185,6 +185,7 @@
   <ItemGroup>
     <ClInclude Include="ClientSocket.h" />
     <ClInclude Include="ConvertString.h" />
+    <ClInclude Include="CPrivateChatDialog.h" />
     <ClInclude Include="CPublicChatDialog.h" />
     <ClInclude Include="FlagClientToServer.h" />
     <ClInclude Include="FlagServerToClient.h" />
@@ -201,6 +202,7 @@
   <ItemGroup>
     <ClCompile Include="ClientSocket.cpp" />
     <ClCompile Include="ConvertString.cpp" />
+    <ClCompile Include="CPrivateChatDialog.cpp" />
     <ClCompile Include="CPublicChatDialog.cpp" />
     <ClCompile Include="FlagClientToServer.cpp" />
     <ClCompile Include="FlagServerToClient.cpp" />

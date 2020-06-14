@@ -9,6 +9,10 @@
 #include "FlagClientToServer.h"
 #include "FlagServerToClient.h"
 #include "Lock.h"
+#include "CPrivateChatDialog.h"
+#include "CPublicChatDialog.h"
+#include "CSignUpLogInDlg.h"
+#include <memory>
 #pragma comment (lib,"ws2_32.lib")
 
 
@@ -16,10 +20,15 @@ static Lock _lock;
 
 class TcpClient
 {
+	
 private:
 	int _serverPort;
 	std::string _serverIpaddress;
 	sockaddr_in _hint;
+	CPublicChatDialog* _publicChatDialog = nullptr;
+	CPrivateChatDialog* _privateChatDialog = nullptr;
+	CSignUpLogInDlg* _signUpLogInDlg = nullptr;
+
 public:
 	//TODO:
 	bool _isActive;
@@ -38,6 +47,12 @@ public:
 	void Run();
 private:
     static TcpClient* _instance;
+
+public:
+	//CPublicChatDialog* GetPublicChatDialog();
+	//CPrivateChatDialog* GetPrivateChatDialog();
+	//CSignUpLogInDlg* GetSignUpLogInDlg();
+	void SetDialog(CDialog* dialog);
 
 
 };
