@@ -64,23 +64,27 @@ void CPublicChatDialog::OnSysCommand(UINT nID, LPARAM lParam)
 	}
 }
 
+void CPublicChatDialog::OnOK()
+{
+
+	//TODO: ENTER 
+
+	AfxMessageBox(L"ENTER");
+
+}
+
 
 BEGIN_MESSAGE_MAP(CPublicChatDialog, CDialogEx)
 	ON_WM_SYSCOMMAND()
-	ON_LBN_SELCHANGE(IDD_PUBLIC_CHAT, &CPublicChatDialog::OnLbnSelchangePublicChat)
 	ON_BN_CLICKED(IDC_BUTTON1, &CPublicChatDialog::OnBnClickedSend)
 	ON_BN_CLICKED(IDC_BUTTON2, &CPublicChatDialog::OnBnClickedLogout)
 	ON_BN_CLICKED(IDC_BUTTON3, &CPublicChatDialog::OnBnClickedUploadFile)
+	ON_LBN_SELCHANGE(IDD_LIST2, &CPublicChatDialog::OnLbnSelchangeListActiveUsers)
 END_MESSAGE_MAP()
 
 
 // CPublicChatDialog message handlers
 
-
-void CPublicChatDialog::OnLbnSelchangePublicChat()
-{
-	// TODO: Add your control notification handler code here
-}
 
 
 void CPublicChatDialog::OnBnClickedSend()
@@ -129,4 +133,19 @@ void CPublicChatDialog::OnBnClickedUploadFile()
 
 
 	}
+}
+
+
+void CPublicChatDialog::OnLbnSelchangeListActiveUsers()
+{
+	auto index = mActiveUsersList.GetCurSel();
+	if (index == -1) {
+		return;
+	}
+	CString buff;
+	mActiveUsersList.GetText(index, buff);
+	CPrivateChatDialog* dlg = TcpClient::GetInstance()->CreatePrivateChatDlg(buff);
+	dlg->ShowWindow(SW_SHOW);
+
+
 }

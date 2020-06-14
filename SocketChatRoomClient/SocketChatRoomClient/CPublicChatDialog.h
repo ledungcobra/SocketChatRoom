@@ -25,13 +25,13 @@ protected:
 
 	BOOL CPublicChatDialog::OnInitDialog();
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
+	afx_msg void OnOK();
 private :
 	CString _username;
 
 
 public:
 	
-	afx_msg void OnLbnSelchangePublicChat();
 	CListBox mActiveUsersList;
 	CEdit mEdtChat;
 	afx_msg void OnBnClickedSend();
@@ -39,4 +39,6 @@ public:
 	afx_msg void OnBnClickedLogout();
 	
 	afx_msg void OnBnClickedUploadFile();
+	
+	afx_msg void OnLbnSelchangeListActiveUsers();
 };

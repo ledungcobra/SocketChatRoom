@@ -134,6 +134,24 @@ bool TcpClient::AnalyzeAndProcess(std::string packet)
 	{
 		std::vector<std::string> info;
 		info = stringTokenizer(packet, '\0');
+		
+		if (_mapPrivateChatDialog.find(info[1]) == _mapPrivateChatDialog.end()) {
+			////Không tim được cửa sổ người gửi
+			//CPrivateChatDialog* pPrivateChatDlg = new CPrivateChatDialog(nullptr, info[1]);
+			//_mapPrivateChatDialog[info[1]] = pPrivateChatDlg;
+			//pPrivateChatDlg->Create(ID_PRIVATE_CHAT);
+			CPrivateChatDialog* pPrivateChatDlg =  this->CreatePrivateChatDlg(ConvertString::ConvertStringToCString(info[1]));
+
+			pPrivateChatDlg->ShowWindow(SW_SHOW);
+			pPrivateChatDlg->UpdateChatView(info[2]);
+
+
+		}
+		else {
+			//Tìm được cửa số người gửi 
+			_mapPrivateChatDialog[info[1]]->UpdateChatView(info[2]);
+			
+		}
 	//TODO: Hiện khung chat riêng và đẩy tin nhắn lên, info[1] là người gửi, info[2] là tin nhắn
 	}
 		break;
@@ -254,11 +272,6 @@ void TcpClient::SetDialog(CDialog* dialog)
 		_signUpLogInDlg = dynamic_cast<CSignUpLogInDlg*> (dialog);
 
 	}
-	else if (strcmp(name, "class CPrivateChatDialog") == 0) {
-
-		_privateChatDialog = dynamic_cast<CPrivateChatDialog*> (dialog);
-
-	}
 	
 }
 
@@ -266,6 +279,23 @@ void TcpClient::ShowSignUpLoginDialog()
 {
 
 	_signUpLogInDlg->ShowWindow(SW_SHOWNORMAL);
+
+}
+
+CPrivateChatDialog* TcpClient::CreatePrivateChatDlg(CString _partnerUsername)
+{
+	CPrivateChatDialog* dlg = nullptr;
+
+	auto partner = ConvertString::ConvertCStringToString(_partnerUsername);
+	if (_mapPrivateChatDialog.find(partner) == _mapPrivateChatDialog.end()) {
+		dlg = new CPrivateChatDialog(nullptr, _partnerUsername);
+		_mapPrivateChatDialog[partner] = dlg;
+
+	}
+	else {
+		dlg = _mapPrivateChatDialog[partner];
+	}
+	return dlg;
 
 }
 

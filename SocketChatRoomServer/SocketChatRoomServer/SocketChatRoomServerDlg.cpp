@@ -119,11 +119,10 @@ void CSocketChatRoomServerDlg::OnSysCommand(UINT nID, LPARAM lParam)
 {
 	if ((nID & 0xFFF0) == SC_CLOSE)
 	{
-		auto i = AfxMessageBox(_T("Do you wanna disconnect to this server"), 1, 1);
+		auto i = AfxMessageBox(_T("Do you wanna disconnect this server"), 1, 1);
 		if (i == IDOK) {
-			
+			AfxEndThread(0);
 			OnDestroy();
-
 		}
 
 

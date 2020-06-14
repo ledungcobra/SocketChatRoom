@@ -1,6 +1,6 @@
 #pragma once
 
-
+#include <string>
 // CPrivateChatDialog dialog
 
 class CPrivateChatDialog : public CDialogEx
@@ -8,7 +8,7 @@ class CPrivateChatDialog : public CDialogEx
 	DECLARE_DYNAMIC(CPrivateChatDialog)
 
 public:
-	CPrivateChatDialog(CWnd* pParent = nullptr);   // standard constructor
+	CPrivateChatDialog(CWnd* pParent,CString partnerUsername);   // standard constructor
 	virtual ~CPrivateChatDialog();
 
 // Dialog Data
@@ -22,4 +22,9 @@ protected:
 	DECLARE_MESSAGE_MAP()
 public:
 	afx_msg void OnBnClickedSendUploadFile();
+private:
+	CString _partnerUsername;
+public:
+	void UpdateChatView(std::string incommingMessage);
+	CEdit mEdtChatView;
 };

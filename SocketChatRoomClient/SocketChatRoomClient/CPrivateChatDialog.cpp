@@ -13,9 +13,10 @@
 
 IMPLEMENT_DYNAMIC(CPrivateChatDialog, CDialogEx)
 
-CPrivateChatDialog::CPrivateChatDialog(CWnd* pParent /*=nullptr*/)
+CPrivateChatDialog::CPrivateChatDialog(CWnd* pParent, CString partnerUsername)
 	: CDialogEx(ID_PRIVATE_CHAT, pParent)
 {
+	this->_partnerUsername = partnerUsername;
 
 }
 
@@ -26,6 +27,7 @@ CPrivateChatDialog::~CPrivateChatDialog()
 void CPrivateChatDialog::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
+	DDX_Control(pDX, IDC_EDIT2, mEdtChatView);
 }
 
 
@@ -50,4 +52,15 @@ void CPrivateChatDialog::OnBnClickedSendUploadFile()
 
 	}
 	
+}
+
+void CPrivateChatDialog::UpdateChatView(std::string incommingMessage)
+{
+
+	CString currentContent;
+	mEdtChatView.GetWindowTextW(currentContent);
+	currentContent += "\r\n";
+	currentContent += _partnerUsername + L":" + ConvertString::ConvertStringToCString(incommingMessage);
+	mEdtChatView.SetWindowTextW(currentContent);
+
 }

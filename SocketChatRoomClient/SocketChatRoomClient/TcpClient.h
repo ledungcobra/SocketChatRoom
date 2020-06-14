@@ -15,6 +15,7 @@
 #include <fstream>
 #include <memory>
 #include "ConvertString.h"
+#include <map>
 #pragma comment (lib,"ws2_32.lib")
 
 
@@ -28,7 +29,7 @@ private:
 	std::string _serverIpaddress;
 	sockaddr_in _hint;
 	CPublicChatDialog* _publicChatDialog = nullptr;
-	CPrivateChatDialog* _privateChatDialog = nullptr;
+	std::map<std::string,CPrivateChatDialog*> _mapPrivateChatDialog;
 	CSignUpLogInDlg* _signUpLogInDlg = nullptr;
 
 public:
@@ -56,6 +57,8 @@ public:
 	//CSignUpLogInDlg* GetSignUpLogInDlg();
 	void SetDialog(CDialog* dialog);
 	void ShowSignUpLoginDialog();
+
+	CPrivateChatDialog* CreatePrivateChatDlg(CString _partnerUsername);
 	
 
 
