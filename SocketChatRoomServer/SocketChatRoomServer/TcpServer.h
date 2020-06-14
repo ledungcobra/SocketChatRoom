@@ -80,7 +80,8 @@ public:
 	std::string ReceivePacket(SOCKET clientSocket);
 	bool Listen(); // Gọi receivePacket
 	void CloseServer();
-	bool IsExists(std::string username,std::string password); //TODO: shibe làm
+	bool IsExists(std::string username,std::string password); // kiểm tra tài khoản để đăng nhập
+	bool IsValid(std::string username); // kiểm tra tên để đăng ký
 	void Run(); // Goị listen
 	void WriteUserInfo(std::string username, std::string password);
 };

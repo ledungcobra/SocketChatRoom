@@ -312,7 +312,7 @@ bool TcpServer::AnalyzeAndProcess(SOCKET clientSocket, std::string packet)
 		_cwprintf(ConvertString::ConvertStringToCString(packet));
 		std::vector<std::string> info;
 		info = stringTokenizer(packet,'\0');
-		if (IsExists(info[1], info[2]))
+		if (IsValid(info[1]))
 		{
 			std::string backMess = std::to_string(static_cast<int>(FlagServerToClient::Fail_Sign_Up)) + '\0';
 			this->SendPacketRaw(clientSocket, backMess);
@@ -448,6 +448,42 @@ bool TcpServer::IsExists(std::string username, std::string password)
 	file.close();
 	return false;
 }
+bool TcpServer::IsValid(std::string username)
+{
+	std::ifstream file;
+	file.open("data.bin", std::ifstream::binary);
+	std::vector<std::string> usersInfo;
+	if (file.is_open())
+	{
+		while (!file.eof())
+		{
+			std::string buffer;
+			safeGetline(file, buffer);
+			usersInfo = stringTokenizer(buffer, ';');
+			if (!usersInfo.empty())
+			{
+				if (usersInfo[0] == username)
+				{
+					file.close();
+					return true;
+				}
+			}
+			else
+			{
+				return false;
+			}
+			usersInfo.clear();
+		}
+	}
+	else
+	{
+		std::ofstream file("data.bin", std::ofstream::binary);
+		file.close();
+	}
+	file.close();
+	return false;
+}
+
 UINT ReceiveAndSend(LPVOID params) {
 	Param* p = (Param*)params;
 	bool isConnect = true;
@@ -489,10 +525,10 @@ void TcpServer::Run()
 
 void TcpServer::WriteUserInfo(std::string username, std::string password)
 {
-	std::ofstream file("data.bin", std::ios::app);
+	std::ofstream file("data.bin", std::ios::app | std::ios::binary);
 	if (file.is_open())
 	{
-		file << username << ";" << password << std::endl;
+		file << username << ";" << password << '\n';
 		file.close();
 	}
 }
