@@ -9,7 +9,6 @@
 #define IDD_PUBLIC_CHAT                 130
 #define IDD_LOGIN_SIGNUP_DIALOG         132
 #define ID_PRIVATE_CHAT                 133
-#define ID_LOGIN_SIGNUP_DIALOG          135
 #define IDC_BUTTON1                     1000
 #define IDC_BUTTON2                     1001
 #define IDC_EDIT1                       1002

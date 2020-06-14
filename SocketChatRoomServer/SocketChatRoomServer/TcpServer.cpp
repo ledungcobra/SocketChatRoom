@@ -356,14 +356,15 @@ bool TcpServer::AnalyzeAndProcess(SOCKET clientSocket, std::string packet)
 				this->SendPacketRaw(clientSocket, backMess);
 				this->_listUser[clientSocket] = info[1];
 
-				std::string send_active_user = std::to_string(static_cast<int>(FlagServerToClient::Send_Active_User)) + '\0';
+				/*std::string send_active_user = std::to_string(static_cast<int>(FlagServerToClient::Send_Active_User)) + '\0';
 				for (auto it = this->_listUser.begin(); it != this->_listUser.end(); it++)
 				{
 					send_active_user += it->second + '|';
 				}
 				send_active_user.pop_back();
 				send_active_user += '\0';
-				this->SendToAll(send_active_user);
+				this->SendToAll(send_active_user);*/
+				this->UpdateUserList();
 			}
 		}
 		else // không tồn tại tài khoản
@@ -385,6 +386,7 @@ bool TcpServer::AnalyzeAndProcess(SOCKET clientSocket, std::string packet)
 		this->_listUser.erase(clientSocket);
 		closesocket(clientSocket);
 		this->UpdateUserList();
+		return false;
 		break;
 
 	case FlagClientToServer::Download_Request:

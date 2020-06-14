@@ -13,10 +13,10 @@
 
 IMPLEMENT_DYNAMIC(CPublicChatDialog, CDialogEx)
 
-CPublicChatDialog::CPublicChatDialog(CWnd* pParent)// ,CString username)
+CPublicChatDialog::CPublicChatDialog(CWnd* pParent,CString username)
 	: CDialogEx(IDD_PUBLIC_CHAT, pParent)
 {
-	//this->_username = username;
+	this->_username = username;
 
 }
 
@@ -42,10 +42,35 @@ BOOL CPublicChatDialog::OnInitDialog()
 	return 0; 
 }
 
+void CPublicChatDialog::OnSysCommand(UINT nID, LPARAM lParam)
+{
+	if ((nID & 0xFFF0) == SC_CLOSE)
+	{
+		auto i = AfxMessageBox(_T("Do you wanna disconnect to this server"), 1, 1);
+		if (i == IDOK) {
+			
+			std::string packet = "";
+			packet += std::to_string(static_cast<int>(FlagClientToServer::Disconnect_To_Server)) + '\0';
+			TcpClient::GetInstance()->SendPacketRaw(packet);
+			OnDestroy();
+
+		}
+		
+
+	}
+	else
+	{
+		CDialogEx::OnSysCommand(nID, lParam);
+	}
+}
+
 
 BEGIN_MESSAGE_MAP(CPublicChatDialog, CDialogEx)
+	ON_WM_SYSCOMMAND()
 	ON_LBN_SELCHANGE(IDD_PUBLIC_CHAT, &CPublicChatDialog::OnLbnSelchangePublicChat)
 	ON_BN_CLICKED(IDC_BUTTON1, &CPublicChatDialog::OnBnClickedSend)
+	ON_BN_CLICKED(IDC_BUTTON2, &CPublicChatDialog::OnBnClickedLogout)
+	ON_BN_CLICKED(IDC_BUTTON3, &CPublicChatDialog::OnBnClickedUploadFile)
 END_MESSAGE_MAP()
 
 
@@ -73,6 +98,35 @@ void CPublicChatDialog::UpdateListActiveUsers(std::vector<std::string> listActiv
 	mActiveUsersList.ResetContent();
 
 	for (int i = 0; i < listActiveUsers.size();i++) {
-		mActiveUsersList.InsertString(i,ConvertString::ConvertStringToCString(listActiveUsers.at(i)));
+		//if (ConvertString::ConvertCStringToString(_username) != listActiveUsers.at(i)) {
+			mActiveUsersList.InsertString(i, ConvertString::ConvertStringToCString(listActiveUsers.at(i)));
+		///}
+	}
+}
+
+
+void CPublicChatDialog::OnBnClickedLogout()
+{
+
+	std::string packet = "";
+	packet += std::to_string(static_cast<int>(FlagClientToServer::LogOut)) + '\0';
+	TcpClient::GetInstance()->SendPacketRaw(packet);
+	EndDialog(IDOK);
+	TcpClient::GetInstance()->ShowSignUpLoginDialog();
+
+
+}
+
+
+void CPublicChatDialog::OnBnClickedUploadFile()
+{
+	CFileDialog fileDlg(TRUE);
+	int check = fileDlg.DoModal();
+	if (check == IDOK) {
+
+		std::string filePath = ConvertString::ConvertCStringToString(fileDlg.GetPathName());
+		_cwprintf(fileDlg.GetPathName());
+
+
 	}
 }

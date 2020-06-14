@@ -98,7 +98,8 @@ bool TcpClient::AnalyzeAndProcess(std::string packet)
 
 	case FlagServerToClient::Login_Success:
 		if (_signUpLogInDlg)
-			_signUpLogInDlg->LoginSuccess();
+			//_signUpLogInDlg->LoginSuccess();
+			SendMessage(_signUpLogInDlg->GetSafeHwnd(), LOGIN_SUCCESS_MSG, 0, 0);
 		else
 			AfxMessageBox(L"Couldn't find sign up login dialog");
 
@@ -123,15 +124,18 @@ bool TcpClient::AnalyzeAndProcess(std::string packet)
 		//TODO:
 	case FlagServerToClient::Already_Login:
 		if (_signUpLogInDlg)
-			_signUpLogInDlg->FailLogin();
+			_signUpLogInDlg->AccountAlreadyUsed();
+			//_signUpLogInDlg->FailLogin();
 		else
 			AfxMessageBox(L"Couldnt find Login Dialog");
 		break;
 
 	case FlagServerToClient::Send_Private_Message:
+	{
 		std::vector<std::string> info;
 		info = stringTokenizer(packet, '\0');
-		//TODO: Hiện khung chat riêng và đẩy tin nhắn lên, info[1] là người gửi, info[2] là tin nhắn
+	//TODO: Hiện khung chat riêng và đẩy tin nhắn lên, info[1] là người gửi, info[2] là tin nhắn
+	}
 		break;
 	case FlagServerToClient::Send_Public_Message:
 	{
@@ -257,6 +261,14 @@ void TcpClient::SetDialog(CDialog* dialog)
 	}
 	
 }
+
+void TcpClient::ShowSignUpLoginDialog()
+{
+
+	_signUpLogInDlg->ShowWindow(SW_SHOWNORMAL);
+
+}
+
 
 std::vector<std::string> stringTokenizer(std::string input, char delim)
 {

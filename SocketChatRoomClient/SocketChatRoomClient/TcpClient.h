@@ -55,6 +55,8 @@ public:
 	//CPrivateChatDialog* GetPrivateChatDialog();
 	//CSignUpLogInDlg* GetSignUpLogInDlg();
 	void SetDialog(CDialog* dialog);
+	void ShowSignUpLoginDialog();
+	
 
 
 
