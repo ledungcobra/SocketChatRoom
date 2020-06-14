@@ -13,10 +13,10 @@
 
 IMPLEMENT_DYNAMIC(CPublicChatDialog, CDialogEx)
 
-CPublicChatDialog::CPublicChatDialog(CWnd* pParent ,CString username)
+CPublicChatDialog::CPublicChatDialog(CWnd* pParent)// ,CString username)
 	: CDialogEx(IDD_PUBLIC_CHAT, pParent)
 {
-	this->_username = username;
+	//this->_username = username;
 
 }
 

@@ -107,8 +107,10 @@ bool TcpClient::AnalyzeAndProcess(std::string packet)
 		break;
 
 	case FlagServerToClient::SignUp_Success:
-		if (_signUpLogInDlg)
-			dynamic_cast<CSignUpLogInDlg*>(_signUpLogInDlg)->SignUpSuccess();
+		if (_signUpLogInDlg) {
+			SendMessage(_signUpLogInDlg->GetSafeHwnd(), SIGNUP_SUCCESS_MSG,0,0);
+			//CWnd
+		}
 		else
 			AfxMessageBox(L"Couldn't find Sign Up login dialog");
 		break;
@@ -232,7 +234,7 @@ void TcpClient::Run()
 //}
 
 void TcpClient::SetDialog(CDialog* dialog)
-{
+ {
 	const char* name = typeid(*dialog).name();
 	if (strcmp(name, "class CPublicChatDialog") == 0) {
 		

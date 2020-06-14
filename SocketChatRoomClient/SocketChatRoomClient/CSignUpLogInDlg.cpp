@@ -1,4 +1,4 @@
-﻿
+
 // SocketChatRoomClientDlg.cpp : implementation file
 //
 
@@ -60,6 +60,8 @@ CSignUpLogInDlg::CSignUpLogInDlg(CWnd* pParent /*=nullptr*/)
 	: CDialogEx(IDD_LOGIN_SIGNUP_DIALOG, pParent)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
+
+
 }
 
 void CSignUpLogInDlg::DoDataExchange(CDataExchange* pDX)
@@ -75,6 +77,7 @@ BEGIN_MESSAGE_MAP(CSignUpLogInDlg, CDialogEx)
 	ON_WM_QUERYDRAGICON()
 	ON_BN_CLICKED(IDC_BUTTON2, &CSignUpLogInDlg::OnBnClickedSignUp)
 	ON_BN_CLICKED(IDC_BUTTON1, &CSignUpLogInDlg::OnBnClickedLogIn)
+	ON_MESSAGE(SIGNUP_SUCCESS_MSG,&CSignUpLogInDlg::SignUpSuccess)
 END_MESSAGE_MAP()
 
 
@@ -148,6 +151,8 @@ void CSignUpLogInDlg::OnPaint()
 		GetClientRect(&rect);
 		int x = (rect.Width() - cxIcon + 1) / 2;
 		int y = (rect.Height() - cyIcon + 1) / 2;
+
+		
 
 		// Draw the icon
 		dc.DrawIcon(x, y, m_hIcon);
@@ -228,30 +233,45 @@ void CSignUpLogInDlg::FailLogin()
 	AfxMessageBox(L"Login unsuccessfully please check your username or password and try it again");
 }
 
+
 void CSignUpLogInDlg::LoginSuccess()
 {
 	//TODO:
-	CString username;
-	mEdtUsername.GetWindowTextW(username);
+	//CString* username = new CString;
+	//mEdtUsername.GetWindowTextW(*username);
+	ShowWindow(SW_HIDE);
+
+	//AfxBeginThread(CreatePublicChatDialog, 0);
+	CPublicChatDialog* p = new CPublicChatDialog(nullptr);
+	auto client = TcpClient::GetInstance();
+	p->Create(IDD_PUBLIC_CHAT);
+	p->ShowWindow(SW_SHOWNORMAL);
+	client->SetDialog(p);
+	
+	
 	//EndDialog(IDOK);	
 	//CPublicChatDialog*dialog = new CPublicChatDialog(nullptr,_T("ABC"));
 //dialog->Create(IDD_PUBLIC_CHAT);
 //dialog->ShowWindow(SW_SHOWNORMAL);
-	CPublicChatDialog* p = new CPublicChatDialog(nullptr,username);
-	auto client = TcpClient::GetInstance(); 
-	client->SetDialog(p);
-	ShowWindow(SW_HIDE);
-	p->DoModal();
+	
 
 }
 
-void CSignUpLogInDlg::SignUpSuccess()
+LRESULT CSignUpLogInDlg::SignUpSuccess(WPARAM wParam, LPARAM lParam)
 {
-	CString username;
-	mEdtUsername.GetWindowTextW(username);
-	CPublicChatDialog *p = new CPublicChatDialog(nullptr,username);
-	TcpClient::GetInstance()->SetDialog(p);
-	//EndDialog(IDOK);
-	p->DoModal();
-}
+	/*CString *username = new CString;
+	mEdtUsername.GetWindowTextW(*username);*/
 
+
+	ShowWindow(SW_HIDE);
+
+	CPublicChatDialog* p = new CPublicChatDialog(nullptr);
+	auto client = TcpClient::GetInstance();
+	p->Create(IDD_PUBLIC_CHAT);
+	p->ShowWindow(SW_SHOWNORMAL);
+	client->SetDialog(p);
+
+	
+	return 0;
+
+}
