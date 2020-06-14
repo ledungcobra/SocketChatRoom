@@ -241,7 +241,8 @@ void CSignUpLogInDlg::LoginSuccess()
 	auto client = TcpClient::GetInstance(); 
 	client->SetDialog(p);
 	ShowWindow(SW_HIDE);
-	p->DoModal();
+	p->Create(IDD_PUBLIC_CHAT);
+	p->ShowWindow(SW_SHOWNORMAL);
 
 }
 

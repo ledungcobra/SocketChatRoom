@@ -86,14 +86,14 @@ bool TcpClient::AnalyzeAndProcess(std::string packet)
 		if(_signUpLogInDlg)
 			_signUpLogInDlg->FailSignUp();
 		else
-		AfxMessageBox(L"Couldn't find Sign Up Login dialog");
+		AfxMessageBox(L"Couldn't find Sign Up dialog");
 		break;
 
 	case FlagServerToClient::Fail_Login:
 		if (_signUpLogInDlg)
 			_signUpLogInDlg->FailLogin();
 		else
-			AfxMessageBox(L"Couldnt find Sign Up Login Dialog");
+			AfxMessageBox(L"Couldnt find Login Dialog");
 		break;
 
 	case FlagServerToClient::Login_Success:
