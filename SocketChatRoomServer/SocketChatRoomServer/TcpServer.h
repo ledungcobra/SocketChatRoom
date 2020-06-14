@@ -85,6 +85,7 @@ public:
 	void Run(); // Goị listen
 	void WriteUserInfo(std::string username, std::string password);
 	void SendToAll(std::string packet);
+	void UpdateUserList();
 };
 
 std::vector<std::string> stringTokenizer(std::string input, char delim);

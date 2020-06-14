@@ -8,6 +8,8 @@ enum class FlagServerToClient
 	Login_Success, //Đăng nhập thành công
 	SignUp_Success, //Đăng kí thành công
 	Send_File_Desc, //Gửi miêu tả file
-	Send_File_Content //Gửi content của file
+	Send_File_Content, //Gửi content của file
+	Send_Private_Message, //flag NULL sender(username - thêm map user vào bên client) NULL message NULL
+	Send_Public_Message //flag NULL sender(username) NULL message NULL
 };
 
