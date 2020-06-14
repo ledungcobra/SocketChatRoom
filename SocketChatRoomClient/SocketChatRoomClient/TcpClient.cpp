@@ -70,7 +70,7 @@ bool TcpClient::AnalyzeAndProcess(std::string packet)
 	{
 	case FlagServerToClient::Send_Active_User:	{
 		std::vector<std::string> listActiveUsers = stringTokenizer(packet, '\0');
-		listActiveUsers.erase(listActiveUsers.begin());
+		listActiveUsers = stringTokenizer(listActiveUsers[1], '|');
 		if (_publicChatDialog) {
 
 			_publicChatDialog->UpdateListActiveUsers(listActiveUsers);
@@ -143,9 +143,8 @@ std::string TcpClient::ReceivePacket()
 
 bool TcpClient::Connect()
 {
-	int connResult = connect(this->_serverSocket , (sockaddr*)&this->_hint, sizeof(this->_hint));
 
-	if (connResult == SOCKET_ERROR)
+	if (connect(this->_serverSocket, (sockaddr*)&this->_hint, sizeof(this->_hint)) )
 	{
 		closesocket(this->_serverSocket); // Do la client nen truoc khi dong can don
 		WSACleanup();

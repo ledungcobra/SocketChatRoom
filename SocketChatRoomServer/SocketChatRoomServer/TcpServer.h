@@ -62,7 +62,7 @@
 class TcpServer
 {
 private:
-	std::vector<std::map<SOCKET, std::string>> _listUser; // Lưu đang on
+	std::map<SOCKET, std::string> _listUser; // Lưu đang on
 	int _port ;
 	std::string _ipAddress;
 	sockaddr_in _hint;
@@ -84,6 +84,7 @@ public:
 	bool IsValid(std::string username); // kiểm tra tên để đăng ký
 	void Run(); // Goị listen
 	void WriteUserInfo(std::string username, std::string password);
+	void SendToAll(std::string packet);
 };
 
 std::vector<std::string> stringTokenizer(std::string input, char delim);

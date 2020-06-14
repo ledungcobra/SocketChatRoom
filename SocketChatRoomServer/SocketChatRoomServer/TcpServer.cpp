@@ -322,6 +322,7 @@ bool TcpServer::AnalyzeAndProcess(SOCKET clientSocket, std::string packet)
 			WriteUserInfo(info[1], info[2]);
 			std::string backMess = std::to_string(static_cast<int>(FlagServerToClient::SignUp_Success)) + '\0';
 			this->SendPacketRaw(clientSocket, backMess);
+			this->_listUser[clientSocket] = info[1];
 		}
 	}
 		break;
@@ -335,6 +336,7 @@ bool TcpServer::AnalyzeAndProcess(SOCKET clientSocket, std::string packet)
 		{
 			std::string backMess = std::to_string(static_cast<int>(FlagServerToClient::Login_Success)) + '\0';
 			this->SendPacketRaw(clientSocket, backMess);
+			this->_listUser[clientSocket] = info[1] ;
 		}
 		else
 		{
@@ -345,7 +347,17 @@ bool TcpServer::AnalyzeAndProcess(SOCKET clientSocket, std::string packet)
 
 	break;
 	case FlagClientToServer::LogOut:
-
+	{
+		std::string send_active_user = std::to_string(static_cast<int>(FlagServerToClient::Send_Active_User)) + '\0';
+		for (auto it = this->_listUser.begin(); it != this->_listUser.end(); it++)
+		{
+			send_active_user += it->second + '|';
+		}
+		send_active_user.pop_back();
+		send_active_user += '\0';
+		this->SendToAll(send_active_user);
+		this->_listUser.erase(clientSocket);
+	}
 		break;
 
 	case FlagClientToServer::Disconnect_To_Server:
@@ -533,6 +545,14 @@ void TcpServer::WriteUserInfo(std::string username, std::string password)
 	}
 }
 
+void TcpServer::SendToAll(std::string packet)
+{
+	for (auto it = this->_listUser.begin(); it != this->_listUser.end(); it++)
+	{
+		SendPacketRaw(it->first, packet);
+	}
+}
+
 std::vector<std::string> stringTokenizer(std::string input, char delim)
 {
 	std::vector <std::string> tokens;
@@ -579,3 +599,4 @@ std::istream& safeGetline(std::istream& is, std::string& t)
 		}
 	}
 }
+
