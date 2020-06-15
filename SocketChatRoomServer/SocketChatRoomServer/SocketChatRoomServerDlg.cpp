@@ -50,6 +50,7 @@
 
 
 
+
 CSocketChatRoomServerDlg::CSocketChatRoomServerDlg(CWnd* pParent /*=nullptr*/)
 	: CDialogEx(IDD_SOCKETCHATROOMSERVER_DIALOG, pParent)
 {
@@ -121,7 +122,16 @@ void CSocketChatRoomServerDlg::OnSysCommand(UINT nID, LPARAM lParam)
 	{
 		auto i = AfxMessageBox(_T("Do you wanna disconnect this server"), 1, 1);
 		if (i == IDOK) {
-			AfxEndThread(0);
+			_cwprintf(L"Number of threads: %d", _flagRunningThread.size());
+			for (auto it = _flagRunningThread.begin(); it != _flagRunningThread.end();it++) {
+
+				*(it->second) = false;
+				delete it->second;
+			}
+			_flagRunningThread.clear();
+			Sleep(2000);
+
+
 			OnDestroy();
 		}
 

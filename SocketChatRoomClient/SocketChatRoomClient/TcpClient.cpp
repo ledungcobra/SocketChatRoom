@@ -141,7 +141,6 @@ bool TcpClient::AnalyzeAndProcess(std::string packet)
 			//_mapPrivateChatDialog[info[1]] = pPrivateChatDlg;
 			//pPrivateChatDlg->Create(ID_PRIVATE_CHAT);
 			CPrivateChatDialog* pPrivateChatDlg =  this->CreatePrivateChatDlg(ConvertString::ConvertStringToCString(info[1]));
-
 			pPrivateChatDlg->ShowWindow(SW_SHOW);
 			pPrivateChatDlg->UpdateChatView(info[2]);
 
@@ -289,7 +288,9 @@ CPrivateChatDialog* TcpClient::CreatePrivateChatDlg(CString _partnerUsername)
 	auto partner = ConvertString::ConvertCStringToString(_partnerUsername);
 	if (_mapPrivateChatDialog.find(partner) == _mapPrivateChatDialog.end()) {
 		dlg = new CPrivateChatDialog(nullptr, _partnerUsername);
+		dlg->Create(ID_PRIVATE_CHAT);
 		_mapPrivateChatDialog[partner] = dlg;
+		
 
 	}
 	else {

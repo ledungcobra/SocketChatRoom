@@ -59,6 +59,8 @@
 //
 //void MessageReceived(TcpServer* listen_server, SOCKET client, std::string msg);
 //
+static std::map<SOCKET, bool*> _flagRunningThread;
+
 class TcpServer
 {
 private:
@@ -67,6 +69,7 @@ private:
 	std::string _ipAddress;
 	sockaddr_in _hint;
 	std::vector<std::string> container;
+	 
 
 public:
 	//TODO:
@@ -87,6 +90,7 @@ public:
 	void WriteUserInfo(std::string username, std::string password);
 	void SendToAll(std::string packet);
 	void UpdateUserList();
+	void RemoveUserFromActiveList(SOCKET clientSocket);
 };
 
 std::vector<std::string> stringTokenizer(std::string input, char delim);

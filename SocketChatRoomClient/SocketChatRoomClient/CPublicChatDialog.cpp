@@ -145,6 +145,7 @@ void CPublicChatDialog::OnLbnSelchangeListActiveUsers()
 	CString buff;
 	mActiveUsersList.GetText(index, buff);
 	CPrivateChatDialog* dlg = TcpClient::GetInstance()->CreatePrivateChatDlg(buff);
+
 	dlg->ShowWindow(SW_SHOW);
 
 

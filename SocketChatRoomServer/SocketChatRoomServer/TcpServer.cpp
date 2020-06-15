@@ -378,12 +378,22 @@ bool TcpServer::AnalyzeAndProcess(SOCKET clientSocket, std::string packet)
 	case FlagClientToServer::LogOut:
 	{
 		this->_listUser.erase(clientSocket);
+		
+		if (_flagRunningThread.find(clientSocket) != _flagRunningThread.end()) {
+			_flagRunningThread.erase(clientSocket);
+		}
+
 		this->UpdateUserList();
 	}
 		break;
 
 	case FlagClientToServer::Disconnect_To_Server:
 		this->_listUser.erase(clientSocket);
+		//Handle thread 
+		if (_flagRunningThread.find(clientSocket) != _flagRunningThread.end()) {
+			_flagRunningThread.erase(clientSocket);
+		}
+		
 		closesocket(clientSocket);
 		this->UpdateUserList();
 		return false;
@@ -562,12 +572,19 @@ std::string TcpServer::ReceivePacket(SOCKET clientSocket)
 	//Tạo buffer
 	char* buffer = new char[6144];
 	//char buffer[6144]; //Tĩnh
+	std::string packet = "";
 	ZeroMemory(buffer, 6144);
-	
+	try {
+		int bytesin = recv(clientSocket, buffer, 6144, 0);
+		packet = std::string(buffer, bytesin);
+		delete[] buffer;
+	}
+	catch (...) {
+		AfxMessageBox(L"One user disconnect unexpectedly");
+		packet = "-1";
+	}
 	//nhận tin nhắn
-	int bytesin = recv(clientSocket , buffer, 6144, 0);
-	std::string packet = std::string(buffer, bytesin);
-	delete[] buffer;
+	
 	return packet;
 }
 
@@ -671,11 +688,22 @@ bool TcpServer::IsValid(std::string username)
 UINT ReceiveAndSend(LPVOID params) {
 	Param* p = (Param*)params;
 	bool isConnect = true;
+	MSG msg;
+	
 	if (p != NULL) {
-		while (isConnect) {
+		while (isConnect &&_flagRunningThread[p->clientSocket]) {
 			
 			std::string packet = p->tcpServer->ReceivePacket(p->clientSocket);
-			isConnect = p->tcpServer->AnalyzeAndProcess(p->clientSocket,packet);
+			if (packet == "-1") {
+				p->tcpServer->RemoveUserFromActiveList(p->clientSocket);
+				isConnect = false;
+				if (_flagRunningThread.find(p->clientSocket) != _flagRunningThread.end()) {
+					_flagRunningThread.erase(p->clientSocket);
+				}
+				break;
+
+			}
+			isConnect = p->tcpServer->AnalyzeAndProcess(p->clientSocket, packet);
 
 		}
 
@@ -686,16 +714,20 @@ UINT ReceiveAndSend(LPVOID params) {
 }
 UINT ListeningThreadFunc(LPVOID param) {
 	TcpServer* server = (TcpServer*)param;
-	while (server->_isRunning) {
+	MSG msg;
+
+	while (server->_isRunning && _flagRunningThread[server->_listeningSocket]) {
 		bool listen = server->Listen();
 
-		if (listen) {
+		if (listen ) {
 			SOCKET clientSock = accept(server->_listeningSocket, nullptr, nullptr);
 			Param* param = new Param;
 			param->tcpServer = server;
 			param->clientSocket = clientSock;
-
-			AfxBeginThread(ReceiveAndSend, param);//TODO:
+			_flagRunningThread[clientSock] = new bool;
+			*_flagRunningThread[clientSock] = true;
+			 AfxBeginThread(ReceiveAndSend, param);//TODO: Tat ket noi server
+			
 		}
 	}
 	return 0;
@@ -704,6 +736,8 @@ UINT ListeningThreadFunc(LPVOID param) {
 void TcpServer::Run()
 {
 	_isRunning = true;
+	_flagRunningThread[this->_listeningSocket] = new bool;
+	*_flagRunningThread[this->_listeningSocket] = true;
 	AfxBeginThread(ListeningThreadFunc,this);
 }
 
@@ -782,4 +816,11 @@ void TcpServer::UpdateUserList()
 	send_active_user.pop_back();
 	send_active_user += '\0';
 	this->SendToAll(send_active_user);
+}
+
+void TcpServer::RemoveUserFromActiveList(SOCKET clientSocket)
+{
+
+	this->_listUser.erase(clientSocket);
+
 }
