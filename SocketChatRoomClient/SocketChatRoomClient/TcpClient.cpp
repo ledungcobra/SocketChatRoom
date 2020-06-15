@@ -132,10 +132,14 @@ bool TcpClient::AnalyzeAndProcess(std::string packet)
 		_cwprintf(ConvertString::ConvertStringToCString(packet));
 		std::vector<std::string> info;
 		info = stringTokenizer(packet, '\0');
-
-
 		std::string backMess = std::to_string(static_cast<int>(FlagClientToServer::Download_Request)) + '\0' + info[1] + '\0' + info[2] + '\0';
-		this->SendPacketRaw(backMess);
+		
+		CString notificationMessage = _T("Do you want to keep the filename: ") + ConvertString::ConvertStringToCString(info[2])+ _T(" from ") + ConvertString::ConvertStringToCString(info[1]);
+
+		auto i = AfxMessageBox(notificationMessage, 1, 1);
+		if (i == IDOK) {	
+			this->SendPacketRaw(backMess);
+		}
 	}
 		break;
 	case FlagServerToClient::Send_File_Content:
@@ -151,8 +155,12 @@ bool TcpClient::AnalyzeAndProcess(std::string packet)
 		packet.pop_back(); // bỏ '\0' tương đương với null trong mẫu tin
 
 		std::string fileContent = packet.substr(packet.length() - stoi(info[3]), stoi(info[3]));
-
-		std::ofstream file(info[2], std::ios::binary);
+		CFileDialog fileDlg(FALSE);
+		fileDlg.DoModal();
+		CString filePath = fileDlg.GetPathName();
+		filePath += _T("\\") + ConvertString::ConvertStringToCString(info[2]);
+		_cwprintf(filePath);
+		std::ofstream file(filePath, std::ios::binary);
 		if (file.is_open())
 		{
 			file << fileContent;
