@@ -16,6 +16,7 @@
 #include <memory>
 #include "ConvertString.h"
 #pragma comment (lib,"ws2_32.lib")
+#define RAWSIZE 6000000
 
 
 static Lock _lock;
@@ -55,6 +56,8 @@ public:
 	//CPrivateChatDialog* GetPrivateChatDialog();
 	//CSignUpLogInDlg* GetSignUpLogInDlg();
 	void SetDialog(CDialog* dialog);
+	void ShowSignUpLoginDialog();
+	
 
 
 
@@ -62,3 +65,4 @@ public:
 
 
 std::vector<std::string> stringTokenizer(std::string input, char delim);
+int fileSize(std::string add);

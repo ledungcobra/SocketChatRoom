@@ -10,6 +10,7 @@
 #include "FlagClientToServer.h"
 #include "FlagServerToClient.h"
 #pragma comment (lib,"ws2_32.lib")
+#define RAWSIZE 6000000
 
 
 //class TcpServer;

@@ -9,7 +9,7 @@ class CPublicChatDialog : public CDialogEx
 	DECLARE_DYNAMIC(CPublicChatDialog)
 
 public:
-	CPublicChatDialog(CWnd* pParent);//,CString username);   // standard constructor
+	CPublicChatDialog(CWnd* pParent,CString username);   // standard constructor
 	virtual ~CPublicChatDialog();
 
 // Dialog Data
@@ -24,6 +24,7 @@ protected:
 	DECLARE_MESSAGE_MAP()
 
 	BOOL CPublicChatDialog::OnInitDialog();
+	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
 private :
 	CString _username;
 
@@ -35,4 +36,7 @@ public:
 	CEdit mEdtChat;
 	afx_msg void OnBnClickedSend();
 	void UpdateListActiveUsers(std::vector<std::string> listActiveUsers);
+	afx_msg void OnBnClickedLogout();
+	
+	afx_msg void OnBnClickedUploadFile();
 };

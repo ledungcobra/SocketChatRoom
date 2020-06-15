@@ -78,6 +78,7 @@ BEGIN_MESSAGE_MAP(CSignUpLogInDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON2, &CSignUpLogInDlg::OnBnClickedSignUp)
 	ON_BN_CLICKED(IDC_BUTTON1, &CSignUpLogInDlg::OnBnClickedLogIn)
 	ON_MESSAGE(SIGNUP_SUCCESS_MSG,&CSignUpLogInDlg::SignUpSuccess)
+	ON_MESSAGE(LOGIN_SUCCESS_MSG, &CSignUpLogInDlg::LoginSuccess)
 END_MESSAGE_MAP()
 
 
@@ -121,10 +122,19 @@ BOOL CSignUpLogInDlg::OnInitDialog()
 
 void CSignUpLogInDlg::OnSysCommand(UINT nID, LPARAM lParam)
 {
-	if ((nID & 0xFFF0) == IDM_ABOUTBOX)
+	if ((nID & 0xFFF0) == SC_CLOSE)
 	{
-		/*CAboutDlg dlgAbout;
-		dlgAbout.DoModal();*/
+		auto i = AfxMessageBox(_T("Do you wanna disconnect to this server"), 1, 1);
+		if (i == IDOK) {
+
+			std::string packet = "";
+			packet += std::to_string(static_cast<int>(FlagClientToServer::Disconnect_To_Server)) + '\0';
+			TcpClient::GetInstance()->SendPacketRaw(packet);
+			OnDestroy();
+
+		}
+
+
 	}
 	else
 	{
@@ -234,38 +244,36 @@ void CSignUpLogInDlg::FailLogin()
 }
 
 
-void CSignUpLogInDlg::LoginSuccess()
+void CSignUpLogInDlg::AccountAlreadyUsed()
+{
+	AfxMessageBox(L"Account has been logged in by another device");
+}
+
+LRESULT CSignUpLogInDlg::LoginSuccess(WPARAM wParam, LPARAM lParam)
 {
 	//TODO:
-	//CString* username = new CString;
-	//mEdtUsername.GetWindowTextW(*username);
+	CString username;
+	mEdtUsername.GetWindowTextW(username);
 	ShowWindow(SW_HIDE);
 
-	//AfxBeginThread(CreatePublicChatDialog, 0);
-	CPublicChatDialog* p = new CPublicChatDialog(nullptr);
+	CPublicChatDialog* p = new CPublicChatDialog(nullptr, username);
 	auto client = TcpClient::GetInstance();
 	p->Create(IDD_PUBLIC_CHAT);
 	p->ShowWindow(SW_SHOWNORMAL);
 	client->SetDialog(p);
-	
-	
-	//EndDialog(IDOK);	
-	//CPublicChatDialog*dialog = new CPublicChatDialog(nullptr,_T("ABC"));
-//dialog->Create(IDD_PUBLIC_CHAT);
-//dialog->ShowWindow(SW_SHOWNORMAL);
+
+	return 0;
 	
 
 }
 
 LRESULT CSignUpLogInDlg::SignUpSuccess(WPARAM wParam, LPARAM lParam)
 {
-	/*CString *username = new CString;
-	mEdtUsername.GetWindowTextW(*username);*/
-
-
+	CString username;
+	mEdtUsername.GetWindowTextW(username);
 	ShowWindow(SW_HIDE);
 
-	CPublicChatDialog* p = new CPublicChatDialog(nullptr);
+	CPublicChatDialog* p = new CPublicChatDialog(nullptr,username);
 	auto client = TcpClient::GetInstance();
 	p->Create(IDD_PUBLIC_CHAT);
 	p->ShowWindow(SW_SHOWNORMAL);

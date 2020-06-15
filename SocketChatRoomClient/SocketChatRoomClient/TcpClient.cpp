@@ -68,25 +68,25 @@ bool TcpClient::AnalyzeAndProcess(std::string packet)
 	
 	switch (flag)
 	{
-	case FlagServerToClient::Send_Active_User:	{
+	case FlagServerToClient::Send_Active_User: {
 		std::vector<std::string> listActiveUsers = stringTokenizer(packet, '\0');
 		listActiveUsers = stringTokenizer(listActiveUsers[1], '|');
 		if (_publicChatDialog) {
 
 			_publicChatDialog->UpdateListActiveUsers(listActiveUsers);
-			
+
 		}
 		else {
 			AfxMessageBox(L"Couldn't find Public Dialog");
 		}
 	}
-		break;
+											 break;
 
 	case FlagServerToClient::Fail_Sign_Up:
-		if(_signUpLogInDlg)
+		if (_signUpLogInDlg)
 			_signUpLogInDlg->FailSignUp();
 		else
-		AfxMessageBox(L"Couldn't find Sign Up dialog");
+			AfxMessageBox(L"Couldn't find Sign Up dialog");
 		break;
 
 	case FlagServerToClient::Fail_Login:
@@ -98,7 +98,8 @@ bool TcpClient::AnalyzeAndProcess(std::string packet)
 
 	case FlagServerToClient::Login_Success:
 		if (_signUpLogInDlg)
-			_signUpLogInDlg->LoginSuccess();
+			//_signUpLogInDlg->LoginSuccess();
+			SendMessage(_signUpLogInDlg->GetSafeHwnd(), LOGIN_SUCCESS_MSG, 0, 0);
 		else
 			AfxMessageBox(L"Couldn't find sign up login dialog");
 
@@ -108,7 +109,7 @@ bool TcpClient::AnalyzeAndProcess(std::string packet)
 
 	case FlagServerToClient::SignUp_Success:
 		if (_signUpLogInDlg) {
-			SendMessage(_signUpLogInDlg->GetSafeHwnd(), SIGNUP_SUCCESS_MSG,0,0);
+			SendMessage(_signUpLogInDlg->GetSafeHwnd(), SIGNUP_SUCCESS_MSG, 0, 0);
 			//CWnd
 		}
 		else
@@ -116,22 +117,55 @@ bool TcpClient::AnalyzeAndProcess(std::string packet)
 		break;
 
 	case FlagServerToClient::Send_File_Desc:
-		
+	{
+		//TODO:testing
+		_cwprintf(ConvertString::ConvertStringToCString(packet));
+		std::vector<std::string> info;
+		info = stringTokenizer(packet, '\0');
+
+
+		std::string backMess = std::to_string(static_cast<int>(FlagClientToServer::Download_Request)) + '\0' + info[1] + '\0' + info[2] + '\0';
+		this->SendPacketRaw(backMess);
+	}
 		break;
 	case FlagServerToClient::Send_File_Content:
+	{
+		//TODO:testing
+		// tách thông tin file 
+		_cwprintf(ConvertString::ConvertStringToCString(packet));
+		std::vector<std::string> info;
+		info = stringTokenizer(packet, '\0');
+
+		// lấy content
+		packet.pop_back(); // bỏ '\0' được thêm vào từ send packet raw
+		packet.pop_back(); // bỏ '\0' tương đương với null trong mẫu tin
+
+		std::string fileContent = packet.substr(packet.length() - stoi(info[3]), stoi(info[3]));
+
+		std::ofstream file(info[2], std::ios::binary);
+		if (file.is_open())
+		{
+			file << fileContent;
+			file.close();
+		}
+
+	}
 		break;
 		//TODO:
 	case FlagServerToClient::Already_Login:
 		if (_signUpLogInDlg)
-			_signUpLogInDlg->FailLogin();
+			_signUpLogInDlg->AccountAlreadyUsed();
+			//_signUpLogInDlg->FailLogin();
 		else
 			AfxMessageBox(L"Couldnt find Login Dialog");
 		break;
 
 	case FlagServerToClient::Send_Private_Message:
+	{
 		std::vector<std::string> info;
 		info = stringTokenizer(packet, '\0');
-		//TODO: Hiện khung chat riêng và đẩy tin nhắn lên, info[1] là người gửi, info[2] là tin nhắn
+	//TODO: Hiện khung chat riêng và đẩy tin nhắn lên, info[1] là người gửi, info[2] là tin nhắn
+	}
 		break;
 	case FlagServerToClient::Send_Public_Message:
 	{
@@ -148,12 +182,12 @@ bool TcpClient::AnalyzeAndProcess(std::string packet)
 std::string TcpClient::ReceivePacket()
 {
 	//Tạo buffer
-	char* buffer = new char[6144];
+	char* buffer = new char[RAWSIZE];
 	//char buffer[6144]; //Tĩnh
-	ZeroMemory(buffer, 6144);
+	ZeroMemory(buffer, RAWSIZE);
 
 	//nhận tin nhắn
-	int bytesin = recv(this->_serverSocket, buffer, 6144, 0);
+	int bytesin = recv(this->_serverSocket, buffer, RAWSIZE, 0);
 	std::string packet = std::string(buffer, bytesin);
 	delete[] buffer;
 	return packet;
@@ -258,6 +292,14 @@ void TcpClient::SetDialog(CDialog* dialog)
 	
 }
 
+void TcpClient::ShowSignUpLoginDialog()
+{
+
+	_signUpLogInDlg->ShowWindow(SW_SHOWNORMAL);
+
+}
+
+
 std::vector<std::string> stringTokenizer(std::string input, char delim)
 {
 	std::vector <std::string> tokens;
@@ -271,6 +313,15 @@ std::vector<std::string> stringTokenizer(std::string input, char delim)
 	return tokens;
 }
 
+int fileSize(std::string add)
+{
+	std::ifstream mySource;
+	mySource.open(add, std::ios_base::binary);
+	mySource.seekg(0, std::ios_base::end);
+	int size = mySource.tellg();
+	mySource.close();
+	return size;
+}
 
 
 
