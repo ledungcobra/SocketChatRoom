@@ -1,4 +1,4 @@
-﻿#include "pch.h"
+#include "pch.h"
 #include "TcpClient.h"
 #include "resource.h"
 TcpClient* TcpClient::_instance = NULL;
@@ -21,7 +21,20 @@ TcpClient::TcpClient()
 	}
 	this->_serverSocket = this->CreateSocket();
 }
+std::string TcpClient::ReceivePacket()
+{
+	//Tạo buffer
+	char* buffer = new char[RAWSIZE];
+	//char buffer[6144]; //Tĩnh
+	ZeroMemory(buffer, RAWSIZE);
 
+	//nhận tin nhắn
+	int bytesin = recv(this->_serverSocket, buffer, RAWSIZE, 0);
+	std::string packet = std::string(buffer, bytesin);
+	delete[] buffer;
+	return packet;
+
+}
 SOCKET TcpClient::CreateSocket()
 {
 	SOCKET sock_server = socket(AF_INET, SOCK_STREAM, 0);
@@ -68,25 +81,25 @@ bool TcpClient::AnalyzeAndProcess(std::string packet)
 	
 	switch (flag)
 	{
-	case FlagServerToClient::Send_Active_User: {
+	case FlagServerToClient::Send_Active_User:	{
 		std::vector<std::string> listActiveUsers = stringTokenizer(packet, '\0');
 		listActiveUsers = stringTokenizer(listActiveUsers[1], '|');
 		if (_publicChatDialog) {
 
 			_publicChatDialog->UpdateListActiveUsers(listActiveUsers);
-
+			
 		}
 		else {
 			AfxMessageBox(L"Couldn't find Public Dialog");
 		}
 	}
-											 break;
+		break;
 
 	case FlagServerToClient::Fail_Sign_Up:
-		if (_signUpLogInDlg)
+		if(_signUpLogInDlg)
 			_signUpLogInDlg->FailSignUp();
 		else
-			AfxMessageBox(L"Couldn't find Sign Up dialog");
+		AfxMessageBox(L"Couldn't find Sign Up dialog");
 		break;
 
 	case FlagServerToClient::Fail_Login:
@@ -102,14 +115,11 @@ bool TcpClient::AnalyzeAndProcess(std::string packet)
 			SendMessage(_signUpLogInDlg->GetSafeHwnd(), LOGIN_SUCCESS_MSG, 0, 0);
 		else
 			AfxMessageBox(L"Couldn't find sign up login dialog");
-
-		//TODO:
-		return false;
 		break;
 
 	case FlagServerToClient::SignUp_Success:
 		if (_signUpLogInDlg) {
-			SendMessage(_signUpLogInDlg->GetSafeHwnd(), SIGNUP_SUCCESS_MSG, 0, 0);
+			SendMessage(_signUpLogInDlg->GetSafeHwnd(), SIGNUP_SUCCESS_MSG,0,0);
 			//CWnd
 		}
 		else
@@ -164,6 +174,21 @@ bool TcpClient::AnalyzeAndProcess(std::string packet)
 	{
 		std::vector<std::string> info;
 		info = stringTokenizer(packet, '\0');
+		
+		if (_mapPrivateChatDialog.find(info[1]) == _mapPrivateChatDialog.end()) {
+
+
+			SendMessage(_publicChatDialog->GetSafeHwnd(), OPEN_PRIVATE_CHAT_DIALOG,(WPARAM)(LPCTSTR)ConvertString::ConvertStringToCString(info[2]), (LPARAM)(LPCTSTR)ConvertString::ConvertStringToCString(info[1]));
+			
+			//pPrivateChatDlg->UpdateChatView(info[2]);
+
+
+		}
+		else {
+			//Tìm được cửa số người gửi 
+			_mapPrivateChatDialog[info[1]]->UpdateChatView(info[2]);
+			
+		}
 	//TODO: Hiện khung chat riêng và đẩy tin nhắn lên, info[1] là người gửi, info[2] là tin nhắn
 	}
 		break;
@@ -172,26 +197,18 @@ bool TcpClient::AnalyzeAndProcess(std::string packet)
 		std::vector<std::string> info;
 		info = stringTokenizer(packet, '\0');
 		//TODO: Đẩy lên khung chat chung ( info[1] là tên người nhắn lên chat public, info[2] là nội dung)
+		_publicChatDialog->UpdateMessage(info[1],info[2]);
 	}
 		break;
+	case FlagServerToClient:: Close_All_Connection:
+	{
+		this->CloseConnection();
+		return false;
+	}
+	break;
 	}
 
 	return true;
-}
-
-std::string TcpClient::ReceivePacket()
-{
-	//Tạo buffer
-	char* buffer = new char[RAWSIZE];
-	//char buffer[6144]; //Tĩnh
-	ZeroMemory(buffer, RAWSIZE);
-
-	//nhận tin nhắn
-	int bytesin = recv(this->_serverSocket, buffer, RAWSIZE, 0);
-	std::string packet = std::string(buffer, bytesin);
-	delete[] buffer;
-	return packet;
-
 }
 
 bool TcpClient::Connect()
@@ -232,10 +249,10 @@ struct Param {
 UINT ReceiveThreadFunc(LPVOID param) {
 
 	TcpClient* pTcpClient = (TcpClient*)param;
-
-	while (pTcpClient->_isRunning) {
+	bool connect=true;
+	while (pTcpClient->_isRunning && connect) {
 		std::string packet = pTcpClient->ReceivePacket();
-		pTcpClient->AnalyzeAndProcess(packet);
+		connect = pTcpClient->AnalyzeAndProcess(packet);
 	}
 	return 0;
 
@@ -284,11 +301,6 @@ void TcpClient::SetDialog(CDialog* dialog)
 		_signUpLogInDlg = dynamic_cast<CSignUpLogInDlg*> (dialog);
 
 	}
-	else if (strcmp(name, "class CPrivateChatDialog") == 0) {
-
-		_privateChatDialog = dynamic_cast<CPrivateChatDialog*> (dialog);
-
-	}
 	
 }
 
@@ -296,6 +308,25 @@ void TcpClient::ShowSignUpLoginDialog()
 {
 
 	_signUpLogInDlg->ShowWindow(SW_SHOWNORMAL);
+
+}
+
+CPrivateChatDialog* TcpClient::CreatePrivateChatDlg(CString _partnerUsername)
+{
+	CPrivateChatDialog* dlg = nullptr;
+
+	auto partner = ConvertString::ConvertCStringToString(_partnerUsername);
+	if (_mapPrivateChatDialog.find(partner) == _mapPrivateChatDialog.end()) {
+		dlg = new CPrivateChatDialog(nullptr, _partnerUsername);
+		dlg->Create(ID_PRIVATE_CHAT);
+		_mapPrivateChatDialog[partner] = dlg;
+		
+
+	}
+	else {
+		dlg = _mapPrivateChatDialog[partner];
+	}
+	return dlg;
 
 }
 

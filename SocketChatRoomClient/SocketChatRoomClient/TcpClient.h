@@ -1,4 +1,4 @@
-﻿#define _WIN32_WINNT _WIN32_WINNT_WIN10
+#define _WIN32_WINNT _WIN32_WINNT_WIN10
 #include <iostream>
 #include <WS2tcpip.h>
 #include <string>
@@ -15,9 +15,9 @@
 #include <fstream>
 #include <memory>
 #include "ConvertString.h"
+#include <map>
 #pragma comment (lib,"ws2_32.lib")
 #define RAWSIZE 6000000
-
 
 static Lock _lock;
 
@@ -29,15 +29,16 @@ private:
 	std::string _serverIpaddress;
 	sockaddr_in _hint;
 	CPublicChatDialog* _publicChatDialog = nullptr;
-	CPrivateChatDialog* _privateChatDialog = nullptr;
+	std::map<std::string,CPrivateChatDialog*> _mapPrivateChatDialog;
 	CSignUpLogInDlg* _signUpLogInDlg = nullptr;
+	
 
 public:
 	//TODO:
 	bool _isActive;
 	bool _isRunning;
 	SOCKET _serverSocket;
-	TcpClient();
+	CString _username;
 	SOCKET CreateSocket();
 	void SendPacketRaw( std::string packet);
 	//TODO: Thay đổi _isRunning nếu ngắt kết nối
@@ -50,6 +51,7 @@ public:
 	void Run();
 private:
     static TcpClient* _instance;
+	TcpClient();
 
 public:
 	//CPublicChatDialog* GetPublicChatDialog();
@@ -57,6 +59,8 @@ public:
 	//CSignUpLogInDlg* GetSignUpLogInDlg();
 	void SetDialog(CDialog* dialog);
 	void ShowSignUpLoginDialog();
+
+	CPrivateChatDialog* CreatePrivateChatDlg(CString partnerUsername);
 	
 
 

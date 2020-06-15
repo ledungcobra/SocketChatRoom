@@ -257,6 +257,8 @@ LRESULT CSignUpLogInDlg::LoginSuccess(WPARAM wParam, LPARAM lParam)
 	ShowWindow(SW_HIDE);
 
 	CPublicChatDialog* p = new CPublicChatDialog(nullptr, username);
+	TcpClient::GetInstance()->_username = username;
+
 	auto client = TcpClient::GetInstance();
 	p->Create(IDD_PUBLIC_CHAT);
 	p->ShowWindow(SW_SHOWNORMAL);
@@ -274,6 +276,7 @@ LRESULT CSignUpLogInDlg::SignUpSuccess(WPARAM wParam, LPARAM lParam)
 	ShowWindow(SW_HIDE);
 
 	CPublicChatDialog* p = new CPublicChatDialog(nullptr,username);
+	TcpClient::GetInstance()->_username = username;
 	auto client = TcpClient::GetInstance();
 	p->Create(IDD_PUBLIC_CHAT);
 	p->ShowWindow(SW_SHOWNORMAL);

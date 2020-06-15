@@ -1,4 +1,4 @@
-﻿#define _WIN32_WINNT _WIN32_WINNT_WIN10
+#define _WIN32_WINNT _WIN32_WINNT_WIN10
 #include <iostream>
 #include <fstream>
 #include <WS2tcpip.h>
@@ -9,9 +9,9 @@
 #include <map>
 #include "FlagClientToServer.h"
 #include "FlagServerToClient.h"
+#include "Lock.h"
 #pragma comment (lib,"ws2_32.lib")
 #define RAWSIZE 6000000
-
 
 //class TcpServer;
 //
@@ -60,6 +60,8 @@
 //
 //void MessageReceived(TcpServer* listen_server, SOCKET client, std::string msg);
 //
+
+static Lock _lock;
 class TcpServer
 {
 private:
@@ -68,13 +70,14 @@ private:
 	std::string _ipAddress;
 	sockaddr_in _hint;
 	std::vector<std::string> container;
+	 
 
 public:
 	//TODO:
 	SOCKET _listeningSocket;
 	bool _isRunning;
 	// Khởi tạo -> Run -> Listen -> receive -> analyzeAndProcess -> SendPacketRaw
-	TcpServer();
+	
 	SOCKET CreateSocket(); //Tạo socket nghe
 	void SendPacketRaw(SOCKET clientSocket, std::string packet );
 	//TODO: Analyze gọi SendPacketRaw
@@ -88,6 +91,13 @@ public:
 	void WriteUserInfo(std::string username, std::string password);
 	void SendToAll(std::string packet);
 	void UpdateUserList();
+	void RemoveUserFromActiveList(SOCKET clientSocket);
+	static std::map<SOCKET, bool> _flagRunningThread;
+	static TcpServer* GetInstance();
+	~TcpServer();
+private:
+	static TcpServer* _instance;
+	TcpServer();
 };
 
 std::vector<std::string> stringTokenizer(std::string input, char delim);

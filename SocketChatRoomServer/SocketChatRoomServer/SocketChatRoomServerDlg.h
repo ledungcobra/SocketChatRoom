@@ -7,10 +7,9 @@
 #include <list>
 #include <vector>
 #include "TcpServer.h"
-#define PORT 54000
-#define WM_SOCKET WM_USER+1
-
-// CSocketChatRoomServerDlg dialog
+#include <map>
+//#define PORT 54000
+//#define WM_SOCKET WM_USER+1
 class CSocketChatRoomServerDlg : public CDialogEx
 {
 // Construction
@@ -40,10 +39,6 @@ public:
 	CButton mBTNSWITCH;
 	afx_msg void OnBnClickedSwitch();
 	CListBox mListBox;
-
-private:
-	TcpServer *_server;
-	bool _isRunning = false;
 	
 
 
