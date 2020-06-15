@@ -1,4 +1,4 @@
-﻿#define _WIN32_WINNT _WIN32_WINNT_WIN10
+#define _WIN32_WINNT _WIN32_WINNT_WIN10
 #include <iostream>
 #include <fstream>
 #include <WS2tcpip.h>
@@ -11,7 +11,7 @@
 #include "FlagServerToClient.h"
 #include "Lock.h"
 #pragma comment (lib,"ws2_32.lib")
-
+#define RAWSIZE 6000000
 
 //class TcpServer;
 //

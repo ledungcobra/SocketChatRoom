@@ -1,4 +1,3 @@
-﻿
 // SocketChatRoomServerDlg.cpp : implementation file
 //
 

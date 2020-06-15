@@ -1,4 +1,4 @@
-﻿#define _WIN32_WINNT _WIN32_WINNT_WIN10
+#define _WIN32_WINNT _WIN32_WINNT_WIN10
 #include <iostream>
 #include <WS2tcpip.h>
 #include <string>
@@ -17,7 +17,7 @@
 #include "ConvertString.h"
 #include <map>
 #pragma comment (lib,"ws2_32.lib")
-
+#define RAWSIZE 6000000
 
 static Lock _lock;
 
@@ -69,3 +69,4 @@ public:
 
 
 std::vector<std::string> stringTokenizer(std::string input, char delim);
+int fileSize(std::string add);

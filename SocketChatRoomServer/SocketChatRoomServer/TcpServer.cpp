@@ -1,4 +1,4 @@
-﻿#include "pch.h"
+#include "pch.h"
 #include "TcpServer.h"
 #include "ConvertString.h"
 
@@ -171,13 +171,19 @@ bool TcpServer::AnalyzeAndProcess(SOCKET clientSocket, std::string packet)
 		for (int i = 0; i < this->container.size(); i++)
 		{
 			std::vector<std::string> content = stringTokenizer((this->container[i]), '\0');
-			if (content[0] == info[1] && content[2] == info[2])
+			if (content[0] == info[1] && content[2] == info[2]) // sender - filename
 			{
-				std::string backMess = std::to_string(static_cast<int>(FlagServerToClient::Send_File_Desc)) + '\0' + info[1] + '\0' + info[2] + '\0' + content[3] + '\0'; // sender + file name + content
+				// lấy receiver ra khỏi content 
+				int pos = this->container[i].find(content[1]);
+				this->container[i].erase(pos, content[1].length() + 1);
+
+				// tạo gói tin gửi đi
+
+				std::string backMess = std::to_string(static_cast<int>(FlagServerToClient::Send_File_Content)) + '\0' + this->container[i];
 				SendPacketRaw(clientSocket, backMess);
 				if (content[1] == "ALL")
 				{
-
+					// do nothing
 				}
 				else
 				{
@@ -188,7 +194,6 @@ bool TcpServer::AnalyzeAndProcess(SOCKET clientSocket, std::string packet)
 		}
 	}
 		break;
-
 	case FlagClientToServer::PrivateChat:
 	{
 		_cwprintf(ConvertString::ConvertStringToCString(packet));
@@ -282,6 +287,13 @@ bool TcpServer::AnalyzeAndProcess(SOCKET clientSocket, std::string packet)
 		std::vector<std::string> info;
 		info = stringTokenizer(packet, '\0');
 
+		// lấy content
+		packet.pop_back(); // bỏ '\0' được thêm vào từ send packet raw
+		packet.pop_back(); // bỏ '\0' tương đương với null trong mẫu tin
+		int size = packet.length();
+
+		std::string fileContent = packet.substr(packet.length() - stoi(info[3]), stoi(info[3]));
+
 		// lấy tên người gửi 
 
 		std::string sender;
@@ -295,7 +307,7 @@ bool TcpServer::AnalyzeAndProcess(SOCKET clientSocket, std::string packet)
 
 		// tách thông tin
 
-		std::string content = sender + '\0' + info[1] +'\0' + info[2] + '\0' + info[3] + '\0'; // sender + receiver + filename + content 
+		std::string content = sender + '\0' + info[1] + '\0' + info[2] + '\0' + info[3] + '\0' + fileContent + '\0'; // sender + receiver + filename + file size + content 
 
 		this->container.push_back(content);
 
@@ -326,7 +338,9 @@ bool TcpServer::AnalyzeAndProcess(SOCKET clientSocket, std::string packet)
 
 	}
 		break;
-	}
+    }
+	
+	
 
 	return true;
 }
@@ -334,21 +348,14 @@ bool TcpServer::AnalyzeAndProcess(SOCKET clientSocket, std::string packet)
 std::string TcpServer::ReceivePacket(SOCKET clientSocket)
 {
 	//Tạo buffer
-	char* buffer = new char[6144];
+	char* buffer = new char[RAWSIZE];
 	//char buffer[6144]; //Tĩnh
-	std::string packet = "";
-	ZeroMemory(buffer, 6144);
-	try {
-		int bytesin = recv(clientSocket, buffer, 6144, 0);
-		packet = std::string(buffer, bytesin);
-		delete[] buffer;
-	}
-	catch (...) {
-		AfxMessageBox(L"One user disconnect unexpectedly");
-		packet = "-1";
-	}
-	//nhận tin nhắn
+	ZeroMemory(buffer, RAWSIZE);
 	
+	//nhận tin nhắn
+	int bytesin = recv(clientSocket , buffer, RAWSIZE, 0);
+	std::string packet = std::string(buffer, bytesin);
+	delete[] buffer;
 	return packet;
 }
 

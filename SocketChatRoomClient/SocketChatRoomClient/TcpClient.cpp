@@ -1,4 +1,4 @@
-﻿#include "pch.h"
+#include "pch.h"
 #include "TcpClient.h"
 #include "resource.h"
 TcpClient* TcpClient::_instance = NULL;
@@ -21,7 +21,20 @@ TcpClient::TcpClient()
 	}
 	this->_serverSocket = this->CreateSocket();
 }
+std::string TcpClient::ReceivePacket()
+{
+	//Tạo buffer
+	char* buffer = new char[RAWSIZE];
+	//char buffer[6144]; //Tĩnh
+	ZeroMemory(buffer, RAWSIZE);
 
+	//nhận tin nhắn
+	int bytesin = recv(this->_serverSocket, buffer, RAWSIZE, 0);
+	std::string packet = std::string(buffer, bytesin);
+	delete[] buffer;
+	return packet;
+
+}
 SOCKET TcpClient::CreateSocket()
 {
 	SOCKET sock_server = socket(AF_INET, SOCK_STREAM, 0);
@@ -114,9 +127,39 @@ bool TcpClient::AnalyzeAndProcess(std::string packet)
 		break;
 
 	case FlagServerToClient::Send_File_Desc:
-		
+	{
+		//TODO:testing
+		_cwprintf(ConvertString::ConvertStringToCString(packet));
+		std::vector<std::string> info;
+		info = stringTokenizer(packet, '\0');
+
+
+		std::string backMess = std::to_string(static_cast<int>(FlagClientToServer::Download_Request)) + '\0' + info[1] + '\0' + info[2] + '\0';
+		this->SendPacketRaw(backMess);
+	}
 		break;
 	case FlagServerToClient::Send_File_Content:
+	{
+		//TODO:testing
+		// tách thông tin file 
+		_cwprintf(ConvertString::ConvertStringToCString(packet));
+		std::vector<std::string> info;
+		info = stringTokenizer(packet, '\0');
+
+		// lấy content
+		packet.pop_back(); // bỏ '\0' được thêm vào từ send packet raw
+		packet.pop_back(); // bỏ '\0' tương đương với null trong mẫu tin
+
+		std::string fileContent = packet.substr(packet.length() - stoi(info[3]), stoi(info[3]));
+
+		std::ofstream file(info[2], std::ios::binary);
+		if (file.is_open())
+		{
+			file << fileContent;
+			file.close();
+		}
+
+	}
 		break;
 		//TODO:
 	case FlagServerToClient::Already_Login:
@@ -166,21 +209,6 @@ bool TcpClient::AnalyzeAndProcess(std::string packet)
 	}
 
 	return true;
-}
-
-std::string TcpClient::ReceivePacket()
-{
-	//Tạo buffer
-	char* buffer = new char[6144];
-	//char buffer[6144]; //Tĩnh
-	ZeroMemory(buffer, 6144);
-
-	//nhận tin nhắn
-	int bytesin = recv(this->_serverSocket, buffer, 6144, 0);
-	std::string packet = std::string(buffer, bytesin);
-	delete[] buffer;
-	return packet;
-
 }
 
 bool TcpClient::Connect()
@@ -316,6 +344,15 @@ std::vector<std::string> stringTokenizer(std::string input, char delim)
 	return tokens;
 }
 
+int fileSize(std::string add)
+{
+	std::ifstream mySource;
+	mySource.open(add, std::ios_base::binary);
+	mySource.seekg(0, std::ios_base::end);
+	int size = mySource.tellg();
+	mySource.close();
+	return size;
+}
 
 
 
