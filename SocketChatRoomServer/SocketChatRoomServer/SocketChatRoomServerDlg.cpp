@@ -1,4 +1,4 @@
-
+﻿
 // SocketChatRoomServerDlg.cpp : implementation file
 //
 
@@ -110,8 +110,7 @@ BOOL CSocketChatRoomServerDlg::OnInitDialog()
 
 	// TODO: Add extra initialization here
 
-	_server = new TcpServer();
-	_server->Run();
+	TcpServer::GetInstance()->Run();
 
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }
@@ -122,17 +121,24 @@ void CSocketChatRoomServerDlg::OnSysCommand(UINT nID, LPARAM lParam)
 	{
 		auto i = AfxMessageBox(_T("Do you wanna disconnect this server"), 1, 1);
 		if (i == IDOK) {
-			_cwprintf(L"Number of threads: %d", _flagRunningThread.size());
-			for (auto it = _flagRunningThread.begin(); it != _flagRunningThread.end();it++) {
+			try {
+				_cwprintf(L"Number of threads: %d", TcpServer::GetInstance()->_flagRunningThread.size());
+				
+				
+				for (auto it = TcpServer::GetInstance()->_flagRunningThread.begin(); it != TcpServer::GetInstance()->_flagRunningThread.end(); it++) {
 
-				*(it->second) = false;
-				delete it->second;
+					it->second = false;
+
+				}
+				TcpServer::GetInstance()->_flagRunningThread.clear();
+				Sleep(2000);
+				//TODO: Tương tự Turn off server
+
+				OnDestroy();
 			}
-			_flagRunningThread.clear();
-			Sleep(2000);
+			catch (...) {
 
-
-			OnDestroy();
+			}
 		}
 
 

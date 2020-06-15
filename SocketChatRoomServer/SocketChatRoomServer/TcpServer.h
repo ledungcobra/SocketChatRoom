@@ -9,6 +9,7 @@
 #include <map>
 #include "FlagClientToServer.h"
 #include "FlagServerToClient.h"
+#include "Lock.h"
 #pragma comment (lib,"ws2_32.lib")
 
 
@@ -59,8 +60,8 @@
 //
 //void MessageReceived(TcpServer* listen_server, SOCKET client, std::string msg);
 //
-static std::map<SOCKET, bool*> _flagRunningThread;
 
+static Lock _lock;
 class TcpServer
 {
 private:
@@ -76,7 +77,7 @@ public:
 	SOCKET _listeningSocket;
 	bool _isRunning;
 	// Khởi tạo -> Run -> Listen -> receive -> analyzeAndProcess -> SendPacketRaw
-	TcpServer();
+	
 	SOCKET CreateSocket(); //Tạo socket nghe
 	void SendPacketRaw(SOCKET clientSocket, std::string packet );
 	//TODO: Analyze gọi SendPacketRaw
@@ -91,6 +92,11 @@ public:
 	void SendToAll(std::string packet);
 	void UpdateUserList();
 	void RemoveUserFromActiveList(SOCKET clientSocket);
+	static std::map<SOCKET, bool> _flagRunningThread;
+	static TcpServer* GetInstance();
+private:
+	static TcpServer* _instance;
+	TcpServer();
 };
 
 std::vector<std::string> stringTokenizer(std::string input, char delim);

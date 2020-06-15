@@ -187,6 +187,7 @@
     <ClInclude Include="FlagClientToServer.h" />
     <ClInclude Include="FlagServerToClient.h" />
     <ClInclude Include="framework.h" />
+    <ClInclude Include="Lock.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="SocketChatRoomServer.h" />
@@ -199,6 +200,7 @@
     <ClCompile Include="ConvertString.cpp" />
     <ClCompile Include="FlagClientToServer.cpp" />
     <ClCompile Include="FlagServerToClient.cpp" />
+    <ClCompile Include="Lock.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
