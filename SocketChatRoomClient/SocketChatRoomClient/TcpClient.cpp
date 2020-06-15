@@ -212,7 +212,7 @@ bool TcpClient::AnalyzeAndProcess(std::string packet)
 	case FlagServerToClient:: Close_All_Connection:
 	{
 		for (auto it = _mapPrivateChatDialog.begin(); it != _mapPrivateChatDialog.end(); it++) {
-			delete it->second;
+			 it->second->ShowWindow(SW_HIDE);
 		}
 		auto i = MessageBox(_publicChatDialog->GetSafeHwnd(), L"The server has shut down !!", L"Press OK  to return Sign Up Log In dialog",0);
 		_publicChatDialog->OnBnClickedLogout();
@@ -333,11 +333,11 @@ void TcpClient::ShowSignUpLoginDialog()
 
 CPrivateChatDialog* TcpClient::CreatePrivateChatDlg(CString _partnerUsername)
 {
-	CPrivateChatDialog* dlg = nullptr;
+	std::shared_ptr<CPrivateChatDialog> dlg;
 
 	auto partner = ConvertString::ConvertCStringToString(_partnerUsername);
 	if (_mapPrivateChatDialog.find(partner) == _mapPrivateChatDialog.end()) {
-		dlg = new CPrivateChatDialog(nullptr, _partnerUsername);
+		dlg = std::shared_ptr<CPrivateChatDialog>(new CPrivateChatDialog(nullptr, _partnerUsername));
 		dlg->Create(ID_PRIVATE_CHAT);
 		_mapPrivateChatDialog[partner] = dlg;
 		
@@ -346,7 +346,7 @@ CPrivateChatDialog* TcpClient::CreatePrivateChatDlg(CString _partnerUsername)
 	else {
 		dlg = _mapPrivateChatDialog[partner];
 	}
-	return dlg;
+	return dlg.get();
 
 }
 

@@ -29,7 +29,7 @@ private:
 	std::string _serverIpaddress;
 	sockaddr_in _hint;
 	CPublicChatDialog* _publicChatDialog = nullptr;
-	std::map<std::string,CPrivateChatDialog*> _mapPrivateChatDialog;
+	std::map<std::string,std::shared_ptr<CPrivateChatDialog> > _mapPrivateChatDialog;
 	CSignUpLogInDlg* _signUpLogInDlg = nullptr;
 	
 
