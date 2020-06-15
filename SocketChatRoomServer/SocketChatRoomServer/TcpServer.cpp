@@ -118,7 +118,7 @@ bool TcpServer::AnalyzeAndProcess(SOCKET clientSocket, std::string packet)
 				std::string backMess = std::to_string(static_cast<int>(FlagServerToClient::Login_Success)) + '\0';
 				this->SendPacketRaw(clientSocket, backMess);
 				this->_listUser[clientSocket] = info[1];
-
+				this->UpdateUserList();
 				/*std::string send_active_user = std::to_string(static_cast<int>(FlagServerToClient::Send_Active_User)) + '\0';
 				for (auto it = this->_listUser.begin(); it != this->_listUser.end(); it++)
 				{
@@ -127,7 +127,7 @@ bool TcpServer::AnalyzeAndProcess(SOCKET clientSocket, std::string packet)
 				send_active_user.pop_back();
 				send_active_user += '\0';
 				this->SendToAll(send_active_user);*/
-				this->UpdateUserList();
+				
 			}
 		}
 		else // không tồn tại tài khoản

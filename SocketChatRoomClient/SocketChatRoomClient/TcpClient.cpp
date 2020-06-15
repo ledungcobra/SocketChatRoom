@@ -102,9 +102,6 @@ bool TcpClient::AnalyzeAndProcess(std::string packet)
 			SendMessage(_signUpLogInDlg->GetSafeHwnd(), LOGIN_SUCCESS_MSG, 0, 0);
 		else
 			AfxMessageBox(L"Couldn't find sign up login dialog");
-
-		//TODO:
-		return false;
 		break;
 
 	case FlagServerToClient::SignUp_Success:
