@@ -142,9 +142,9 @@ bool TcpServer::AnalyzeAndProcess(SOCKET clientSocket, std::string packet)
 	{
 		this->_listUser.erase(clientSocket);
 		
-		if (_flagRunningThread.find(clientSocket) != _flagRunningThread.end()) {
+	/*	if (_flagRunningThread.find(clientSocket) != _flagRunningThread.end()) {
 			_flagRunningThread.erase(clientSocket);
-		}
+		}*/
 
 		this->UpdateUserList();
 	}
@@ -373,6 +373,8 @@ struct Param {
 
 void TcpServer::CloseServer()
 {
+	std::string close_server = std::to_string(static_cast<int>(FlagServerToClient::Close_All_Connection)) + '\0';
+	this->SendToAll(close_server);
 	closesocket(this->_listeningSocket);
 	WSACleanup();
 }
@@ -384,7 +386,7 @@ bool TcpServer::IsExists(std::string username, std::string password)
 	std::vector<std::string> usersInfo;
 	if (file.is_open())
 	{
-		while (!file.eof())
+		while (!file.eof())	
 		{
 			std::string buffer;
 			safeGetline(file, buffer);
@@ -604,11 +606,6 @@ TcpServer* TcpServer::GetInstance()
 	return _instance;
 }
 
-void TcpServer::SendToAllCloseConnection()
-{
-	//TODO:
-
-}
 
 TcpServer::~TcpServer()
 {

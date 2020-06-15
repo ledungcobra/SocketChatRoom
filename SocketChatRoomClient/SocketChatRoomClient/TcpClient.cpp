@@ -161,6 +161,12 @@ bool TcpClient::AnalyzeAndProcess(std::string packet)
 		//TODO: Đẩy lên khung chat chung ( info[1] là tên người nhắn lên chat public, info[2] là nội dung)
 	}
 		break;
+	case FlagServerToClient:: Close_All_Connection:
+	{
+		this->CloseConnection();
+		return false;
+	}
+	break;
 	}
 
 	return true;
@@ -219,10 +225,10 @@ struct Param {
 UINT ReceiveThreadFunc(LPVOID param) {
 
 	TcpClient* pTcpClient = (TcpClient*)param;
-
-	while (pTcpClient->_isRunning) {
+	bool connect=true;
+	while (pTcpClient->_isRunning && connect) {
 		std::string packet = pTcpClient->ReceivePacket();
-		pTcpClient->AnalyzeAndProcess(packet);
+		connect = pTcpClient->AnalyzeAndProcess(packet);
 	}
 	return 0;
 

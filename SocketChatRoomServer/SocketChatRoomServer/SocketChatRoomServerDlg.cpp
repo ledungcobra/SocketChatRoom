@@ -131,7 +131,8 @@ void CSocketChatRoomServerDlg::OnSysCommand(UINT nID, LPARAM lParam)
 
 				}
 				TcpServer::GetInstance()->_flagRunningThread.clear();
-				Sleep(2000);
+
+				TcpServer::GetInstance()->CloseServer();
 				//TODO: Tương tự Turn off server
 
 				OnDestroy();
