@@ -94,6 +94,8 @@ public:
 	void RemoveUserFromActiveList(SOCKET clientSocket);
 	static std::map<SOCKET, bool> _flagRunningThread;
 	static TcpServer* GetInstance();
+	void SendToAllCloseConnection();
+	~TcpServer();
 private:
 	static TcpServer* _instance;
 	TcpServer();

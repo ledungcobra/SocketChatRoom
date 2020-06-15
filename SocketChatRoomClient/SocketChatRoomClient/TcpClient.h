@@ -37,7 +37,7 @@ public:
 	bool _isActive;
 	bool _isRunning;
 	SOCKET _serverSocket;
-	TcpClient();
+
 	SOCKET CreateSocket();
 	void SendPacketRaw( std::string packet);
 	//TODO: Thay đổi _isRunning nếu ngắt kết nối
@@ -50,6 +50,7 @@ public:
 	void Run();
 private:
     static TcpClient* _instance;
+	TcpClient();
 
 public:
 	//CPublicChatDialog* GetPublicChatDialog();

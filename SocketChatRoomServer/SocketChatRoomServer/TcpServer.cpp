@@ -469,14 +469,18 @@ UINT ReceiveAndSend(LPVOID params) {
 			isConnect = p->tcpServer->AnalyzeAndProcess(p->clientSocket, packet);
 
 		}
+		if (p != nullptr) {
+			//TODO:
+			delete p;
+		}
 
 	}
 	return 0;
 
 
 }
-UINT ListeningThreadFunc(LPVOID param) {
-	TcpServer* server = (TcpServer*)param;
+UINT ListeningThreadFunc(LPVOID serv) {
+	TcpServer* server = (TcpServer*)serv;
 
 	while (server->_isRunning && TcpServer::GetInstance()->_flagRunningThread[server->_listeningSocket]) {
 		bool listen = server->Listen();
@@ -491,6 +495,7 @@ UINT ListeningThreadFunc(LPVOID param) {
 			
 		}
 	}
+
 	return 0;
 }
 
@@ -597,4 +602,16 @@ TcpServer* TcpServer::GetInstance()
 
 	}
 	return _instance;
+}
+
+void TcpServer::SendToAllCloseConnection()
+{
+	//TODO:
+
+}
+
+TcpServer::~TcpServer()
+{
+	delete _instance;
+	_instance = nullptr;
 }
