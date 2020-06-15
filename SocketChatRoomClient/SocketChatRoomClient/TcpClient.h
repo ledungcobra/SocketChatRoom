@@ -31,13 +31,14 @@ private:
 	CPublicChatDialog* _publicChatDialog = nullptr;
 	std::map<std::string,CPrivateChatDialog*> _mapPrivateChatDialog;
 	CSignUpLogInDlg* _signUpLogInDlg = nullptr;
+	
 
 public:
 	//TODO:
 	bool _isActive;
 	bool _isRunning;
 	SOCKET _serverSocket;
-
+	CString _username;
 	SOCKET CreateSocket();
 	void SendPacketRaw( std::string packet);
 	//TODO: Thay đổi _isRunning nếu ngắt kết nối
@@ -59,7 +60,7 @@ public:
 	void SetDialog(CDialog* dialog);
 	void ShowSignUpLoginDialog();
 
-	CPrivateChatDialog* CreatePrivateChatDlg(CString _partnerUsername);
+	CPrivateChatDialog* CreatePrivateChatDlg(CString partnerUsername);
 	
 
 

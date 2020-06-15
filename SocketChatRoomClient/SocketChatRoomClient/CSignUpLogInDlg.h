@@ -7,6 +7,7 @@
 #define LOGIN_SUCCESS_MSG WM_APP+2
 
 
+
 // CSocketChatRoomClientDlg dialog
 class CSignUpLogInDlg : public CDialogEx
 {

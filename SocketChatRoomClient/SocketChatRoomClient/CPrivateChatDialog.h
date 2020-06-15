@@ -20,11 +20,16 @@ protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 
 	DECLARE_MESSAGE_MAP()
+	afx_msg void OnOK();
 public:
 	afx_msg void OnBnClickedSendUploadFile();
+	
 private:
 	CString _partnerUsername;
 public:
 	void UpdateChatView(std::string incommingMessage);
-	CEdit mEdtChatView;
+	CEdit mMessageBox;
+	
+	afx_msg void OnBnClickedSend();
+	CEdit mEdtMessage;
 };

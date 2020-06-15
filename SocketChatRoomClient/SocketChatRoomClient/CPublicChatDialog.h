@@ -1,7 +1,7 @@
 #pragma once
 #include<vector>
 #include <string>
-
+#define OPEN_PRIVATE_CHAT_DIALOG WM_APP+3
 // CPublicChatDialog dialog
 
 class CPublicChatDialog : public CDialogEx
@@ -31,7 +31,7 @@ private :
 
 
 public:
-	
+	afx_msg LRESULT OpenDialog(WPARAM wParam, LPARAM lParam);
 	CListBox mActiveUsersList;
 	CEdit mEdtChat;
 	afx_msg void OnBnClickedSend();
@@ -41,4 +41,6 @@ public:
 	afx_msg void OnBnClickedUploadFile();
 	
 	afx_msg void OnLbnSelchangeListActiveUsers();
+	void UpdateMessage(std::string partnerUsername, std::string content);
+	CEdit mMessageBox;
 };

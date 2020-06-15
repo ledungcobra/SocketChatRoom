@@ -196,11 +196,11 @@ bool TcpServer::AnalyzeAndProcess(SOCKET clientSocket, std::string packet)
 		info = stringTokenizer(packet, '\0');
 		//info[1] là username người nhận, info[2] là nội dung tin nhắn
 		std::string private_msg = std::to_string(static_cast<int>(FlagServerToClient::Send_Private_Message)) + '\0'; //Gửi cờ 
-		private_msg += this->_listUser[clientSocket] + '\0' + info[2] +'\0';
+		private_msg += this->_listUser[clientSocket] + '\0' + info[3] +'\0';
 		SOCKET receiver;
 		for (auto it = this->_listUser.begin(); it != this->_listUser.end(); it++)
 		{
-			if (it->second == info[1])
+			if (it->second == info[2])
 			{
 				receiver = it->first;
 			}
@@ -215,8 +215,9 @@ bool TcpServer::AnalyzeAndProcess(SOCKET clientSocket, std::string packet)
 		std::vector<std::string> info;
 		info = stringTokenizer(packet, '\0');
 		//info[1] là nội dung tin nhắn
-		std::string public_msg = std::to_string(static_cast<int>(FlagServerToClient::Send_Private_Message)) + '\0'; //Gửi cờ 
-		public_msg += this->_listUser[clientSocket] + '\0' + info[1] + '\0';
+		//flagNULL sender NULL content NULL
+		std::string public_msg = std::to_string(static_cast<int>(FlagServerToClient::Send_Public_Message)) + '\0'; //Gửi cờ 
+		public_msg += this->_listUser[clientSocket] + '\0' + info[2] + '\0';
 		this->SendToAll(public_msg);
 	}
 		break;

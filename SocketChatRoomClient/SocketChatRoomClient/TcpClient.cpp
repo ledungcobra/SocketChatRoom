@@ -133,13 +133,11 @@ bool TcpClient::AnalyzeAndProcess(std::string packet)
 		info = stringTokenizer(packet, '\0');
 		
 		if (_mapPrivateChatDialog.find(info[1]) == _mapPrivateChatDialog.end()) {
-			////Không tim được cửa sổ người gửi
-			//CPrivateChatDialog* pPrivateChatDlg = new CPrivateChatDialog(nullptr, info[1]);
-			//_mapPrivateChatDialog[info[1]] = pPrivateChatDlg;
-			//pPrivateChatDlg->Create(ID_PRIVATE_CHAT);
-			CPrivateChatDialog* pPrivateChatDlg =  this->CreatePrivateChatDlg(ConvertString::ConvertStringToCString(info[1]));
-			pPrivateChatDlg->ShowWindow(SW_SHOW);
-			pPrivateChatDlg->UpdateChatView(info[2]);
+
+
+			SendMessage(_publicChatDialog->GetSafeHwnd(), OPEN_PRIVATE_CHAT_DIALOG,(WPARAM)(LPCTSTR)ConvertString::ConvertStringToCString(info[2]), (LPARAM)(LPCTSTR)ConvertString::ConvertStringToCString(info[1]));
+			
+			//pPrivateChatDlg->UpdateChatView(info[2]);
 
 
 		}
@@ -156,6 +154,7 @@ bool TcpClient::AnalyzeAndProcess(std::string packet)
 		std::vector<std::string> info;
 		info = stringTokenizer(packet, '\0');
 		//TODO: Đẩy lên khung chat chung ( info[1] là tên người nhắn lên chat public, info[2] là nội dung)
+		_publicChatDialog->UpdateMessage(info[1],info[2]);
 	}
 		break;
 	case FlagServerToClient:: Close_All_Connection:

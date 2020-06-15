@@ -30,6 +30,7 @@ void CPublicChatDialog::DoDataExchange(CDataExchange* pDX)
 
 	DDX_Control(pDX, IDD_LIST2, mActiveUsersList);
 	DDX_Control(pDX, IDC_EDIT1, mEdtChat);
+	DDX_Control(pDX, IDC_EDIT2, mMessageBox);
 }
 
 
@@ -66,11 +67,7 @@ void CPublicChatDialog::OnSysCommand(UINT nID, LPARAM lParam)
 
 void CPublicChatDialog::OnOK()
 {
-
-	//TODO: ENTER 
-
-	AfxMessageBox(L"ENTER");
-
+	OnBnClickedSend();
 }
 
 
@@ -80,6 +77,7 @@ BEGIN_MESSAGE_MAP(CPublicChatDialog, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON2, &CPublicChatDialog::OnBnClickedLogout)
 	ON_BN_CLICKED(IDC_BUTTON3, &CPublicChatDialog::OnBnClickedUploadFile)
 	ON_LBN_SELCHANGE(IDD_LIST2, &CPublicChatDialog::OnLbnSelchangeListActiveUsers)
+	ON_MESSAGE(OPEN_PRIVATE_CHAT_DIALOG,&CPublicChatDialog::OpenDialog)
 END_MESSAGE_MAP()
 
 
@@ -91,7 +89,13 @@ void CPublicChatDialog::OnBnClickedSend()
 {
 	CString message;
 	mEdtChat.GetWindowTextW(message);
-	TcpClient::GetInstance()->SendPacketRaw(ConvertString::ConvertCStringToString(message));
+
+	std::string packet = std::to_string(static_cast<int>
+	(FlagClientToServer::PublicChat)) + '\0' + ConvertString::ConvertCStringToString(_username) + '\0' +
+		ConvertString::ConvertCStringToString(message) + '\0';
+	_cwprintf(ConvertString::ConvertStringToCString(packet));
+
+	TcpClient::GetInstance()->SendPacketRaw(packet);
 	//TODO: update local message
 
 
@@ -138,15 +142,47 @@ void CPublicChatDialog::OnBnClickedUploadFile()
 
 void CPublicChatDialog::OnLbnSelchangeListActiveUsers()
 {
+	
 	auto index = mActiveUsersList.GetCurSel();
 	if (index == -1) {
 		return;
 	}
-	CString buff;
-	mActiveUsersList.GetText(index, buff);
-	CPrivateChatDialog* dlg = TcpClient::GetInstance()->CreatePrivateChatDlg(buff);
+	CString selectedUser;
+	mActiveUsersList.GetText(index, selectedUser);
+
+	if (selectedUser == _username) {
+		return;
+	}
+	CPrivateChatDialog* dlg = TcpClient::GetInstance()->CreatePrivateChatDlg(selectedUser);
 
 	dlg->ShowWindow(SW_SHOW);
+	mActiveUsersList.SetCurSel(-1);
+
+
+
+}
+LRESULT CPublicChatDialog::OpenDialog(WPARAM wParam, LPARAM lParam)
+{
+
+	LPCTSTR  username = (LPCTSTR)lParam;
+	LPCTSTR message = (LPCTSTR)wParam;
+
+	_cwprintf(username);
+	auto dlg = TcpClient::GetInstance()->CreatePrivateChatDlg(username);
+	dlg->ShowWindow(SW_SHOW);
+	dlg->UpdateChatView(ConvertString::ConvertCStringToString(message));
+	return 0;
+}
+
+void CPublicChatDialog::UpdateMessage(std::string partnerUsername, std::string content)
+{
+	CString messages;
+	mMessageBox.GetWindowTextW(messages);
+	messages += ConvertString::ConvertStringToCString(partnerUsername) + L": " +
+		ConvertString::ConvertStringToCString(content) + L"\r\n";
+	mMessageBox.SetWindowTextW(messages);
+	mEdtChat.SetWindowTextW(L"");
+
 
 
 }
