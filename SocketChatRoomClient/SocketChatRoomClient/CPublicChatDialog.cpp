@@ -141,21 +141,33 @@ void CPublicChatDialog::OnBnClickedUploadFile()
 		{
 
 			std::ostringstream ostrm;
-			int size = fileSize(filePath); // kich thuoc theo byte
-			ostrm << file.rdbuf();
+			long long size = fileSize(filePath); // kich thuoc theo byte
 
-			std::string content = std::string(ostrm.str());
+			if (size > 5242880)
+			{
+				AfxMessageBox(L"File is too big");
+				return;
+			}
+			else
+			{
+				// ghi vào packet
+
+				ostrm << file.rdbuf();
+
+				std::string content = std::string(ostrm.str());
 
 
-			// lấy tên file
-			std::vector<std::string> info = stringTokenizer(filePath, '\\');
-			// gửi đi desc
-			std::string file_desc = std::to_string(static_cast<int>(FlagClientToServer::Send_File_Descriptor)) + '\0' + "ALL" + '\0' + info[info.size() - 1] + '\0' + std::to_string(size) + '\0'; // all + filename + filesize
-			TcpClient::GetInstance()->SendPacketRaw(file_desc);
-			// gửi đi content
-			std::string file_content = std::to_string(static_cast<int>(FlagClientToServer::Send_Content)) + '\0' + "ALL" + '\0' + info[info.size() - 1] + '\0' + std::to_string(size) + '\0' + content + '\0'; // all + filename + filesize +content
-			TcpClient::GetInstance()->SendPacketRaw(file_content);
-			file.close();
+
+				// lấy tên file
+				std::vector<std::string> info = stringTokenizer(filePath, '\\');
+				// gửi đi desc
+				std::string file_desc = std::to_string(static_cast<int>(FlagClientToServer::Send_File_Descriptor)) + '\0' + "ALL" + '\0' + info[info.size() - 1] + '\0' + std::to_string(size) + '\0'; // all + filename + filesize
+				TcpClient::GetInstance()->SendPacketRaw(file_desc);
+				// gửi đi content
+				std::string file_content = std::to_string(static_cast<int>(FlagClientToServer::Send_Content)) + '\0' + "ALL" + '\0' + info[info.size() - 1] + '\0' + std::to_string(size) + '\0' + content + '\0'; // all + filename + filesize +content
+				TcpClient::GetInstance()->SendPacketRaw(file_content);
+				file.close();
+			}
 		}
 	}
 }

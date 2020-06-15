@@ -69,4 +69,4 @@ public:
 
 
 std::vector<std::string> stringTokenizer(std::string input, char delim);
-int fileSize(std::string add);
+long long fileSize(std::string add);

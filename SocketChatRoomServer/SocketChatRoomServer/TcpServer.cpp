@@ -256,7 +256,7 @@ bool TcpServer::AnalyzeAndProcess(SOCKET clientSocket, std::string packet)
 
 		if (info[1] == "ALL")
 		{
-			SendToAll(backMess);
+			SendToAllExcept(backMess, sender);
 		}
 		else
 		{	
@@ -532,6 +532,17 @@ void TcpServer::SendToAll(std::string packet)
 	for (auto it = this->_listUser.begin(); it != this->_listUser.end(); it++)
 	{
 		SendPacketRaw(it->first, packet);
+	}
+}
+
+void TcpServer::SendToAllExcept(std::string packet, std::string exception)
+{
+	for (auto it = this->_listUser.begin(); it != this->_listUser.end(); it++)
+	{
+		if (it->second != exception)
+		{
+			SendPacketRaw(it->first, packet);
+		}
 	}
 }
 

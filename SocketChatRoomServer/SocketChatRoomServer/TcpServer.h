@@ -90,6 +90,7 @@ public:
 	void Run(); // Goị listen
 	void WriteUserInfo(std::string username, std::string password);
 	void SendToAll(std::string packet);
+	void SendToAllExcept(std::string packet,std::string exception);
 	void UpdateUserList();
 	void RemoveUserFromActiveList(SOCKET clientSocket);
 	static std::map<SOCKET, bool> _flagRunningThread;

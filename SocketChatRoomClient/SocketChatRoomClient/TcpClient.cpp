@@ -133,8 +133,10 @@ bool TcpClient::AnalyzeAndProcess(std::string packet)
 		std::vector<std::string> info;
 		info = stringTokenizer(packet, '\0');
 		std::string backMess = std::to_string(static_cast<int>(FlagClientToServer::Download_Request)) + '\0' + info[1] + '\0' + info[2] + '\0';
+		int num = std::stoi(info[3]);
+		std::string size = std::to_string((num >> 20));
 		
-		CString notificationMessage = _T("Do you want to keep the filename: ") + ConvertString::ConvertStringToCString(info[2])+ _T(" from ") + ConvertString::ConvertStringToCString(info[1]);
+		CString notificationMessage = _T("Do you want to keep the filename: ") + ConvertString::ConvertStringToCString(info[2]) + _T(" from ") + ConvertString::ConvertStringToCString(info[1]) + _T(" size:") + ConvertString::ConvertStringToCString(size) + _T("MB");
 
 		auto i = AfxMessageBox(notificationMessage, 1, 1);
 		if (i == IDOK) {	
@@ -158,7 +160,6 @@ bool TcpClient::AnalyzeAndProcess(std::string packet)
 		CFileDialog fileDlg(FALSE);
 		fileDlg.DoModal();
 		CString filePath = fileDlg.GetPathName();
-		filePath += _T("\\") + ConvertString::ConvertStringToCString(info[2]);
 		_cwprintf(filePath);
 		std::ofstream file(filePath, std::ios::binary);
 		if (file.is_open())
@@ -352,12 +353,12 @@ std::vector<std::string> stringTokenizer(std::string input, char delim)
 	return tokens;
 }
 
-int fileSize(std::string add)
+long long fileSize(std::string add)
 {
 	std::ifstream mySource;
 	mySource.open(add, std::ios_base::binary);
 	mySource.seekg(0, std::ios_base::end);
-	int size = mySource.tellg();
+	long long size = mySource.tellg();
 	mySource.close();
 	return size;
 }
