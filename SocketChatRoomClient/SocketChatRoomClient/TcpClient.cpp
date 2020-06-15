@@ -211,10 +211,21 @@ bool TcpClient::AnalyzeAndProcess(std::string packet)
 		break;
 	case FlagServerToClient:: Close_All_Connection:
 	{
+		for (auto it = _mapPrivateChatDialog.begin(); it != _mapPrivateChatDialog.end(); it++) {
+			delete it->second;
+		}
+		auto i = MessageBox(_publicChatDialog->GetSafeHwnd(), L"The server has shut down !!", L"Press OK  to return Sign Up Log In dialog",0);
+		_publicChatDialog->OnBnClickedLogout();
+		if (i == IDOK) {
+			_signUpLogInDlg->ShowWindow(SW_SHOW);
+		}
+		
+
 		this->CloseConnection();
 		return false;
 	}
 	break;
+	
 	}
 
 	return true;
