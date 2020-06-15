@@ -39,7 +39,7 @@ void CPublicChatDialog::DoDataExchange(CDataExchange* pDX)
 BOOL CPublicChatDialog::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
-		
+	SetWindowText(L"Public Chat");
 	return 0; 
 }
 

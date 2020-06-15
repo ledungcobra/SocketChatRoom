@@ -67,22 +67,27 @@ bool TcpServer::AnalyzeAndProcess(SOCKET clientSocket, std::string packet)
 	// biến tạm thời 
 
 
-	std::string packet_send = "Hello there"; // TODO:Dùng chung
+	std::string message = "";
+
 	switch (flag)
 	{
 	case FlagClientToServer::SignUp:
 	{
-		_cwprintf(ConvertString::ConvertStringToCString(packet));
 		std::vector<std::string> info;
 		info = stringTokenizer(packet,'\0');
 		if (IsValid(info[1]))
 		{
 			std::string backMess = std::to_string(static_cast<int>(FlagServerToClient::Fail_Sign_Up)) + '\0';
 			this->SendPacketRaw(clientSocket, backMess);
+			
 		}
 		else
 		{
 			WriteUserInfo(info[1], info[2]);
+			
+			message = info[1] + " has signed up and logged in";
+			this->_serverDlg->UpdateActiveUserListView();
+			
 			std::string backMess = std::to_string(static_cast<int>(FlagServerToClient::SignUp_Success)) + '\0';
 			this->SendPacketRaw(clientSocket, backMess);
 			this->_listUser[clientSocket] = info[1];
@@ -93,7 +98,6 @@ bool TcpServer::AnalyzeAndProcess(SOCKET clientSocket, std::string packet)
 	case FlagClientToServer::Login:
 	{
 		//TODO:
-		_cwprintf(ConvertString::ConvertStringToCString(packet));
 		std::vector<std::string> info;
 		info = stringTokenizer(packet, '\0');
 
@@ -118,15 +122,12 @@ bool TcpServer::AnalyzeAndProcess(SOCKET clientSocket, std::string packet)
 				std::string backMess = std::to_string(static_cast<int>(FlagServerToClient::Login_Success)) + '\0';
 				this->SendPacketRaw(clientSocket, backMess);
 				this->_listUser[clientSocket] = info[1];
+				
+				message = info[1] + " has logged in";
+				this->_serverDlg->UpdateActiveUserListView();
+				
 				this->UpdateUserList();
-				/*std::string send_active_user = std::to_string(static_cast<int>(FlagServerToClient::Send_Active_User)) + '\0';
-				for (auto it = this->_listUser.begin(); it != this->_listUser.end(); it++)
-				{
-					send_active_user += it->second + '|';
-				}
-				send_active_user.pop_back();
-				send_active_user += '\0';
-				this->SendToAll(send_active_user);*/
+				
 				
 			}
 		}
@@ -140,17 +141,22 @@ bool TcpServer::AnalyzeAndProcess(SOCKET clientSocket, std::string packet)
 	break;
 	case FlagClientToServer::LogOut:
 	{
+		message = _listUser[clientSocket] + "has logged out";
+
+		this->_serverDlg->UpdateActiveUserListView();
 		this->_listUser.erase(clientSocket);
-		
-	/*	if (_flagRunningThread.find(clientSocket) != _flagRunningThread.end()) {
-			_flagRunningThread.erase(clientSocket);
-		}*/
+				
 
 		this->UpdateUserList();
 	}
 		break;
 
 	case FlagClientToServer::Disconnect_To_Server:
+
+		message = _listUser[clientSocket] + "has disconnected";
+
+		this->_serverDlg->UpdateActiveUserListView();
+		
 		this->_listUser.erase(clientSocket);
 		//Handle thread 
 		if (_flagRunningThread.find(clientSocket) != _flagRunningThread.end()) {
@@ -164,7 +170,7 @@ bool TcpServer::AnalyzeAndProcess(SOCKET clientSocket, std::string packet)
 
 	case FlagClientToServer::Download_Request:
 	{
-		_cwprintf(ConvertString::ConvertStringToCString(packet));
+		
 		std::vector<std::string> info;
 		info = stringTokenizer(packet, '\0');
 
@@ -196,10 +202,11 @@ bool TcpServer::AnalyzeAndProcess(SOCKET clientSocket, std::string packet)
 		break;
 	case FlagClientToServer::PrivateChat:
 	{
-		_cwprintf(ConvertString::ConvertStringToCString(packet));
 		std::vector<std::string> info;
 		info = stringTokenizer(packet, '\0');
 		//info[1] là username người nhận, info[2] là nội dung tin nhắn
+		message = _listUser[clientSocket] + " -> " + info[1] + ": " + info[2];
+
 		std::string private_msg = std::to_string(static_cast<int>(FlagServerToClient::Send_Private_Message)) + '\0'; //Gửi cờ 
 		private_msg += this->_listUser[clientSocket] + '\0' + info[3] +'\0';
 		SOCKET receiver;
@@ -216,11 +223,11 @@ bool TcpServer::AnalyzeAndProcess(SOCKET clientSocket, std::string packet)
 
 	case FlagClientToServer::PublicChat:
 	{
-		_cwprintf(ConvertString::ConvertStringToCString(packet));
 		std::vector<std::string> info;
 		info = stringTokenizer(packet, '\0');
-		//info[1] là nội dung tin nhắn
+		//info[2] là nội dung tin nhắn
 		//flagNULL sender NULL content NULL
+		message = _listUser[clientSocket] + " -> " + "PUBLIC: " + info[2];
 		std::string public_msg = std::to_string(static_cast<int>(FlagServerToClient::Send_Public_Message)) + '\0'; //Gửi cờ 
 		public_msg += this->_listUser[clientSocket] + '\0' + info[2] + '\0';
 		this->SendToAll(public_msg);
@@ -311,36 +318,11 @@ bool TcpServer::AnalyzeAndProcess(SOCKET clientSocket, std::string packet)
 
 		this->container.push_back(content);
 
-		//// gửi thông tin của tin đi
-
-		//if (info[1] == "ALL")
-		//{
-		//	SendToAll(backMess);
-		//}
-		//else
-		//{
-		//	// lấy thông tin socket từ username
-
-		//	SOCKET receiver = NULL;
-
-		//	for (auto it = this->_listUser.begin(); it != this->_listUser.end(); ++it)
-		//		if (it->second == info[1])
-		//		{
-		//			receiver = it->first;
-		//			break;
-		//		}
-
-		//	if (receiver)
-		//	{
-		//		SendPacketRaw(receiver, backMess);
-		//	}
-		//}
-
 	}
 		break;
     }
 	
-	
+	this->_serverDlg->UpdateLogBox(message);
 
 	return true;
 }
@@ -630,4 +612,10 @@ TcpServer::~TcpServer()
 {
 	delete _instance;
 	_instance = nullptr;
+}
+
+void TcpServer::SetDialog(SocketChatRoomServerDlg* dlg)
+{
+	this->_serverDlg = dlg;
+
 }

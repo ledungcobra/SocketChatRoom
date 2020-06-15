@@ -20,6 +20,7 @@ CPrivateChatDialog::CPrivateChatDialog(CWnd* pParent, CString partnerUsername)
 {
 	this->_partnerUsername = partnerUsername;
 	
+	
 
 
 }
@@ -33,6 +34,13 @@ void CPrivateChatDialog::DoDataExchange(CDataExchange* pDX)
 	CDialogEx::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_EDIT2, mMessageBox);
 	DDX_Control(pDX, IDC_EDIT1, mEdtMessage);
+}
+
+BOOL CPrivateChatDialog::OnInitDialog()
+{
+	CDialogEx::OnInitDialog();
+	SetWindowText(_partnerUsername);
+	return 0;
 }
 
 

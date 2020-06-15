@@ -10,6 +10,8 @@
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
+#include "ConvertString.h"
+#include "TcpServer.h"
 
 
 // CAboutDlg dialog used for App About
@@ -50,13 +52,13 @@
 
 
 
-CSocketChatRoomServerDlg::CSocketChatRoomServerDlg(CWnd* pParent /*=nullptr*/)
+SocketChatRoomServerDlg::SocketChatRoomServerDlg(CWnd* pParent /*=nullptr*/)
 	: CDialogEx(IDD_SOCKETCHATROOMSERVER_DIALOG, pParent)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
 
-void CSocketChatRoomServerDlg::DoDataExchange(CDataExchange* pDX)
+void SocketChatRoomServerDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_BUTTON1, mBTNSWITCH);
@@ -64,17 +66,17 @@ void CSocketChatRoomServerDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_EDIT1, mEdtLog);
 }
 
-BEGIN_MESSAGE_MAP(CSocketChatRoomServerDlg, CDialogEx)
+BEGIN_MESSAGE_MAP(SocketChatRoomServerDlg, CDialogEx)
 	ON_WM_SYSCOMMAND()
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
-	ON_BN_CLICKED(IDC_BUTTON1, &CSocketChatRoomServerDlg::OnBnClickedSwitch)
+	ON_BN_CLICKED(IDC_BUTTON1, &SocketChatRoomServerDlg::OnBnClickedSwitch)
 END_MESSAGE_MAP()
 
 
 // CSocketChatRoomServerDlg message handlers
 
-BOOL CSocketChatRoomServerDlg::OnInitDialog()
+BOOL SocketChatRoomServerDlg::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 
@@ -108,13 +110,15 @@ BOOL CSocketChatRoomServerDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// Set small icon
 
 	// TODO: Add extra initialization here
-
+	SetWindowText(L"Server");
+	TcpServer::GetInstance()->SetDialog(this);
 	TcpServer::GetInstance()->Run();
+
 
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }
 
-void CSocketChatRoomServerDlg::OnSysCommand(UINT nID, LPARAM lParam)
+void SocketChatRoomServerDlg::OnSysCommand(UINT nID, LPARAM lParam)
 {
 	if ((nID & 0xFFF0) == SC_CLOSE)
 	{
@@ -153,7 +157,7 @@ void CSocketChatRoomServerDlg::OnSysCommand(UINT nID, LPARAM lParam)
 //  to draw the icon.  For MFC applications using the document/view model,
 //  this is automatically done for you by the framework.
 
-void CSocketChatRoomServerDlg::OnPaint()
+void SocketChatRoomServerDlg::OnPaint()
 {
 	if (IsIconic())
 	{
@@ -180,14 +184,14 @@ void CSocketChatRoomServerDlg::OnPaint()
 
 // The system calls this function to obtain the cursor to display while the user drags
 //  the minimized window.
-HCURSOR CSocketChatRoomServerDlg::OnQueryDragIcon()
+HCURSOR SocketChatRoomServerDlg::OnQueryDragIcon()
 {
 	return static_cast<HCURSOR>(m_hIcon);
 }
 
 
 
-void CSocketChatRoomServerDlg::OnBnClickedSwitch()
+void SocketChatRoomServerDlg::OnBnClickedSwitch()
 {
 	// TODO: Add your control notification handler code here
 	/*if (_isRunning == false) {
@@ -210,4 +214,20 @@ void CSocketChatRoomServerDlg::OnBnClickedSwitch()
 	mBTNSWITCH.SetWindowTextW(_T("TURN OFF"));*/
 	
 	
+}
+
+void SocketChatRoomServerDlg::UpdateLogBox(std::string message)
+{
+	CString buff;
+
+	mEdtLog.GetWindowText(buff);
+	buff += ConvertString::ConvertStringToCString(message) + L"\r\n";
+	mEdtLog.SetWindowText(buff);
+}
+
+void SocketChatRoomServerDlg::UpdateActiveUserListView()
+{
+	for (auto it = TcpServer::GetInstance()->_listUser.begin(); it != TcpServer::GetInstance()->_listUser.end(); it++) {
+		this->mListBox.AddString(ConvertString::ConvertStringToCString(it->second));
+	}
 }

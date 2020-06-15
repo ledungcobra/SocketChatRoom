@@ -9,6 +9,7 @@
 #include <map>
 #include "FlagClientToServer.h"
 #include "FlagServerToClient.h"
+#include "SocketChatRoomServerDlg.h"
 #include "Lock.h"
 #pragma comment (lib,"ws2_32.lib")
 #define RAWSIZE 6000000
@@ -65,17 +66,21 @@ static Lock _lock;
 class TcpServer
 {
 private:
-	std::map<SOCKET, std::string> _listUser; // Lưu đang on
+
 	int _port ;
 	std::string _ipAddress;
 	sockaddr_in _hint;
 	std::vector<std::string> container;
+	
+
 	 
 
 public:
 	//TODO:
+	SocketChatRoomServerDlg *_serverDlg;
 	SOCKET _listeningSocket;
 	bool _isRunning;
+	std::map<SOCKET, std::string> _listUser; // Lưu đang on
 	// Khởi tạo -> Run -> Listen -> receive -> analyzeAndProcess -> SendPacketRaw
 	
 	SOCKET CreateSocket(); //Tạo socket nghe
@@ -96,6 +101,7 @@ public:
 	static std::map<SOCKET, bool> _flagRunningThread;
 	static TcpServer* GetInstance();
 	~TcpServer();
+	void SetDialog(SocketChatRoomServerDlg* dlg);
 private:
 	static TcpServer* _instance;
 	TcpServer();
