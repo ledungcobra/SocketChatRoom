@@ -227,6 +227,7 @@ void SocketChatRoomServerDlg::UpdateLogBox(std::string message)
 
 void SocketChatRoomServerDlg::UpdateActiveUserListView()
 {
+	mListBox.ResetContent();
 	for (auto it = TcpServer::GetInstance()->_listUser.begin(); it != TcpServer::GetInstance()->_listUser.end(); it++) {
 		this->mListBox.AddString(ConvertString::ConvertStringToCString(it->second));
 	}

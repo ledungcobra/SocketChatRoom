@@ -153,11 +153,11 @@ bool TcpServer::AnalyzeAndProcess(SOCKET clientSocket, std::string packet)
 
 	case FlagClientToServer::Disconnect_To_Server:
 
-		message = _listUser[clientSocket] + "has disconnected";
-
-		this->_serverDlg->UpdateActiveUserListView();
+		message = _listUser[clientSocket] + " has disconnected";
 		
 		this->_listUser.erase(clientSocket);
+		this->_serverDlg->UpdateActiveUserListView();
+		
 		//Handle thread 
 		if (_flagRunningThread.find(clientSocket) != _flagRunningThread.end()) {
 			_flagRunningThread.erase(clientSocket);
@@ -165,6 +165,7 @@ bool TcpServer::AnalyzeAndProcess(SOCKET clientSocket, std::string packet)
 		
 		closesocket(clientSocket);
 		this->UpdateUserList();
+		this->_serverDlg->UpdateLogBox(message);
 		return false;
 		break;
 
@@ -204,8 +205,8 @@ bool TcpServer::AnalyzeAndProcess(SOCKET clientSocket, std::string packet)
 	{
 		std::vector<std::string> info;
 		info = stringTokenizer(packet, '\0');
-		//info[1] là username người nhận, info[2] là nội dung tin nhắn
-		message = _listUser[clientSocket] + " -> " + info[1] + ": " + info[2];
+		//info[2] là username người nhận, info[3] là nội dung tin nhắn
+		message = _listUser[clientSocket] + " -> " + info[2] + ": " + info[3];
 
 		std::string private_msg = std::to_string(static_cast<int>(FlagServerToClient::Send_Private_Message)) + '\0'; //Gửi cờ 
 		private_msg += this->_listUser[clientSocket] + '\0' + info[3] +'\0';
@@ -332,6 +333,7 @@ std::string TcpServer::ReceivePacket(SOCKET clientSocket)
 	//Tạo buffer
 	char* buffer = new char[RAWSIZE];
 	//char buffer[6144]; //Tĩnh
+
 	ZeroMemory(buffer, RAWSIZE);
 	
 	//nhận tin nhắn
