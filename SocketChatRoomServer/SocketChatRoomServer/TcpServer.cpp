@@ -165,13 +165,16 @@ bool TcpServer::AnalyzeAndProcess(SOCKET clientSocket, std::string packet)
 
 	case FlagClientToServer::Disconnect_To_Server:
 	{
+		if (_listUser[clientSocket] != "") {
 
-		message = _listUser[clientSocket] + " has disconnected";
-		//Gửi cờ cập nhật log
-		std::string Another_logOut = std::to_string(static_cast<int>(FlagServerToClient::Another_Client_LogOut)) + '\0';
-		Another_logOut += this->_listUser[clientSocket];
-		this->SendToAll(Another_logOut);
-		//
+		
+			message = _listUser[clientSocket] + " has disconnected";
+			//Gửi cờ cập nhật log
+			std::string Another_logOut = std::to_string(static_cast<int>(FlagServerToClient::Another_Client_LogOut)) + '\0';
+			Another_logOut += this->_listUser[clientSocket];
+			this->SendToAll(Another_logOut);
+			//
+		}
 		this->_listUser.erase(clientSocket);
 		this->_serverDlg->UpdateActiveUserListView();
 
