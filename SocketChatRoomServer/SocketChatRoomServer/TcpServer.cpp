@@ -86,13 +86,13 @@ bool TcpServer::AnalyzeAndProcess(SOCKET clientSocket, std::string packet)
 			WriteUserInfo(info[1], info[2]);
 			
 			message = info[1] + " has signed up and logged in";
-			this->_serverDlg->UpdateActiveUserListView();
+			
 			
 			std::string backMess = std::to_string(static_cast<int>(FlagServerToClient::SignUp_Success)) + '\0';
 			this->SendPacketRaw(clientSocket, backMess);
 			this->_listUser[clientSocket] = info[1];
 			this->UpdateUserList();
-
+			this->_serverDlg->UpdateActiveUserListView();
 			// Gửi cờ cập nhập log
 			std::string Another_logIn = std::to_string(static_cast<int>(FlagServerToClient::Another_Client_LogIn)) + '\0';
 			Another_logIn += info[1];
