@@ -92,6 +92,11 @@ bool TcpServer::AnalyzeAndProcess(SOCKET clientSocket, std::string packet)
 			this->SendPacketRaw(clientSocket, backMess);
 			this->_listUser[clientSocket] = info[1];
 			this->UpdateUserList();
+
+			// Gửi cờ cập nhập log
+			std::string Another_logIn = std::to_string(static_cast<int>(FlagServerToClient::Another_Client_LogIn)) + '\0';
+			Another_logIn += info[1];
+			this->SendToAll(Another_logIn);
 		}
 	}
 		break;
@@ -127,8 +132,11 @@ bool TcpServer::AnalyzeAndProcess(SOCKET clientSocket, std::string packet)
 				this->_serverDlg->UpdateActiveUserListView();
 				
 				this->UpdateUserList();
-				
-				
+
+				// Gửi cờ để hiện log hoạt động bên client
+				std::string Another_logIn = std::to_string(static_cast<int>(FlagServerToClient::Another_Client_LogIn))+'\0';
+				Another_logIn += info[1];
+				this->SendToAll(Another_logIn);
 			}
 		}
 		else // không tồn tại tài khoản
@@ -146,13 +154,22 @@ bool TcpServer::AnalyzeAndProcess(SOCKET clientSocket, std::string packet)
 		this->_serverDlg->UpdateActiveUserListView();
 		this->_listUser[clientSocket]="";
 		this->UpdateUserList();
+
+		//Gửi cờ cập nhật log
+		std::string Another_logOut = std::to_string(static_cast<int>(FlagServerToClient::Another_Client_LogOut)) + '\0';
+		Another_logOut += this->_listUser[clientSocket];
+		this->SendToAll(Another_logOut);
 	}
 		break;
 
 	case FlagClientToServer::Disconnect_To_Server:
 
 		message = _listUser[clientSocket] + " has disconnected";
-		
+		//Gửi cờ cập nhật log
+		std::string Another_logOut = std::to_string(static_cast<int>(FlagServerToClient::Another_Client_LogOut)) + '\0';
+		Another_logOut += this->_listUser[clientSocket];
+		this->SendToAll(Another_logOut);
+		//
 		this->_listUser.erase(clientSocket);
 		this->_serverDlg->UpdateActiveUserListView();
 		

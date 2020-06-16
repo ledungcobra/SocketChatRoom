@@ -226,7 +226,19 @@ bool TcpClient::AnalyzeAndProcess(std::string packet)
 		return false;
 	}
 	break;
-	
+	case FlagServerToClient::Another_Client_LogIn:
+	{
+		std::vector<std::string> info;
+		info = stringTokenizer(packet, '\0');
+		//TODO: Ghi lên ô thoại , info[1] là username mới log in
+	}
+	break;
+	case FlagServerToClient::Another_Client_LogOut:
+	{
+		std::vector<std::string> info;
+		info = stringTokenizer(packet, '\0');
+		//TODO: Ghi lên ô thoại , info[1] là username mới log out
+	}
 	}
 
 	return true;
