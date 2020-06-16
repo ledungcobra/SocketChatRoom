@@ -226,3 +226,20 @@ void CPublicChatDialog::UpdateMessage(std::string partnerUsername, std::string c
 
 
 }
+
+void CPublicChatDialog::UpdateLogMessage(std::string message,int flag)
+{
+	CString buffer;
+
+	if (flag == 0) {
+		mEdtActiveLog.GetWindowTextW(buffer);
+		buffer += ConvertString::ConvertStringToCString(message) + L" has logged in\r\n";
+		
+
+	}
+	else if (flag == 1) {
+		mEdtActiveLog.GetWindowTextW(buffer);
+		buffer += ConvertString::ConvertStringToCString(message) + L" has logged out\r\n";
+	}
+	mEdtActiveLog.SetWindowTextW(buffer);
+}

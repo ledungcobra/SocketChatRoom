@@ -231,6 +231,7 @@ bool TcpClient::AnalyzeAndProcess(std::string packet)
 		std::vector<std::string> info;
 		info = stringTokenizer(packet, '\0');
 		//TODO: Ghi lên ô thoại , info[1] là username mới log in
+		_publicChatDialog->UpdateLogMessage(info[1],0);
 	}
 	break;
 	case FlagServerToClient::Another_Client_LogOut:
@@ -238,6 +239,7 @@ bool TcpClient::AnalyzeAndProcess(std::string packet)
 		std::vector<std::string> info;
 		info = stringTokenizer(packet, '\0');
 		//TODO: Ghi lên ô thoại , info[1] là username mới log out
+		_publicChatDialog->UpdateLogMessage(info[1],1);
 	}
 	}
 

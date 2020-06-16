@@ -152,17 +152,19 @@ bool TcpServer::AnalyzeAndProcess(SOCKET clientSocket, std::string packet)
 		message = _listUser[clientSocket] + " has logged out";
 
 		this->_serverDlg->UpdateActiveUserListView();
+		std::string Another_logOut = std::to_string(static_cast<int>(FlagServerToClient::Another_Client_LogOut)) + '\0';
+		Another_logOut += this->_listUser[clientSocket] + '\0';
 		this->_listUser[clientSocket]="";
 		this->UpdateUserList();
 
 		//Gửi cờ cập nhật log
-		std::string Another_logOut = std::to_string(static_cast<int>(FlagServerToClient::Another_Client_LogOut)) + '\0';
-		Another_logOut += this->_listUser[clientSocket];
+		
 		this->SendToAll(Another_logOut);
 	}
 		break;
 
 	case FlagClientToServer::Disconnect_To_Server:
+	{
 
 		message = _listUser[clientSocket] + " has disconnected";
 		//Gửi cờ cập nhật log
@@ -172,16 +174,18 @@ bool TcpServer::AnalyzeAndProcess(SOCKET clientSocket, std::string packet)
 		//
 		this->_listUser.erase(clientSocket);
 		this->_serverDlg->UpdateActiveUserListView();
-		
+
 		//Handle thread 
 		if (_flagRunningThread.find(clientSocket) != _flagRunningThread.end()) {
 			_flagRunningThread.erase(clientSocket);
 		}
-		
+
 		closesocket(clientSocket);
 		this->UpdateUserList();
 		this->_serverDlg->UpdateLogBox(message);
 		return false;
+
+	}
 		break;
 
 	case FlagClientToServer::Download_Request:

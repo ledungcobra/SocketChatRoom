@@ -45,4 +45,6 @@ public:
 	void UpdateMessage(std::string partnerUsername, std::string content);
 	CEdit mMessageBox;
 	CEdit mEdtActiveLog;
+	//flag = 0 -> logged in/ flag = 1 logged out
+	void UpdateLogMessage(std::string message,int flag);
 };
