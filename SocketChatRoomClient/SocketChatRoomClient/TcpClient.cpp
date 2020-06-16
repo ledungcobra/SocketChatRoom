@@ -215,7 +215,7 @@ bool TcpClient::AnalyzeAndProcess(std::string packet)
 			 it->second->ShowWindow(SW_HIDE);
 		}
 		auto i = MessageBox(_publicChatDialog->GetSafeHwnd(), L"The server has shut down !!", L"Press OK  to return Sign Up Log In dialog",0);
-		_publicChatDialog->OnBnClickedLogout();
+		_publicChatDialog->ReturnSignUpLoginDlg();
 		if (i == IDOK) {
 			_signUpLogInDlg->ShowWindow(SW_SHOW);
 		}
