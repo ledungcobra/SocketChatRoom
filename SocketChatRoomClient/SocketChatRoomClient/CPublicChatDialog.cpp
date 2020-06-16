@@ -126,6 +126,12 @@ void CPublicChatDialog::OnBnClickedLogout()
 
 }
 
+void CPublicChatDialog::ReturnSignUpLoginDlg()
+{
+	EndDialog(IDOK);
+	TcpClient::GetInstance()->ShowSignUpLoginDialog();
+}
+
 
 void CPublicChatDialog::OnBnClickedUploadFile()
 {

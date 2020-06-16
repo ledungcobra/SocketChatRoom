@@ -39,7 +39,8 @@ public:
 	afx_msg void OnBnClickedLogout();
 	
 	afx_msg void OnBnClickedUploadFile();
-	
+	void ReturnSignUpLoginDlg();
+
 	afx_msg void OnLbnSelchangeListActiveUsers();
 	void UpdateMessage(std::string partnerUsername, std::string content);
 	CEdit mMessageBox;

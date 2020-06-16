@@ -141,12 +141,10 @@ bool TcpServer::AnalyzeAndProcess(SOCKET clientSocket, std::string packet)
 	break;
 	case FlagClientToServer::LogOut:
 	{
-		message = _listUser[clientSocket] + "has logged out";
+		message = _listUser[clientSocket] + " has logged out";
 
 		this->_serverDlg->UpdateActiveUserListView();
-		this->_listUser.erase(clientSocket);
-				
-
+		this->_listUser[clientSocket]="";
 		this->UpdateUserList();
 	}
 		break;
@@ -582,7 +580,10 @@ void TcpServer::UpdateUserList()
 	std::string send_active_user = std::to_string(static_cast<int>(FlagServerToClient::Send_Active_User)) + '\0';
 	for (auto it = this->_listUser.begin(); it != this->_listUser.end(); it++)
 	{
-		send_active_user += it->second + '|';
+		if (it->second != "")
+		{
+			send_active_user += it->second + '|';
+		}
 	}
 	send_active_user.pop_back();
 	send_active_user += '\0';
