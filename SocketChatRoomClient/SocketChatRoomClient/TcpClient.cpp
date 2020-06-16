@@ -133,10 +133,22 @@ bool TcpClient::AnalyzeAndProcess(std::string packet)
 		std::vector<std::string> info;
 		info = stringTokenizer(packet, '\0');
 		std::string backMess = std::to_string(static_cast<int>(FlagClientToServer::Download_Request)) + '\0' + info[1] + '\0' + info[2] + '\0';
-		int num = std::stoi(info[3]);
-		std::string size = std::to_string((num >> 20));
+
+		// xử kí thước file từ byte ra MB
+		double num = std::stod(info[3]);
+
+		num /= 1000000;
 		
-		CString notificationMessage = _T("Do you want to keep the filename: ") + ConvertString::ConvertStringToCString(info[2]) + _T(" from ") + ConvertString::ConvertStringToCString(info[1]) + _T(" size:") + ConvertString::ConvertStringToCString(size) + _T("MB");
+		std::ostringstream ostrm;
+		ostrm << std::fixed;
+		ostrm << std::setprecision(2);
+		ostrm << num;
+
+		std::string size = ostrm.str();
+
+		// hiện thông báo
+		
+		CString notificationMessage = _T("Do you want to keep \"") + ConvertString::ConvertStringToCString(info[2]) + _T("\" from: ") + ConvertString::ConvertStringToCString(info[1]) + _T(" size: ") + ConvertString::ConvertStringToCString(size) + _T(" MB");
 
 		auto i = AfxMessageBox(notificationMessage, 1, 1);
 		if (i == IDOK) {	

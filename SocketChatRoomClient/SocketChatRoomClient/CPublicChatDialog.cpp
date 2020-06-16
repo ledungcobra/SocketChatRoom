@@ -143,9 +143,9 @@ void CPublicChatDialog::OnBnClickedUploadFile()
 			std::ostringstream ostrm;
 			long long size = fileSize(filePath); // kich thuoc theo byte
 
-			if (size > 5242880)
+			if (size > 5242880 && size < 1048576)
 			{
-				AfxMessageBox(L"File is too big");
+				AfxMessageBox(L"File must be between 2 and 5 MB");
 				return;
 			}
 			else
@@ -155,8 +155,6 @@ void CPublicChatDialog::OnBnClickedUploadFile()
 				ostrm << file.rdbuf();
 
 				std::string content = std::string(ostrm.str());
-
-
 
 				// lấy tên file
 				std::vector<std::string> info = stringTokenizer(filePath, '\\');

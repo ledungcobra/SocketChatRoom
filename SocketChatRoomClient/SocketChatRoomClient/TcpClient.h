@@ -16,6 +16,7 @@
 #include <memory>
 #include "ConvertString.h"
 #include <map>
+#include <iomanip>
 #pragma comment (lib,"ws2_32.lib")
 #define RAWSIZE 6000000
 
