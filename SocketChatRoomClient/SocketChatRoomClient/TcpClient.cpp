@@ -278,6 +278,7 @@ struct Param {
 	SOCKET serverSocket;
 	TcpClient* tcpClient;
 };
+
 UINT ReceiveThreadFunc(LPVOID param) {
 
 	TcpClient* pTcpClient = (TcpClient*)param;
@@ -376,7 +377,7 @@ std::vector<std::string> stringTokenizer(std::string input, char delim)
 	return tokens;
 }
 
-long long fileSize(std::string add)
+long long fileSize(CString add)
 {
 	std::ifstream mySource;
 	mySource.open(add, std::ios_base::binary);
