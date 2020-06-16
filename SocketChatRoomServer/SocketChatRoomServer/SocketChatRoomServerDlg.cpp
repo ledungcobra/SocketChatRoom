@@ -61,7 +61,6 @@ SocketChatRoomServerDlg::SocketChatRoomServerDlg(CWnd* pParent /*=nullptr*/)
 void SocketChatRoomServerDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
-	DDX_Control(pDX, IDC_BUTTON1, mBTNSWITCH);
 	DDX_Control(pDX, IDC_LIST1, mListBox);
 	DDX_Control(pDX, IDC_EDIT1, mEdtLog);
 }
@@ -121,7 +120,7 @@ void SocketChatRoomServerDlg::OnSysCommand(UINT nID, LPARAM lParam)
 {
 	if ((nID & 0xFFF0) == SC_CLOSE)
 	{
-		auto i = AfxMessageBox(_T("Do you wanna disconnect this server"), 1, 1);
+		auto i = AfxMessageBox(_T("Do you want to close this server"), 1, 1);
 		if (i == IDOK) {
 			try {
 				_cwprintf(L"Number of threads: %d", TcpServer::GetInstance()->_flagRunningThread.size());

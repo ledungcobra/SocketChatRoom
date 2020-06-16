@@ -9,6 +9,8 @@ TcpClient::TcpClient()
 	this->_serverPort = 54000;
 	this->_serverIpaddress = "127.0.0.1";
 
+	
+
 	// Tạo winsock
 	WSADATA data;
 	WORD ver = MAKEWORD(2, 2); // version 2,2
@@ -37,17 +39,30 @@ std::string TcpClient::ReceivePacket()
 }
 SOCKET TcpClient::CreateSocket()
 {
+	
 	SOCKET sock_server = socket(AF_INET, SOCK_STREAM, 0);
 
 	if (sock_server != INVALID_SOCKET)	//Check xem cấp có bị lỗi không 
 	{
 		// Hoàn thiện cấu trúc _hint ( báo là mình dùng kiểu protocol nào, hiện đang dùng IPv4 )
-		this->_hint.sin_family = AF_INET;
-		this->_hint.sin_port = htons(this->_serverPort);
-		inet_pton(AF_INET, this->_serverIpaddress.c_str(), &this->_hint.sin_addr);
+		this->_sockAddr.sin_family = AF_INET;
+		this->_sockAddr.sin_port = htons(this->_serverPort);
+		inet_pton(AF_INET, this->_serverIpaddress.c_str(), &this->_sockAddr.sin_addr);
 
 		// Bind ipaddress và port vào socket
-		int bind_check = bind(sock_server, (sockaddr*)&this->_hint, sizeof(this->_hint));
+		int error = bind(sock_server, (sockaddr*)&this->_sockAddr, sizeof(this->_sockAddr));
+		//TODO:FIX
+		_cwprintf(L"%d", error);
+		if (error != 0) {
+			this->_isRunning = true;
+		}
+		else {
+			this->_isRunning = false;
+			AfxMessageBox(L"Cannot connect to server");
+			exit(0);
+		}
+		
+
 	}
 	else
 	{
@@ -249,7 +264,7 @@ bool TcpClient::AnalyzeAndProcess(std::string packet)
 bool TcpClient::Connect()
 {
 
-	if (connect(this->_serverSocket, (sockaddr*)&this->_hint, sizeof(this->_hint)) )
+	if (connect(this->_serverSocket, (sockaddr*)&this->_sockAddr, sizeof(this->_sockAddr)) )
 	{
 		closesocket(this->_serverSocket); // Do la client nen truoc khi dong can don
 		WSACleanup();
@@ -297,15 +312,9 @@ void TcpClient::Run()
 {
 	
 	this->_isRunning = true;
-	bool success = this->Connect();
-	if (success) {
+	bool success = this->Connect();	
+	AfxBeginThread(ReceiveThreadFunc, this);
 
-		AfxBeginThread(ReceiveThreadFunc, this);
-	}
-	else {
-		AfxMessageBox(L"Connect to server fail");
-		_isRunning = false;
-	}
 	
 }
 
