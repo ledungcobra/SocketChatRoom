@@ -211,6 +211,10 @@ bool TcpClient::AnalyzeAndProcess(std::string packet)
 		else {
 			//Tìm được cửa số người gửi 
 			_mapPrivateChatDialog[info[1]]->UpdateChatView(info[2]);
+			_mapPrivateChatDialog[info[1]]->ShowWindow(SW_SHOW);
+
+
+
 			
 		}
 	//TODO: Hiện khung chat riêng và đẩy tin nhắn lên, info[1] là người gửi, info[2] là tin nhắn

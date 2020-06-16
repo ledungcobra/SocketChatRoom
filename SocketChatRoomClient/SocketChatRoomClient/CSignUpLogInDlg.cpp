@@ -114,9 +114,12 @@ BOOL CSignUpLogInDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// Set small icon
 
 	// TODO: Add extra initialization here
+	CString a("Xin chào");
+	_cwprintf(a);
 	SetWindowText(L"Socket Chat Room");
 	TcpClient::GetInstance()->SetDialog(this);
 	TcpClient::GetInstance()->Run();
+	
 
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }
