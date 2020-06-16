@@ -31,6 +31,7 @@ void CPublicChatDialog::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDD_LIST2, mActiveUsersList);
 	DDX_Control(pDX, IDC_EDIT1, mEdtChat);
 	DDX_Control(pDX, IDC_EDIT2, mMessageBox);
+	DDX_Control(pDX, IDC_EDIT3, mEdtActiveLog);
 }
 
 
@@ -104,12 +105,12 @@ void CPublicChatDialog::OnBnClickedSend()
 void CPublicChatDialog::UpdateListActiveUsers(std::vector<std::string> listActiveUsers)
 {
 	mActiveUsersList.ResetContent();
-
 	for (int i = 0; i < listActiveUsers.size();i++) {
 		//if (ConvertString::ConvertCStringToString(_username) != listActiveUsers.at(i)) {
 			mActiveUsersList.InsertString(i, ConvertString::ConvertStringToCString(listActiveUsers.at(i)));
 		///}
 	}
+
 }
 
 

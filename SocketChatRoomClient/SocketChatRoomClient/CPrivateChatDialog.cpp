@@ -27,6 +27,7 @@ CPrivateChatDialog::CPrivateChatDialog(CWnd* pParent, CString partnerUsername)
 
 CPrivateChatDialog::~CPrivateChatDialog()
 {
+	OnDestroy();
 }
 
 void CPrivateChatDialog::DoDataExchange(CDataExchange* pDX)

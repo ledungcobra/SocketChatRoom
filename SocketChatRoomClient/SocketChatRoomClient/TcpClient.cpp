@@ -212,7 +212,8 @@ bool TcpClient::AnalyzeAndProcess(std::string packet)
 	case FlagServerToClient:: Close_All_Connection:
 	{
 		for (auto it = _mapPrivateChatDialog.begin(); it != _mapPrivateChatDialog.end(); it++) {
-			 it->second->ShowWindow(SW_HIDE);
+			// it->second->ShowWindow(SW_HIDE);
+			it->second->~CPrivateChatDialog();
 		}
 		auto i = MessageBox(_publicChatDialog->GetSafeHwnd(), L"The server has shut down !!", L"Press OK  to return Sign Up Log In dialog",0);
 		_publicChatDialog->OnBnClickedLogout();

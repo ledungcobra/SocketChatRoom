@@ -70,7 +70,6 @@ BEGIN_MESSAGE_MAP(SocketChatRoomServerDlg, CDialogEx)
 	ON_WM_SYSCOMMAND()
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
-	ON_BN_CLICKED(IDC_BUTTON1, &SocketChatRoomServerDlg::OnBnClickedSwitch)
 END_MESSAGE_MAP()
 
 
@@ -190,31 +189,6 @@ HCURSOR SocketChatRoomServerDlg::OnQueryDragIcon()
 }
 
 
-
-void SocketChatRoomServerDlg::OnBnClickedSwitch()
-{
-	// TODO: Add your control notification handler code here
-	/*if (_isRunning == false) {
-		if (_server->Init()) {
-
-			_server->Run();
-			_isRunning = true;
-			CString currentText;
-			mEdtLog.GetWindowTextW(currentText);
-			currentText += "\r\nServer is running";
-
-		}
-		
-	}
-	else {
-
-
-	}
-	
-	mBTNSWITCH.SetWindowTextW(_T("TURN OFF"));*/
-	
-	
-}
 
 void SocketChatRoomServerDlg::UpdateLogBox(std::string message)
 {

@@ -43,4 +43,5 @@ public:
 	afx_msg void OnLbnSelchangeListActiveUsers();
 	void UpdateMessage(std::string partnerUsername, std::string content);
 	CEdit mMessageBox;
+	CEdit mEdtActiveLog;
 };
