@@ -33,6 +33,7 @@ protected:
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
 	afx_msg void OnPaint();
 	afx_msg HCURSOR OnQueryDragIcon();
+	afx_msg void OnOK();
 	DECLARE_MESSAGE_MAP()
 public:
 	afx_msg void OnBnClickedSignUp();
@@ -43,7 +44,7 @@ public:
 	void FailLogin();
 	afx_msg LRESULT LoginSuccess(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT SignUpSuccess(WPARAM wParam, LPARAM lParam);
-
+	
 
 	void AccountAlreadyUsed();
 };

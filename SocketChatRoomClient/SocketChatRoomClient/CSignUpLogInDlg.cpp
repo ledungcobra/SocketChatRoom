@@ -185,6 +185,11 @@ HCURSOR CSignUpLogInDlg::OnQueryDragIcon()
 	return static_cast<HCURSOR>(m_hIcon);
 }
 
+void CSignUpLogInDlg::OnOK()
+{
+	this->OnBnClickedLogIn();
+}
+
 
 
 
