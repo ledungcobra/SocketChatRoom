@@ -3,7 +3,7 @@
 
 CString User::getUsername()
 {
-	return _username;
+	return username;
 }
 
 CString User::getPassword()
@@ -13,7 +13,7 @@ CString User::getPassword()
 
 void User::setUserName(CString username)
 {
-	this->_username = username;
+	this->username = username;
 
 }
 

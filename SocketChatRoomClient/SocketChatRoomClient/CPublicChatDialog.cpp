@@ -16,7 +16,7 @@ IMPLEMENT_DYNAMIC(CPublicChatDialog, CDialogEx)
 CPublicChatDialog::CPublicChatDialog(CWnd* pParent,CString username)
 	: CDialogEx(IDD_PUBLIC_CHAT, pParent)
 {
-	this->_username = username;
+	this->username = username;
 
 }
 
@@ -54,7 +54,7 @@ void CPublicChatDialog::OnSysCommand(UINT nID, LPARAM lParam)
 			std::string packet = "";
 			packet += std::to_string(static_cast<int>(FlagClientToServer::Disconnect_To_Server)) + '\0';
 			TcpClient::GetInstance()->SendPacketRaw(packet);
-			TcpClient::GetInstance()->_isRunning = false;
+			TcpClient::GetInstance()->isRunning = false;
 			OnDestroy();
 
 		}
@@ -93,7 +93,7 @@ void CPublicChatDialog::OnBnClickedSend()
 	mEdtChat.GetWindowTextW(message);
 
 	std::string packet = std::to_string(static_cast<int>
-	(FlagClientToServer::PublicChat)) + '\0' + ConvertString::ConvertCStringToString(_username) + '\0' +
+	(FlagClientToServer::PublicChat)) + '\0' + ConvertString::ConvertCStringToString(username) + '\0' +
 		ConvertString::ConvertCStringToString(message) + '\0';
 	_cwprintf(ConvertString::ConvertStringToCString(packet));
 
@@ -107,7 +107,7 @@ void CPublicChatDialog::UpdateListActiveUsers(std::vector<std::string> listActiv
 {
 	mActiveUsersList.ResetContent();
 	for (int i = 0; i < listActiveUsers.size();i++) {
-		//if (ConvertString::ConvertCStringToString(_username) != listActiveUsers.at(i)) {
+		//if (ConvertString::ConvertCStringToString(username) != listActiveUsers.at(i)) {
 			mActiveUsersList.InsertString(i, ConvertString::ConvertStringToCString(listActiveUsers.at(i)));
 		///}
 	}
@@ -204,7 +204,7 @@ void CPublicChatDialog::OnLbnSelchangeListActiveUsers()
 	CString selectedUser;
 	mActiveUsersList.GetText(index, selectedUser);
 
-	if (selectedUser == _username) {
+	if (selectedUser == username) {
 		return;
 	}
 	CPrivateChatDialog* dlg = TcpClient::GetInstance()->CreatePrivateChatDlg(selectedUser);

@@ -10,7 +10,7 @@ public:
 	void setPassword(CString password);
 
 private:
-	CString _username;
+	CString username;
 	CString _password;
 	
 

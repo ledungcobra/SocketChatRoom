@@ -19,59 +19,43 @@
 #include <iomanip>
 #pragma comment (lib,"ws2_32.lib")
 #define RAWSIZE 6000000
-
 static Lock _lock;
 
 class TcpClient
 {
-	
 private:
 	int _serverPort;
 	std::string _serverIpaddress;
 	sockaddr_in _sockAddr;
 	CPublicChatDialog* _publicChatDialog = nullptr;
-	
 	CSignUpLogInDlg* _signUpLogInDlg = nullptr;
-	
-	//tạm thời
+	static TcpClient* _instance;
+	TcpClient();
+	// dùng cho đọc và ghi file
 	CString _filePath = L"";
 public:
-	//TODO:
-	std::map<std::string, std::shared_ptr<CPrivateChatDialog> > _mapPrivateChatDialog;
-	bool _isActive;
-	bool _isRunning;
-	SOCKET _serverSocket;
-	CString _username;
-	SOCKET CreateSocket();
-	void SendPacketRaw( std::string packet);
-	//TODO: Thay đổi _isRunning nếu ngắt kết nối
-	bool AnalyzeAndProcess( std::string packet);
-	std::string ReceivePacket();
-	bool Connect();
-	void CloseConnection();
-
-    static TcpClient *GetInstance();
-	void Run();
-private:
-    static TcpClient* _instance;
-	TcpClient();
-
-public:
-	//CPublicChatDialog* GetPublicChatDialog();
-	//CPrivateChatDialog* GetPrivateChatDialog();
-	//CSignUpLogInDlg* GetSignUpLogInDlg();
-	void SetDialog(CDialog* dialog);
-	void ShowSignUpLoginDialog();
-
+	std::map<std::string, std::shared_ptr<CPrivateChatDialog> > _mapPrivateChatDialog; //
+	bool isRunning; // kiểm tra có đang chạy hay không
+	SOCKET serverSocket; // socket client 
+	CString username; // tên của client 
+	SOCKET CreateSocket(); // tạo socket 
+	void SendPacketRaw( std::string packet); // gửi gói tin thô
+	bool AnalyzeAndProcess( std::string packet); // phân tích và xử lí
+	std::string ReceivePacket(); // nhận gói tin 
+	bool Connect(); // kết nối với server
+	void CloseConnection(); // đóng kết nối
+    static TcpClient *GetInstance(); // lấy thể hiện
+	void Run(); // chạy client
+	void SetDialog(CDialog* dialog); //
+	void ShowSignUpLoginDialog(); //
 	CPrivateChatDialog* CreatePrivateChatDlg(CString partnerUsername);
-	
-
-public:
-	
-
 };
 
 
-std::vector<std::string> stringTokenizer(std::string input, char delim, int limit);
 std::vector<std::string> stringTokenizer(std::string input, char delim);
+std::vector<std::string> stringTokenizer(std::string input, char delim, int lim);
 long long fileSize(CString add);
+
+
+//thread
+UINT ReceiveThreadFunc(LPVOID param);

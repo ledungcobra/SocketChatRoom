@@ -27,7 +27,7 @@ protected:
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
 	afx_msg void OnOK();
 private :
-	CString _username;
+	CString username;
 
 
 public:

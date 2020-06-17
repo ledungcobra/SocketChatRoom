@@ -134,7 +134,7 @@ void CSignUpLogInDlg::OnSysCommand(UINT nID, LPARAM lParam)
 			std::string packet = "";
 			packet += std::to_string(static_cast<int>(FlagClientToServer::Disconnect_To_Server)) + '\0';
 			TcpClient::GetInstance()->SendPacketRaw(packet);
-			TcpClient::GetInstance()->_isRunning = false;
+			TcpClient::GetInstance()->isRunning = false;
 			OnDestroy();
 
 		}
@@ -267,7 +267,7 @@ LRESULT CSignUpLogInDlg::LoginSuccess(WPARAM wParam, LPARAM lParam)
 	ShowWindow(SW_HIDE);
 
 	CPublicChatDialog* p = new CPublicChatDialog(nullptr, username);
-	TcpClient::GetInstance()->_username = username;
+	TcpClient::GetInstance()->username = username;
 
 	auto client = TcpClient::GetInstance();
 	p->Create(IDD_PUBLIC_CHAT);
@@ -286,7 +286,7 @@ LRESULT CSignUpLogInDlg::SignUpSuccess(WPARAM wParam, LPARAM lParam)
 	ShowWindow(SW_HIDE);
 
 	CPublicChatDialog* p = new CPublicChatDialog(nullptr,username);
-	TcpClient::GetInstance()->_username = username;
+	TcpClient::GetInstance()->username = username;
 	auto client = TcpClient::GetInstance();
 	p->Create(IDD_PUBLIC_CHAT);
 	p->ShowWindow(SW_SHOWNORMAL);

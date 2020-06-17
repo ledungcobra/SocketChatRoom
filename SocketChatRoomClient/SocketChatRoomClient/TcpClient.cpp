@@ -2,14 +2,12 @@
 #include "TcpClient.h"
 #include "resource.h"
 TcpClient* TcpClient::_instance = NULL;
+
 TcpClient::TcpClient()
 {
-	this->_isRunning = false;
-	this->_isActive = false;
+	this->isRunning = false;
 	this->_serverPort = 54000;
 	this->_serverIpaddress = "127.0.0.1";
-	//this->_serverIpaddress = "192.168.187.1";
-	
 
 	// Tạo winsock
 	WSADATA data;
@@ -21,8 +19,9 @@ TcpClient::TcpClient()
 	{
 		std::cerr << "Can't start winsock ! Error # " << WSAGetLastError << std::endl;
 	}
-	this->_serverSocket = this->CreateSocket();
+	this->serverSocket = this->CreateSocket();
 }
+
 std::string TcpClient::ReceivePacket()
 {
 	//Tạo buffer
@@ -31,7 +30,7 @@ std::string TcpClient::ReceivePacket()
 	ZeroMemory(buffer, RAWSIZE);
 
 	//nhận tin nhắn
-	int bytesin = recv(this->_serverSocket, buffer, RAWSIZE, 0);
+	int bytesin = recv(this->serverSocket, buffer, RAWSIZE, 0);
 	std::string packet = std::string(buffer, bytesin);
 	delete[] buffer;
 	return packet;
@@ -54,15 +53,13 @@ SOCKET TcpClient::CreateSocket()
 		//TODO:FIX
 		_cwprintf(L"%d", error);
 		if (error != 0) {
-			this->_isRunning = true;
+			this->isRunning = true;
 		}
 		else {
-			this->_isRunning = false;
+			this->isRunning = false;
 			AfxMessageBox(L"Cannot connect to server");
 			exit(0);
 		}
-		
-
 	}
 	else
 	{
@@ -74,20 +71,19 @@ SOCKET TcpClient::CreateSocket()
 
 void TcpClient::SendPacketRaw(std::string packet)
 {
-	if (_isRunning) {
-		send(this->_serverSocket, packet.c_str(), (int)(packet.size() + 1), 0);
+	if (isRunning) {
+		send(this->serverSocket, packet.c_str(), (int)(packet.size() + 1), 0);
 	}
 	
 }
 
 bool TcpClient::AnalyzeAndProcess(std::string packet)
 {
-
 	if (packet.empty() == true || packet[0] == '\r')
 	{
 		return true;
 	}
-	//TODO:
+	// lấy flag 
 	int pos = packet.find('\0');
 	std::string flag_head_str = packet.substr(0, pos);
 	int flag_num = stoi(flag_head_str);
@@ -96,15 +92,18 @@ bool TcpClient::AnalyzeAndProcess(std::string packet)
 	
 	switch (flag)
 	{
-	case FlagServerToClient::Send_Active_User:	{
+	case FlagServerToClient::Send_Active_User:	
+	{
 		std::vector<std::string> listActiveUsers = stringTokenizer(packet, '\0');
 		listActiveUsers = stringTokenizer(listActiveUsers[1], '|');
-		if (_publicChatDialog) {
+		if (_publicChatDialog) 
+		{
 
 			_publicChatDialog->UpdateListActiveUsers(listActiveUsers);
 			
 		}
-		else {
+		else 
+		{
 			AfxMessageBox(L"Couldn't find Public Dialog");
 		}
 	}
@@ -133,7 +132,8 @@ bool TcpClient::AnalyzeAndProcess(std::string packet)
 		break;
 
 	case FlagServerToClient::SignUp_Success:
-		if (_signUpLogInDlg) {
+		if (_signUpLogInDlg) 
+		{
 			SendMessage(_signUpLogInDlg->GetSafeHwnd(), SIGNUP_SUCCESS_MSG,0,0);
 			//CWnd
 		}
@@ -143,13 +143,12 @@ bool TcpClient::AnalyzeAndProcess(std::string packet)
 
 	case FlagServerToClient::Send_File_Desc:
 	{
-		//TODO:testing
-		_cwprintf(ConvertString::ConvertStringToCString(packet));
+
 		std::vector<std::string> info;
 		info = stringTokenizer(packet, '\0');
 		std::string backMess = std::to_string(static_cast<int>(FlagClientToServer::Download_Request)) + '\0' + info[1] + '\0' + info[2] + '\0';
 
-		// xử kí thước file từ byte ra MB
+		// xử kích thước file từ byte ra MB
 		double num = std::stod(info[3]);
 
 		num /= 1000000;
@@ -165,29 +164,22 @@ bool TcpClient::AnalyzeAndProcess(std::string packet)
 		
 		CString notificationMessage = _T("Do you want to keep \"") + ConvertString::ConvertStringToCString(info[2]) + _T("\" from: ") + ConvertString::ConvertStringToCString(info[1]) + _T(" size: ") + ConvertString::ConvertStringToCString(size) + _T(" MB");
 
-	
-
-
 		auto i = AfxMessageBox(notificationMessage, 1, 1);
-		if (i == IDOK) {	
-			// tạm thời 
+		if (i == IDOK) 
+		{	
 			CFileDialog fileDlg(FALSE);
 			fileDlg.DoModal();
 			CString filePath = fileDlg.GetPathName();
 			_cwprintf(filePath);
 			this->_filePath = filePath;
-			//
 			this->SendPacketRaw(backMess);
 		}
 	}
 		break;
 	case FlagServerToClient::Send_File_Content:
 	{
-		//TODO:testing
-		// tách thông tin file 
-		
 		std::vector<std::string> info;
-		info = stringTokenizer(packet, '\0',10);
+		info = stringTokenizer(packet, '\0',5);
 
 		// lấy content
 		packet.pop_back(); // bỏ '\0' được thêm vào từ send packet raw
@@ -203,7 +195,6 @@ bool TcpClient::AnalyzeAndProcess(std::string packet)
 
 	}
 		break;
-		//TODO:
 	case FlagServerToClient::Already_Login:
 		if (_signUpLogInDlg)
 			_signUpLogInDlg->AccountAlreadyUsed();
@@ -221,8 +212,6 @@ bool TcpClient::AnalyzeAndProcess(std::string packet)
 
 
 			SendMessage(_publicChatDialog->GetSafeHwnd(), OPEN_PRIVATE_CHAT_DIALOG,(WPARAM)(LPCTSTR)ConvertString::ConvertStringToCString(info[2]), (LPARAM)(LPCTSTR)ConvertString::ConvertStringToCString(info[1]));
-			
-			//pPrivateChatDlg->UpdateChatView(info[2]);
 
 
 		}
@@ -232,21 +221,19 @@ bool TcpClient::AnalyzeAndProcess(std::string packet)
 			_mapPrivateChatDialog[info[1]]->ShowWindow(SW_SHOW);
 			
 		}
-	//TODO: Hiện khung chat riêng và đẩy tin nhắn lên, info[1] là người gửi, info[2] là tin nhắn
+	
 	}
 		break;
 	case FlagServerToClient::Send_Public_Message:
 	{
 		std::vector<std::string> info;
 		info = stringTokenizer(packet, '\0');
-		//TODO: Đẩy lên khung chat chung ( info[1] là tên người nhắn lên chat public, info[2] là nội dung)
 		_publicChatDialog->UpdateMessage(info[1],info[2]);
 	}
 		break;
 	case FlagServerToClient:: Close_All_Connection:
 	{
 		for (auto it = _mapPrivateChatDialog.begin(); it != _mapPrivateChatDialog.end(); it++) {
-			// it->second->ShowWindow(SW_HIDE);
 			it->second->~CPrivateChatDialog();
 		}
 		auto i = MessageBox(_publicChatDialog->GetSafeHwnd(), L"The server has shut down !!", L"Press OK  to return Sign Up Log In dialog",0);
@@ -264,7 +251,6 @@ bool TcpClient::AnalyzeAndProcess(std::string packet)
 	{
 		std::vector<std::string> info;
 		info = stringTokenizer(packet, '\0');
-		//TODO: Ghi lên ô thoại , info[1] là username mới log in
 		_publicChatDialog->UpdateLogMessage(info[1],0);
 	}
 	break;
@@ -272,7 +258,6 @@ bool TcpClient::AnalyzeAndProcess(std::string packet)
 	{
 		std::vector<std::string> info;
 		info = stringTokenizer(packet, '\0');
-		//TODO: Ghi lên ô thoại , info[1] là username mới log out
 		_publicChatDialog->UpdateLogMessage(info[1],1);
 	}
 	}
@@ -283,9 +268,9 @@ bool TcpClient::AnalyzeAndProcess(std::string packet)
 bool TcpClient::Connect()
 {
 
-	if (connect(this->_serverSocket, (sockaddr*)&this->_sockAddr, sizeof(this->_sockAddr)) )
+	if (connect(this->serverSocket, (sockaddr*)&this->_sockAddr, sizeof(this->_sockAddr)) )
 	{
-		closesocket(this->_serverSocket); // Do la client nen truoc khi dong can don
+		closesocket(this->serverSocket); // Do la client nen truoc khi dong can don
 		WSACleanup();
 		return false;
 	}
@@ -294,7 +279,7 @@ bool TcpClient::Connect()
 
 void TcpClient::CloseConnection() // Close dùng trong analyze
 {
-	closesocket(this->_serverSocket);
+	closesocket(this->serverSocket);
 	WSACleanup();
 }
 
@@ -320,7 +305,7 @@ UINT ReceiveThreadFunc(LPVOID param) {
 
 	TcpClient* pTcpClient = (TcpClient*)param;
 	bool connect=true;
-	while (pTcpClient->_isRunning && connect) {
+	while (pTcpClient->isRunning && connect) {
 		std::string packet = pTcpClient->ReceivePacket();
 		connect = pTcpClient->AnalyzeAndProcess(packet);
 	}
@@ -328,30 +313,17 @@ UINT ReceiveThreadFunc(LPVOID param) {
 
 
 }
+
 void TcpClient::Run()
 {
 	
-	this->_isRunning = true;
+	this->isRunning = true;
 	bool success = this->Connect();	
 	AfxBeginThread(ReceiveThreadFunc, this);
 
 	
 }
 
-//CPublicChatDialog* TcpClient::GetPublicChatDialog()
-//{
-//	return this->_publicChatDialog;
-//}
-//
-//CPrivateChatDialog* TcpClient::GetPrivateChatDialog()
-//{
-//	return this->_privateChatDialog;
-//}
-//
-//CSignUpLogInDlg* TcpClient::GetSignUpLogInDlg()
-//{
-//	return this->_signUpLogInDlg;
-//}
 
 void TcpClient::SetDialog(CDialog* dialog)
  {
@@ -395,22 +367,6 @@ CPrivateChatDialog* TcpClient::CreatePrivateChatDlg(CString _partnerUsername)
 }
 
 
-std::vector<std::string> stringTokenizer(std::string input, char delim, int limit)
-{
-	std::vector <std::string> tokens;
-	std::stringstream check(input);
-	std::string intermediate;
-
-	int count = 0;
-
-	while (getline(check, intermediate, delim) && count < limit)
-	{
-		tokens.push_back(intermediate);
-		++count;
-	}
-	return tokens;
-}
-
 std::vector<std::string> stringTokenizer(std::string input, char delim)
 {
 	std::vector <std::string> tokens;
@@ -420,6 +376,23 @@ std::vector<std::string> stringTokenizer(std::string input, char delim)
 	while (getline(check, intermediate, delim))
 	{
 		tokens.push_back(intermediate);
+	}
+	return tokens;
+}
+
+std::vector<std::string> stringTokenizer(std::string input, char delim, int lim)
+{
+
+	std::vector <std::string> tokens;
+	std::stringstream check(input);
+	std::string intermediate;
+
+	int count = 0;
+
+	while (getline(check, intermediate, delim) && count < lim)
+	{
+		tokens.push_back(intermediate);
+		++count;
 	}
 	return tokens;
 }

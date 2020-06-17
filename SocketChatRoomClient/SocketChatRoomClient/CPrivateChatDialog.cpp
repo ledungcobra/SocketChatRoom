@@ -139,16 +139,15 @@ void CPrivateChatDialog::OnBnClickedSend()
 	mEdtMessage.GetWindowTextW(message);
 	packet = std::to_string(static_cast<int>(FlagClientToServer::PrivateChat)) +
 		'\0'+ConvertString::
-		ConvertCStringToString(TcpClient::GetInstance()->_username)+'\0'+ ConvertString::
+		ConvertCStringToString(TcpClient::GetInstance()->username)+'\0'+ ConvertString::
 		ConvertCStringToString(_partnerUsername)+'\0'+ ConvertString::
 		ConvertCStringToString(message)+'\0';
 	CString buff;
 	mMessageBox.GetWindowTextW(buff);
-	buff += TcpClient::GetInstance()->_username + L": " + message+L"\r\n";
+	buff += TcpClient::GetInstance()->username + L": " + message+L"\r\n";
 	mMessageBox.SetWindowTextW(buff);
 	mEdtMessage.SetWindowTextW(L"");
 	TcpClient::GetInstance()->SendPacketRaw(packet);
-
-
-
 }
+
+
