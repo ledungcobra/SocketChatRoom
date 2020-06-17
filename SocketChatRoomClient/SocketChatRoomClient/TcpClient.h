@@ -28,14 +28,15 @@ class TcpClient
 private:
 	int _serverPort;
 	std::string _serverIpaddress;
-	sockaddr_in _hint;
+	sockaddr_in _sockAddr;
 	CPublicChatDialog* _publicChatDialog = nullptr;
-	std::map<std::string,std::shared_ptr<CPrivateChatDialog> > _mapPrivateChatDialog;
+	
 	CSignUpLogInDlg* _signUpLogInDlg = nullptr;
 	
 
 public:
 	//TODO:
+	std::map<std::string, std::shared_ptr<CPrivateChatDialog> > _mapPrivateChatDialog;
 	bool _isActive;
 	bool _isRunning;
 	SOCKET _serverSocket;

@@ -13,6 +13,8 @@ enum class FlagServerToClient
 
 	Send_Private_Message, //flag NULL sender(username - thêm map user vào bên client) NULL message NULL
 	Send_Public_Message, //flag NULL sender(username) NULL message NULL
-	Close_All_Connection//flag NULL
+	Close_All_Connection,//flag NULL
+	Another_Client_LogIn,
+	Another_Client_LogOut
 };
 

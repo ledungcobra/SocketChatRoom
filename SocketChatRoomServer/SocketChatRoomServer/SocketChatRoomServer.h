@@ -27,7 +27,6 @@ public:
 // Implementation
 
 	DECLARE_MESSAGE_MAP()
-	afx_msg void OnBnClickedButton1();
 };
 
 extern CSocketChatRoomServerApp theApp;

@@ -61,7 +61,6 @@ SocketChatRoomServerDlg::SocketChatRoomServerDlg(CWnd* pParent /*=nullptr*/)
 void SocketChatRoomServerDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
-	DDX_Control(pDX, IDC_BUTTON1, mBTNSWITCH);
 	DDX_Control(pDX, IDC_LIST1, mListBox);
 	DDX_Control(pDX, IDC_EDIT1, mEdtLog);
 }
@@ -70,7 +69,6 @@ BEGIN_MESSAGE_MAP(SocketChatRoomServerDlg, CDialogEx)
 	ON_WM_SYSCOMMAND()
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
-	ON_BN_CLICKED(IDC_BUTTON1, &SocketChatRoomServerDlg::OnBnClickedSwitch)
 END_MESSAGE_MAP()
 
 
@@ -122,7 +120,7 @@ void SocketChatRoomServerDlg::OnSysCommand(UINT nID, LPARAM lParam)
 {
 	if ((nID & 0xFFF0) == SC_CLOSE)
 	{
-		auto i = AfxMessageBox(_T("Do you wanna disconnect this server"), 1, 1);
+		auto i = AfxMessageBox(_T("Do you want to close this server"), 1, 1);
 		if (i == IDOK) {
 			try {
 				_cwprintf(L"Number of threads: %d", TcpServer::GetInstance()->_flagRunningThread.size());
@@ -191,31 +189,6 @@ HCURSOR SocketChatRoomServerDlg::OnQueryDragIcon()
 
 
 
-void SocketChatRoomServerDlg::OnBnClickedSwitch()
-{
-	// TODO: Add your control notification handler code here
-	/*if (_isRunning == false) {
-		if (_server->Init()) {
-
-			_server->Run();
-			_isRunning = true;
-			CString currentText;
-			mEdtLog.GetWindowTextW(currentText);
-			currentText += "\r\nServer is running";
-
-		}
-		
-	}
-	else {
-
-
-	}
-	
-	mBTNSWITCH.SetWindowTextW(_T("TURN OFF"));*/
-	
-	
-}
-
 void SocketChatRoomServerDlg::UpdateLogBox(std::string message)
 {
 	CString buff;
@@ -229,6 +202,9 @@ void SocketChatRoomServerDlg::UpdateActiveUserListView()
 {
 	mListBox.ResetContent();
 	for (auto it = TcpServer::GetInstance()->_listUser.begin(); it != TcpServer::GetInstance()->_listUser.end(); it++) {
-		this->mListBox.AddString(ConvertString::ConvertStringToCString(it->second));
+		if (it->second != "") {
+			this->mListBox.AddString(ConvertString::ConvertStringToCString(it->second));
+		}
+		
 	}
 }

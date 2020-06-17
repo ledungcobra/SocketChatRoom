@@ -8,7 +8,7 @@ TcpServer::TcpServer()
 {
 	this->_port = 54000;
 	this->_isRunning = false;
-	this->_ipAddress = "127.0.0.1"; //TODO: sửa lại sau
+	this->_ipAddress = "10.0.130.251"; //TODO: sửa lại sau
 
 	// Tạo winsock
 	WSADATA data;
@@ -103,12 +103,17 @@ bool TcpServer::AnalyzeAndProcess(SOCKET clientSocket, std::string packet)
 			WriteUserInfo(info[1], info[2]);
 			
 			message = info[1] + " has signed up and logged in";
-			this->_serverDlg->UpdateActiveUserListView();
+			
 			
 			std::string backMess = std::to_string(static_cast<int>(FlagServerToClient::SignUp_Success)) + '\0';
 			this->SendPacketRaw(clientSocket, backMess);
 			this->_listUser[clientSocket] = info[1];
 			this->UpdateUserList();
+			this->_serverDlg->UpdateActiveUserListView();
+			// Gửi cờ cập nhập log
+			std::string Another_logIn = std::to_string(static_cast<int>(FlagServerToClient::Another_Client_LogIn)) + '\0';
+			Another_logIn += info[1];
+			this->SendToAll(Another_logIn);
 		}
 	}
 		break;
@@ -144,8 +149,11 @@ bool TcpServer::AnalyzeAndProcess(SOCKET clientSocket, std::string packet)
 				this->_serverDlg->UpdateActiveUserListView();
 				
 				this->UpdateUserList();
-				
-				
+
+				// Gửi cờ để hiện log hoạt động bên client
+				std::string Another_logIn = std::to_string(static_cast<int>(FlagServerToClient::Another_Client_LogIn))+'\0';
+				Another_logIn += info[1];
+				this->SendToAll(Another_logIn);
 			}
 		}
 		else // không tồn tại tài khoản
@@ -158,32 +166,48 @@ bool TcpServer::AnalyzeAndProcess(SOCKET clientSocket, std::string packet)
 	break;
 	case FlagClientToServer::LogOut:
 	{
-		message = _listUser[clientSocket] + "has logged out";
+		message = _listUser[clientSocket] + " has logged out";
 
+		
+		std::string Another_logOut = std::to_string(static_cast<int>(FlagServerToClient::Another_Client_LogOut)) + '\0';
+		Another_logOut += this->_listUser[clientSocket] + '\0';
+		this->_listUser[clientSocket]="";
+		
 		this->_serverDlg->UpdateActiveUserListView();
-		this->_listUser.erase(clientSocket);
-				
-
 		this->UpdateUserList();
+
+		//Gửi cờ cập nhật log
+		
+		this->SendToAll(Another_logOut);
 	}
 		break;
 
 	case FlagClientToServer::Disconnect_To_Server:
+	{
+		if (_listUser[clientSocket] != "") {
 
-		message = _listUser[clientSocket] + " has disconnected";
 		
+			message = _listUser[clientSocket] + " has disconnected";
+			//Gửi cờ cập nhật log
+			std::string Another_logOut = std::to_string(static_cast<int>(FlagServerToClient::Another_Client_LogOut)) + '\0';
+			Another_logOut += this->_listUser[clientSocket];
+			this->SendToAll(Another_logOut);
+			//
+		}
 		this->_listUser.erase(clientSocket);
 		this->_serverDlg->UpdateActiveUserListView();
-		
+
 		//Handle thread 
 		if (_flagRunningThread.find(clientSocket) != _flagRunningThread.end()) {
 			_flagRunningThread.erase(clientSocket);
 		}
-		
+
 		closesocket(clientSocket);
 		this->UpdateUserList();
 		this->_serverDlg->UpdateLogBox(message);
 		return false;
+
+	}
 		break;
 
 	case FlagClientToServer::Download_Request:
@@ -353,13 +377,18 @@ std::string TcpServer::ReceivePacket(SOCKET clientSocket)
 	//Tạo buffer
 	char* buffer = new char[RAWSIZE];
 	//char buffer[6144]; //Tĩnh
+	std::string packet;
+	try {
+		ZeroMemory(buffer, RAWSIZE);
 
-	ZeroMemory(buffer, RAWSIZE);
-	
-	//nhận tin nhắn
-	int bytesin = recv(clientSocket , buffer, RAWSIZE, 0);
-	std::string packet = std::string(buffer, bytesin);
-	delete[] buffer;
+		//nhận tin nhắn
+		int bytesin = recv(clientSocket, buffer, RAWSIZE, 0);
+		packet = std::string(buffer, bytesin);
+		delete[] buffer;
+	}
+	catch (...) {
+		AfxMessageBox(L"Error buffer");
+	}
 	return packet;
 }
 
@@ -603,7 +632,10 @@ void TcpServer::UpdateUserList()
 	std::string send_active_user = std::to_string(static_cast<int>(FlagServerToClient::Send_Active_User)) + '\0';
 	for (auto it = this->_listUser.begin(); it != this->_listUser.end(); it++)
 	{
-		send_active_user += it->second + '|';
+		if (it->second != "")
+		{
+			send_active_user += it->second + '|';
+		}
 	}
 	send_active_user.pop_back();
 	send_active_user += '\0';

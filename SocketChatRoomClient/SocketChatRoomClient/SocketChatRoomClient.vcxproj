@@ -183,7 +183,6 @@
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="ClientSocket.h" />
     <ClInclude Include="ConvertString.h" />
     <ClInclude Include="CPrivateChatDialog.h" />
     <ClInclude Include="CPublicChatDialog.h" />
@@ -200,7 +199,6 @@
     <ClInclude Include="User.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="ClientSocket.cpp" />
     <ClCompile Include="ConvertString.cpp" />
     <ClCompile Include="CPrivateChatDialog.cpp" />
     <ClCompile Include="CPublicChatDialog.cpp" />

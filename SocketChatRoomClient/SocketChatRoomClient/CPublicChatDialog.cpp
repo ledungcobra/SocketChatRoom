@@ -31,6 +31,7 @@ void CPublicChatDialog::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDD_LIST2, mActiveUsersList);
 	DDX_Control(pDX, IDC_EDIT1, mEdtChat);
 	DDX_Control(pDX, IDC_EDIT2, mMessageBox);
+	DDX_Control(pDX, IDC_EDIT3, mEdtActiveLog);
 }
 
 
@@ -53,6 +54,7 @@ void CPublicChatDialog::OnSysCommand(UINT nID, LPARAM lParam)
 			std::string packet = "";
 			packet += std::to_string(static_cast<int>(FlagClientToServer::Disconnect_To_Server)) + '\0';
 			TcpClient::GetInstance()->SendPacketRaw(packet);
+			TcpClient::GetInstance()->_isRunning = false;
 			OnDestroy();
 
 		}
@@ -104,25 +106,35 @@ void CPublicChatDialog::OnBnClickedSend()
 void CPublicChatDialog::UpdateListActiveUsers(std::vector<std::string> listActiveUsers)
 {
 	mActiveUsersList.ResetContent();
-
 	for (int i = 0; i < listActiveUsers.size();i++) {
 		//if (ConvertString::ConvertCStringToString(_username) != listActiveUsers.at(i)) {
 			mActiveUsersList.InsertString(i, ConvertString::ConvertStringToCString(listActiveUsers.at(i)));
 		///}
 	}
+
 }
 
 
 void CPublicChatDialog::OnBnClickedLogout()
 {
 
+	
 	std::string packet = "";
 	packet += std::to_string(static_cast<int>(FlagClientToServer::LogOut)) + '\0';
 	TcpClient::GetInstance()->SendPacketRaw(packet);
+	for (auto it = TcpClient::GetInstance()->_mapPrivateChatDialog.begin(); it != TcpClient::GetInstance()->_mapPrivateChatDialog.end(); it++) {
+		 it->second->ShowWindow(SW_HIDE);
+	}
 	EndDialog(IDOK);
 	TcpClient::GetInstance()->ShowSignUpLoginDialog();
 
 
+}
+
+void CPublicChatDialog::ReturnSignUpLoginDlg()
+{
+	EndDialog(IDOK);
+	TcpClient::GetInstance()->ShowSignUpLoginDialog();
 }
 
 
@@ -227,4 +239,21 @@ void CPublicChatDialog::UpdateMessage(std::string partnerUsername, std::string c
 
 
 
+}
+
+void CPublicChatDialog::UpdateLogMessage(std::string message,int flag)
+{
+	CString buffer;
+
+	if (flag == 0) {
+		mEdtActiveLog.GetWindowTextW(buffer);
+		buffer += ConvertString::ConvertStringToCString(message) + L" has logged in\r\n";
+		
+
+	}
+	else if (flag == 1) {
+		mEdtActiveLog.GetWindowTextW(buffer);
+		buffer += ConvertString::ConvertStringToCString(message) + L" has logged out\r\n";
+	}
+	mEdtActiveLog.SetWindowTextW(buffer);
 }

@@ -36,8 +36,7 @@ protected:
 	afx_msg HCURSOR OnQueryDragIcon();
 	DECLARE_MESSAGE_MAP()
 public:
-	CButton mBTNSWITCH;
-	afx_msg void OnBnClickedSwitch();
+	
 	CListBox mListBox;
 	void UpdateLogBox(std::string message);
 	void UpdateActiveUserListView();

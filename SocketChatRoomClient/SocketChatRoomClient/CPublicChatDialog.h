@@ -39,8 +39,12 @@ public:
 	afx_msg void OnBnClickedLogout();
 	
 	afx_msg void OnBnClickedUploadFile();
-	
+	void ReturnSignUpLoginDlg();
+
 	afx_msg void OnLbnSelchangeListActiveUsers();
 	void UpdateMessage(std::string partnerUsername, std::string content);
 	CEdit mMessageBox;
+	CEdit mEdtActiveLog;
+	//flag = 0 -> logged in/ flag = 1 logged out
+	void UpdateLogMessage(std::string message,int flag);
 };
