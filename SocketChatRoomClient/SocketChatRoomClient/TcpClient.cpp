@@ -158,7 +158,7 @@ bool TcpClient::AnalyzeAndProcess(std::string packet)
 		ostrm << std::fixed;
 		ostrm << std::setprecision(2);
 		ostrm << num;
-
+	 
 		std::string size = ostrm.str();
 
 		// hiện thông báo
@@ -182,7 +182,6 @@ bool TcpClient::AnalyzeAndProcess(std::string packet)
 		// lấy content
 		packet.pop_back(); // bỏ '\0' được thêm vào từ send packet raw
 		packet.pop_back(); // bỏ '\0' tương đương với null trong mẫu tin
-
 		std::string fileContent = packet.substr(packet.length() - stoi(info[3]), stoi(info[3]));
 		CFileDialog fileDlg(FALSE);
 		fileDlg.DoModal();

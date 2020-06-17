@@ -229,16 +229,6 @@ bool TcpServer::AnalyzeAndProcess(SOCKET clientSocket, std::string packet)
 
 				std::string backMess = std::to_string(static_cast<int>(FlagServerToClient::Send_File_Content)) + '\0' + this->_container[i];
 				SendPacketRaw(clientSocket, backMess);
-				//if (content[1] == "ALL")
-				//{
-				//	//TODO:
-
-				//}
-				//else
-				//{
-				//	this->_container.erase(this->_container.begin() + i);
-				//}
-				//break;
 			}
 		}
 	}
