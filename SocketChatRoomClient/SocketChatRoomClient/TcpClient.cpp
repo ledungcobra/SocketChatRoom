@@ -7,7 +7,7 @@ TcpClient::TcpClient()
 	this->_isRunning = false;
 	this->_isActive = false;
 	this->_serverPort = 54000;
-	this->_serverIpaddress = "10.0.130.251";
+	this->_serverIpaddress = "127.0.0.1";
 	//this->_serverIpaddress = "192.168.187.1";
 	
 
@@ -165,8 +165,18 @@ bool TcpClient::AnalyzeAndProcess(std::string packet)
 		
 		CString notificationMessage = _T("Do you want to keep \"") + ConvertString::ConvertStringToCString(info[2]) + _T("\" from: ") + ConvertString::ConvertStringToCString(info[1]) + _T(" size: ") + ConvertString::ConvertStringToCString(size) + _T(" MB");
 
+	
+
+
 		auto i = AfxMessageBox(notificationMessage, 1, 1);
 		if (i == IDOK) {	
+			// tạm thời 
+			CFileDialog fileDlg(FALSE);
+			fileDlg.DoModal();
+			CString filePath = fileDlg.GetPathName();
+			_cwprintf(filePath);
+			this->_filePath = filePath;
+			//
 			this->SendPacketRaw(backMess);
 		}
 	}
@@ -177,17 +187,14 @@ bool TcpClient::AnalyzeAndProcess(std::string packet)
 		// tách thông tin file 
 		
 		std::vector<std::string> info;
-		info = stringTokenizer(packet, '\0');
+		info = stringTokenizer(packet, '\0',10);
 
 		// lấy content
 		packet.pop_back(); // bỏ '\0' được thêm vào từ send packet raw
 		packet.pop_back(); // bỏ '\0' tương đương với null trong mẫu tin
 		std::string fileContent = packet.substr(packet.length() - stoi(info[3]), stoi(info[3]));
-		CFileDialog fileDlg(FALSE);
-		fileDlg.DoModal();
-		CString filePath = fileDlg.GetPathName();
-		_cwprintf(filePath);
-		std::ofstream file(filePath, std::ios::binary);
+	
+		std::ofstream file(this->_filePath, std::ios::binary);
 		if (file.is_open())
 		{
 			file << fileContent;
@@ -387,6 +394,22 @@ CPrivateChatDialog* TcpClient::CreatePrivateChatDlg(CString _partnerUsername)
 
 }
 
+
+std::vector<std::string> stringTokenizer(std::string input, char delim, int limit)
+{
+	std::vector <std::string> tokens;
+	std::stringstream check(input);
+	std::string intermediate;
+
+	int count = 0;
+
+	while (getline(check, intermediate, delim) && count < limit)
+	{
+		tokens.push_back(intermediate);
+		++count;
+	}
+	return tokens;
+}
 
 std::vector<std::string> stringTokenizer(std::string input, char delim)
 {
