@@ -7,8 +7,8 @@ TcpClient::TcpClient()
 	this->_isRunning = false;
 	this->_isActive = false;
 	this->_serverPort = 54000;
-	this->_serverIpaddress = "127.0.0.1";
-
+	this->_serverIpaddress = "10.0.130.251";
+	//this->_serverIpaddress = "192.168.187.1";
 	
 
 	// Tạo winsock
@@ -212,9 +212,6 @@ bool TcpClient::AnalyzeAndProcess(std::string packet)
 			//Tìm được cửa số người gửi 
 			_mapPrivateChatDialog[info[1]]->UpdateChatView(info[2]);
 			_mapPrivateChatDialog[info[1]]->ShowWindow(SW_SHOW);
-
-
-
 			
 		}
 	//TODO: Hiện khung chat riêng và đẩy tin nhắn lên, info[1] là người gửi, info[2] là tin nhắn

@@ -120,6 +120,9 @@ void CPublicChatDialog::OnBnClickedLogout()
 	std::string packet = "";
 	packet += std::to_string(static_cast<int>(FlagClientToServer::LogOut)) + '\0';
 	TcpClient::GetInstance()->SendPacketRaw(packet);
+	for (auto it = TcpClient::GetInstance()->_mapPrivateChatDialog.begin(); it != TcpClient::GetInstance()->_mapPrivateChatDialog.end(); it++) {
+		 it->second->ShowWindow(SW_HIDE);
+	}
 	EndDialog(IDOK);
 	TcpClient::GetInstance()->ShowSignUpLoginDialog();
 

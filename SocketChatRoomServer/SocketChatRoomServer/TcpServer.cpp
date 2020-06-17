@@ -8,7 +8,7 @@ TcpServer::TcpServer()
 {
 	this->_port = 54000;
 	this->_isRunning = false;
-	this->_ipAddress = "127.0.0.1"; //TODO: sửa lại sau
+	this->_ipAddress = "10.0.130.251"; //TODO: sửa lại sau
 
 	// Tạo winsock
 	WSADATA data;
@@ -151,10 +151,12 @@ bool TcpServer::AnalyzeAndProcess(SOCKET clientSocket, std::string packet)
 	{
 		message = _listUser[clientSocket] + " has logged out";
 
-		this->_serverDlg->UpdateActiveUserListView();
+		
 		std::string Another_logOut = std::to_string(static_cast<int>(FlagServerToClient::Another_Client_LogOut)) + '\0';
 		Another_logOut += this->_listUser[clientSocket] + '\0';
 		this->_listUser[clientSocket]="";
+		
+		this->_serverDlg->UpdateActiveUserListView();
 		this->UpdateUserList();
 
 		//Gửi cờ cập nhật log
