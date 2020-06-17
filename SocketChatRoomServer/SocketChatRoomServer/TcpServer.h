@@ -16,8 +16,8 @@
 #define TOKENIZERLIMIT 10
 
 
-static CMutex containerLock;
-static Lock _lock;
+static CMutex containerLock; // khóa cho thread dùng container
+static Lock _lock; // khóa singleton
 
 
 class TcpServer
@@ -30,43 +30,44 @@ private:
 	std::vector<std::string> _container; // chỗ chứa file
 
 public:
-	// 
+	// biến public :)))
 	SocketChatRoomServerDlg *serverDlg; 
-	SOCKET _listeningSocket;
-	bool _isRunning;
-	std::map<SOCKET, std::string> _listUser; // Lưu đang on
+	SOCKET listeningSocket;
+	bool isRunning;
+	std::map<SOCKET, std::string> listUser; // Lưu đang on
+	static std::map<SOCKET, bool> flagRunningThread;
+
 	// Khởi tạo -> Run -> Listen -> receive -> analyzeAndProcess -> SendPacketRaw
 	
 	SOCKET CreateSocket(); //Tạo socket nghe
-	void SendPacketRaw(SOCKET clientSocket, std::string packet );
-	//TODO: Analyze gọi SendPacketRaw
-	bool AnalyzeAndProcess(SOCKET clientSocket,std::string packet);
-	std::string ReceivePacket(SOCKET clientSocket);
+	void SendPacketRaw(SOCKET clientSocket, std::string packet ); // gửi gói tin dạng thô
+	bool AnalyzeAndProcess(SOCKET clientSocket,std::string packet); // phân tích và xử lí gói tin
+	std::string ReceivePacket(SOCKET clientSocket); // nhân gói tin và trả về string
 	bool Listen(); // Gọi receivePacket
-	void CloseServer();
+	void CloseServer(); // đóng server
 	bool IsExists(std::string username,std::string password); // kiểm tra tài khoản để đăng nhập
 	bool IsValid(std::string username); // kiểm tra tên để đăng ký
 	void Run(); // Goị listen
-	void WriteUserInfo(std::string username, std::string password);
-	void SendToAll(std::string packet);
-	void SendToAllExcept(std::string packet,std::string exception);
-	void UpdateUserList();
-	void RemoveUserFromActiveList(SOCKET clientSocket);
-	static std::map<SOCKET, bool> _flagRunningThread;
-	static TcpServer* GetInstance();
-	~TcpServer();
-	void SetDialog(SocketChatRoomServerDlg* dlg);
-	void refreshContainer();
-	int getContainerSize();
-	bool checkContainer();
+	void WriteUserInfo(std::string username, std::string password); // ghi thông tin user xuống file data
+	void SendToAll(std::string packet); // gửi tới tất cả các client
+	void SendToAllExcept(std::string packet,std::string exception); // gửi tất trừ ai đó :))
+	void UpdateUserList(); // cập nhật danh sách user
+	void RemoveUserFromActiveList(SOCKET clientSocket); // xóa user khỏi dang sách online
+	static TcpServer* GetInstance(); // lấy thể hiện
+
+	void SetDialog(SocketChatRoomServerDlg* dlg); // liên quan tới dialog Dũng ko nói :<
+	void refreshContainer(); // làm mới container
+	int getContainerSize(); // lấy kích thước container
+	bool checkContainer(); // kiểm tra container có trống hay không
+	~TcpServer(); // destructor :))
 private:
 	static TcpServer* _instance;
-	TcpServer();
+	TcpServer(); // constructor
 
 };
 
-std::vector<std::string> stringTokenizer(std::string input, char delim);
-std::istream& safeGetline(std::istream& is, std::string& t);
+std::vector<std::string> stringTokenizer(std::string input, char delim); // string tokenizer 
+std::istream& safeGetline(std::istream& is, std::string& t); // lấy chuổi từ file mà không dính \r \n v.v kiểu vậy
 
 
 // thread

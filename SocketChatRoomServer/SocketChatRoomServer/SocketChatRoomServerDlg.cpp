@@ -86,15 +86,15 @@ void SocketChatRoomServerDlg::OnSysCommand(UINT nID, LPARAM lParam)
 		auto i = AfxMessageBox(_T("Do you want to close this server"), 1, 1);
 		if (i == IDOK) {
 			try {
-				_cwprintf(L"Number of threads: %d", TcpServer::GetInstance()->_flagRunningThread.size());
+				_cwprintf(L"Number of threads: %d", TcpServer::GetInstance()->flagRunningThread.size());
 				
 				
-				for (auto it = TcpServer::GetInstance()->_flagRunningThread.begin(); it != TcpServer::GetInstance()->_flagRunningThread.end(); it++) {
+				for (auto it = TcpServer::GetInstance()->flagRunningThread.begin(); it != TcpServer::GetInstance()->flagRunningThread.end(); it++) {
 
 					it->second = false;
 
 				}
-				TcpServer::GetInstance()->_flagRunningThread.clear();
+				TcpServer::GetInstance()->flagRunningThread.clear();
 
 				TcpServer::GetInstance()->CloseServer();
 				//TODO: Tương tự Turn off server
@@ -164,7 +164,7 @@ void SocketChatRoomServerDlg::UpdateLogBox(std::string message)
 void SocketChatRoomServerDlg::UpdateActiveUserListView()
 {
 	mListBox.ResetContent();
-	for (auto it = TcpServer::GetInstance()->_listUser.begin(); it != TcpServer::GetInstance()->_listUser.end(); it++) {
+	for (auto it = TcpServer::GetInstance()->listUser.begin(); it != TcpServer::GetInstance()->listUser.end(); it++) {
 		if (it->second != "") {
 			this->mListBox.AddString(ConvertString::ConvertStringToCString(it->second));
 		}

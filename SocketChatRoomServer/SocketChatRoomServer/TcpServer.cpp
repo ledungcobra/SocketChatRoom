@@ -3,12 +3,12 @@
 #include "ConvertString.h"
 
 TcpServer* TcpServer::_instance = 0;
-std::map<SOCKET, bool> TcpServer::_flagRunningThread = std::map<SOCKET, bool>(); 
+std::map<SOCKET, bool> TcpServer::flagRunningThread = std::map<SOCKET, bool>(); 
 
 TcpServer::TcpServer()
 {
 	this->_port = 54000;
-	this->_isRunning = false;
+	this->isRunning = false;
 	this->_ipAddress = "127.0.0.1"; //TODO: sửa lại sau
 
 	// Tạo winsock
@@ -22,7 +22,7 @@ TcpServer::TcpServer()
 		std::cerr << "Can't start winsock ! Error # " << WSAGetLastError << std::endl;
 	}
 	
-	this->_listeningSocket = CreateSocket(); // Tạo socket listening
+	this->listeningSocket = CreateSocket(); // Tạo socket listening
 
 }
 
@@ -103,7 +103,7 @@ bool TcpServer::AnalyzeAndProcess(SOCKET clientSocket, std::string packet)
 
 			// cập nhật UI server 
 
-			this->_listUser[clientSocket] = info[1];
+			this->listUser[clientSocket] = info[1];
 			this->UpdateUserList();
 			this->serverDlg->UpdateActiveUserListView();
 
@@ -121,7 +121,7 @@ bool TcpServer::AnalyzeAndProcess(SOCKET clientSocket, std::string packet)
 			bool flag = 0; // đã có ai đăng nhập bằng tài khoản này chưa
 
 			// kiểm tra xem tài khoản này đã có người đăng nhập trước đó
-			for (auto it = this->_listUser.begin(); it != this->_listUser.end(); ++it)
+			for (auto it = this->listUser.begin(); it != this->listUser.end(); ++it)
 				if (it->second == info[1])
 				{
 					std::string backMess = std::to_string(static_cast<int>(FlagServerToClient::Already_Login)) + '\0';
@@ -139,7 +139,7 @@ bool TcpServer::AnalyzeAndProcess(SOCKET clientSocket, std::string packet)
 				this->SendPacketRaw(clientSocket, backMess);
 
 				// cho user đã đăng nhập vào list online
-				this->_listUser[clientSocket] = info[1];
+				this->listUser[clientSocket] = info[1];
 				
 				// thông báo đã đăng nhập
 				message = info[1] + " has logged in";
@@ -166,12 +166,12 @@ bool TcpServer::AnalyzeAndProcess(SOCKET clientSocket, std::string packet)
 	case FlagClientToServer::LogOut:
 	{
 		// thông báo user đã log out
-		message = _listUser[clientSocket] + " has logged out";
+		message = listUser[clientSocket] + " has logged out";
 
 		// Gửi cờ để hiện log hoạt động bên client
 		std::string Another_logOut = std::to_string(static_cast<int>(FlagServerToClient::Another_Client_LogOut)) + '\0';
-		Another_logOut += this->_listUser[clientSocket] + '\0';
-		this->_listUser[clientSocket]="";
+		Another_logOut += this->listUser[clientSocket] + '\0';
+		this->listUser[clientSocket]="";
 		
 		// cập nhật danh sách user
 
@@ -186,21 +186,21 @@ bool TcpServer::AnalyzeAndProcess(SOCKET clientSocket, std::string packet)
 
 	case FlagClientToServer::Disconnect_To_Server:
 	{
-		if (_listUser[clientSocket] != "") 
+		if (listUser[clientSocket] != "") 
 		{
-			message = _listUser[clientSocket] + " has disconnected";
+			message = listUser[clientSocket] + " has disconnected";
 			//Gửi cờ cập nhật log
 			std::string Another_logOut = std::to_string(static_cast<int>(FlagServerToClient::Another_Client_LogOut)) + '\0';
-			Another_logOut += this->_listUser[clientSocket];
+			Another_logOut += this->listUser[clientSocket];
 			this->SendToAll(Another_logOut);
 		}
-		this->_listUser.erase(clientSocket);
+		this->listUser.erase(clientSocket);
 		this->serverDlg->UpdateActiveUserListView();
 
 		//Handle thread 
-		if (_flagRunningThread.find(clientSocket) != _flagRunningThread.end()) 
+		if (flagRunningThread.find(clientSocket) != flagRunningThread.end()) 
 		{
-			_flagRunningThread.erase(clientSocket);
+			flagRunningThread.erase(clientSocket);
 		}
 
 		closesocket(clientSocket);
@@ -240,13 +240,13 @@ bool TcpServer::AnalyzeAndProcess(SOCKET clientSocket, std::string packet)
 	{
 
 		//info[2] là username người nhận, info[3] là nội dung tin nhắn
-		message = _listUser[clientSocket] + " -> " + info[2] + ": " + info[3];
+		message = listUser[clientSocket] + " -> " + info[2] + ": " + info[3];
 
 		std::string private_msg = std::to_string(static_cast<int>(FlagServerToClient::Send_Private_Message)) + '\0'; //Gửi cờ 
-		private_msg += this->_listUser[clientSocket] + '\0' + info[3] +'\0';
+		private_msg += this->listUser[clientSocket] + '\0' + info[3] +'\0';
 		SOCKET receiver = NULL;
 
-		for (auto it = this->_listUser.begin(); it != this->_listUser.end(); it++)
+		for (auto it = this->listUser.begin(); it != this->listUser.end(); it++)
 		{
 			if (it->second == info[2])
 			{
@@ -262,9 +262,9 @@ bool TcpServer::AnalyzeAndProcess(SOCKET clientSocket, std::string packet)
 
 		//info[2] là nội dung tin nhắn
 		//flagNULL sender NULL content NULL
-		message = _listUser[clientSocket] + " -> " + "PUBLIC: " + info[2];
+		message = listUser[clientSocket] + " -> " + "PUBLIC: " + info[2];
 		std::string public_msg = std::to_string(static_cast<int>(FlagServerToClient::Send_Public_Message)) + '\0'; //Gửi cờ 
-		public_msg += this->_listUser[clientSocket] + '\0' + info[2] + '\0';
+		public_msg += this->listUser[clientSocket] + '\0' + info[2] + '\0';
 		this->SendToAll(public_msg);
 	}
 		break;
@@ -276,7 +276,7 @@ bool TcpServer::AnalyzeAndProcess(SOCKET clientSocket, std::string packet)
 
 		std::string sender;
 
-		for (auto it = this->_listUser.begin(); it != this->_listUser.end(); ++it)
+		for (auto it = this->listUser.begin(); it != this->listUser.end(); ++it)
 			if (it->first == clientSocket)
 			{
 				sender = it->second;
@@ -301,7 +301,7 @@ bool TcpServer::AnalyzeAndProcess(SOCKET clientSocket, std::string packet)
 
 			SOCKET receiver = NULL;
 
-			for (auto it = this->_listUser.begin(); it != this->_listUser.end(); ++it)
+			for (auto it = this->listUser.begin(); it != this->listUser.end(); ++it)
 				if (it->second == info[1])
 				{
 					receiver = it->first;
@@ -327,7 +327,7 @@ bool TcpServer::AnalyzeAndProcess(SOCKET clientSocket, std::string packet)
 
 		std::string sender;
 
-		for (auto it = this->_listUser.begin(); it != this->_listUser.end(); ++it)
+		for (auto it = this->listUser.begin(); it != this->listUser.end(); ++it)
 			if (it->first == clientSocket)
 			{
 				sender = it->second;
@@ -375,7 +375,7 @@ std::string TcpServer::ReceivePacket(SOCKET clientSocket)
 
 bool TcpServer::Listen()
 {
-	int listen_check = listen(this->_listeningSocket, SOMAXCONN); // SOMAXCONN là số connect tối đa có thể nghe được, là hằng số
+	int listen_check = listen(this->listeningSocket, SOMAXCONN); // SOMAXCONN là số connect tối đa có thể nghe được, là hằng số
 	if (listen_check == SOCKET_ERROR) // check xem nghe có được không
 	{
 		std::cerr << "Can't listen to socket ! Error #" << WSAGetLastError() << std::endl; // Xuất ra báo lỗi
@@ -390,7 +390,7 @@ void TcpServer::CloseServer()
 {
 	std::string close_server = std::to_string(static_cast<int>(FlagServerToClient::Close_All_Connection)) + '\0';
 	this->SendToAll(close_server);
-	closesocket(this->_listeningSocket);
+	closesocket(this->listeningSocket);
 	WSACleanup();
 }
 
@@ -473,14 +473,14 @@ UINT ReceiveAndSend(LPVOID params)
 	MSG msg;
 	
 	if (p != NULL) {
-		while (isConnect && TcpServer::GetInstance()->_flagRunningThread[p->clientSocket]) {
+		while (isConnect && TcpServer::GetInstance()->flagRunningThread[p->clientSocket]) {
 			
 			std::string packet = p->tcpServer->ReceivePacket(p->clientSocket);
 			if (packet == "-1") {
 				p->tcpServer->RemoveUserFromActiveList(p->clientSocket);
 				isConnect = false;
-				if (TcpServer::GetInstance()->_flagRunningThread.find(p->clientSocket) != TcpServer::GetInstance()->_flagRunningThread.end()) {
-					TcpServer::GetInstance()->_flagRunningThread.erase(p->clientSocket);
+				if (TcpServer::GetInstance()->flagRunningThread.find(p->clientSocket) != TcpServer::GetInstance()->flagRunningThread.end()) {
+					TcpServer::GetInstance()->flagRunningThread.erase(p->clientSocket);
 				}
 				break;
 			}
@@ -502,15 +502,15 @@ UINT ListeningThreadFunc(LPVOID serv)
 {
 	TcpServer* server = (TcpServer*)serv;
 
-	while (server->_isRunning && TcpServer::GetInstance()->_flagRunningThread[server->_listeningSocket]) {
+	while (server->isRunning && TcpServer::GetInstance()->flagRunningThread[server->listeningSocket]) {
 		bool listen = server->Listen();
 
 		if (listen ) {
-			SOCKET clientSock = accept(server->_listeningSocket, nullptr, nullptr);
+			SOCKET clientSock = accept(server->listeningSocket, nullptr, nullptr);
 			Param* param = new Param;
 			param->tcpServer = server;
 			param->clientSocket = clientSock;
-			TcpServer::GetInstance()->_flagRunningThread[clientSock] = true;
+			TcpServer::GetInstance()->flagRunningThread[clientSock] = true;
 			AfxBeginThread(ReceiveAndSend, param); 
 		}
 	}
@@ -521,8 +521,8 @@ UINT ListeningThreadFunc(LPVOID serv)
 
 void TcpServer::Run()
 {
-	_isRunning = true;
-	_flagRunningThread[this->_listeningSocket] = true;
+	isRunning = true;
+	flagRunningThread[this->listeningSocket] = true;
 	AfxBeginThread(ListeningThreadFunc,this);
 }
 
@@ -538,7 +538,7 @@ void TcpServer::WriteUserInfo(std::string username, std::string password)
 
 void TcpServer::SendToAll(std::string packet)
 {
-	for (auto it = this->_listUser.begin(); it != this->_listUser.end(); it++)
+	for (auto it = this->listUser.begin(); it != this->listUser.end(); it++)
 	{
 		SendPacketRaw(it->first, packet);
 	}
@@ -546,7 +546,7 @@ void TcpServer::SendToAll(std::string packet)
 
 void TcpServer::SendToAllExcept(std::string packet, std::string exception)
 {
-	for (auto it = this->_listUser.begin(); it != this->_listUser.end(); it++)
+	for (auto it = this->listUser.begin(); it != this->listUser.end(); it++)
 	{
 		if (it->second != exception)
 		{
@@ -602,7 +602,7 @@ std::istream& safeGetline(std::istream& is, std::string& t)
 void TcpServer::UpdateUserList()
 {
 	std::string send_active_user = std::to_string(static_cast<int>(FlagServerToClient::Send_Active_User)) + '\0';
-	for (auto it = this->_listUser.begin(); it != this->_listUser.end(); it++)
+	for (auto it = this->listUser.begin(); it != this->listUser.end(); it++)
 	{
 		if (it->second != "")
 		{
@@ -617,7 +617,7 @@ void TcpServer::UpdateUserList()
 void TcpServer::RemoveUserFromActiveList(SOCKET clientSocket)
 {
 
-	this->_listUser.erase(clientSocket);
+	this->listUser.erase(clientSocket);
 
 }
 
