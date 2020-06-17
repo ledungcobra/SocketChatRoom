@@ -13,22 +13,25 @@
 #include "Lock.h"
 #pragma comment (lib,"ws2_32.lib")
 #define RAWSIZE 6000000
+#define TOKENIZERLIMIT 10
 
 
 static CMutex containerLock;
 static Lock _lock;
+
+
 class TcpServer
 {
 private:
 
-	int _port ;
-	std::string _ipAddress;
-	sockaddr_in _hint;
-	std::vector<std::string> _container;
+	int _port ; // số port
+	std::string _ipAddress; // địa chỉ ip
+	sockaddr_in _hint; // không biết
+	std::vector<std::string> _container; // chỗ chứa file
 
 public:
-	//TODO:
-	SocketChatRoomServerDlg *_serverDlg;
+	// 
+	SocketChatRoomServerDlg *serverDlg; 
 	SOCKET _listeningSocket;
 	bool _isRunning;
 	std::map<SOCKET, std::string> _listUser; // Lưu đang on
@@ -63,5 +66,17 @@ private:
 };
 
 std::vector<std::string> stringTokenizer(std::string input, char delim);
-std::vector<std::string> stringTokenizer(std::string input, char delim, int limit);
 std::istream& safeGetline(std::istream& is, std::string& t);
+
+
+// thread
+UINT Timer(LPVOID param); // bấm giờ 
+UINT ListeningThreadFunc(LPVOID serv); // nghe client kết nối
+UINT ReceiveAndSend(LPVOID params); // nhận packet và xử lí
+
+
+struct Param
+{
+	SOCKET clientSocket;
+	TcpServer* tcpServer;
+};
