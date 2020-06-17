@@ -91,8 +91,8 @@ bool TcpServer::AnalyzeAndProcess(SOCKET clientSocket, std::string packet)
 	int flag_num = stoi(flag_head_str);
 	FlagClientToServer flag = static_cast<FlagClientToServer>(flag_num);
 
-	// biến tạm thời 
-
+	std::vector<std::string> info;
+	info = stringTokenizer(packet, '\0');
 
 	std::string message = "";
 
@@ -100,8 +100,6 @@ bool TcpServer::AnalyzeAndProcess(SOCKET clientSocket, std::string packet)
 	{
 	case FlagClientToServer::SignUp:
 	{
-		std::vector<std::string> info;
-		info = stringTokenizer(packet,'\0');
 		if (IsValid(info[1]))
 		{
 			std::string backMess = std::to_string(static_cast<int>(FlagServerToClient::Fail_Sign_Up)) + '\0';
@@ -130,8 +128,7 @@ bool TcpServer::AnalyzeAndProcess(SOCKET clientSocket, std::string packet)
 	case FlagClientToServer::Login:
 	{
 		//TODO:
-		std::vector<std::string> info;
-		info = stringTokenizer(packet, '\0');
+
 
 		if (IsExists(info[1], info[2]))
 		{
@@ -222,9 +219,6 @@ bool TcpServer::AnalyzeAndProcess(SOCKET clientSocket, std::string packet)
 
 	case FlagClientToServer::Download_Request:
 	{
-		
-		std::vector<std::string> info;
-		info = stringTokenizer(packet, '\0');
 
 		containerLock.Lock();
 		for (int i = 0; i < this->_container.size(); i++)
@@ -249,8 +243,7 @@ bool TcpServer::AnalyzeAndProcess(SOCKET clientSocket, std::string packet)
 		break;
 	case FlagClientToServer::PrivateChat:
 	{
-		std::vector<std::string> info;
-		info = stringTokenizer(packet, '\0');
+
 		//info[2] là username người nhận, info[3] là nội dung tin nhắn
 		message = _listUser[clientSocket] + " -> " + info[2] + ": " + info[3];
 
@@ -270,8 +263,7 @@ bool TcpServer::AnalyzeAndProcess(SOCKET clientSocket, std::string packet)
 
 	case FlagClientToServer::PublicChat:
 	{
-		std::vector<std::string> info;
-		info = stringTokenizer(packet, '\0');
+
 		//info[2] là nội dung tin nhắn
 		//flagNULL sender NULL content NULL
 		message = _listUser[clientSocket] + " -> " + "PUBLIC: " + info[2];
@@ -284,8 +276,6 @@ bool TcpServer::AnalyzeAndProcess(SOCKET clientSocket, std::string packet)
 	case FlagClientToServer::Send_File_Descriptor:
 	{
 		_cwprintf(ConvertString::ConvertStringToCString(packet));
-		std::vector<std::string> info;
-		info = stringTokenizer(packet, '\0');
 
 		// lấy tên người gửi 
 
@@ -338,8 +328,6 @@ bool TcpServer::AnalyzeAndProcess(SOCKET clientSocket, std::string packet)
 	{
 		// tách thông tin file
 		_cwprintf(ConvertString::ConvertStringToCString(packet));
-		std::vector<std::string> info;
-		info = stringTokenizer(packet, '\0',10);
 
 		// lấy content
 		packet.pop_back(); // bỏ '\0' được thêm vào từ send packet raw
@@ -381,7 +369,6 @@ std::string TcpServer::ReceivePacket(SOCKET clientSocket)
 {
 	//Tạo buffer
 	char* buffer = new char[RAWSIZE];
-	//char buffer[6144]; //Tĩnh
 	std::string packet;
 	try {
 		ZeroMemory(buffer, RAWSIZE);
@@ -406,8 +393,6 @@ bool TcpServer::Listen()
 		return false;
 	}
 	return true;
-
-	// SOCKET client = accept(this->_listeningSocket, nullptr, nullptr); TODO: bỏ vào hàm chạy thread
 	
 
 }
@@ -619,12 +604,6 @@ std::vector<std::string> stringTokenizer(std::string input, char delim, int limi
 std::istream& safeGetline(std::istream& is, std::string& t)
 {
 	t.clear();
-
-	// The characters in the stream are read one-by-one using a std::streambuf.
-	// That is faster than reading them one-by-one using the std::istream.
-	// Code that uses streambuf this way must be guarded by a sentry object.
-	// The sentry object performs various tasks,
-	// such as thread synchronization and updating the stream state.
 
 	std::istream::sentry se(is, true);
 	std::streambuf* sb = is.rdbuf();
