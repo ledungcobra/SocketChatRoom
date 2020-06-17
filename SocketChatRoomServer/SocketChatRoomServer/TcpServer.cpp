@@ -8,7 +8,7 @@ TcpServer::TcpServer()
 {
 	this->_port = 54000;
 	this->_isRunning = false;
-	this->_ipAddress = "10.0.130.251"; //TODO: sửa lại sau
+	this->_ipAddress = "127.0.0.1"; //TODO: sửa lại sau
 
 	// Tạo winsock
 	WSADATA data;
@@ -29,7 +29,16 @@ TcpServer::TcpServer()
 UINT Timer(LPVOID param)
 {
 	TcpServer* server = (TcpServer*)param;
-	Sleep(30000);
+	int time = clock();
+	while (true)
+	{
+		if (clock() - time > 30000)
+		{
+			break;
+		}
+	}
+
+	containerLock.Lock();
 	if (server->checkContainer() == true)
 	{
 		server->refreshContainer();
@@ -38,6 +47,7 @@ UINT Timer(LPVOID param)
 			server->refreshContainer();
 		}
 	}
+	containerLock.Unlock();
 	return 0;
 }
 
@@ -216,31 +226,25 @@ bool TcpServer::AnalyzeAndProcess(SOCKET clientSocket, std::string packet)
 		std::vector<std::string> info;
 		info = stringTokenizer(packet, '\0');
 
+		containerLock.Lock();
 		for (int i = 0; i < this->_container.size(); i++)
 		{
-			std::vector<std::string> content = stringTokenizer((this->_container[i]), '\0');
+			std::vector<std::string> content = stringTokenizer((this->_container[i]), '\0', 10);
 			if (content[0] == info[1] && content[2] == info[2]) // sender - filename
 			{
 				// lấy receiver ra khỏi content 
-				int pos = this->_container[i].find(content[1]);
-				this->_container[i].erase(pos, content[1].length() + 1);
+
+				std::string temp = this->_container[i];
+				int pos = temp.find(content[1]);
+				temp.erase(pos, content[1].length() + 1);
 
 				// tạo gói tin gửi đi
 
-				std::string backMess = std::to_string(static_cast<int>(FlagServerToClient::Send_File_Content)) + '\0' + this->_container[i];
+				std::string backMess = std::to_string(static_cast<int>(FlagServerToClient::Send_File_Content)) + '\0' + temp;
 				SendPacketRaw(clientSocket, backMess);
-				//if (content[1] == "ALL")
-				//{
-				//	//TODO:
-
-				//}
-				//else
-				//{
-				//	this->_container.erase(this->_container.begin() + i);
-				//}
-				//break;
 			}
 		}
+		containerLock.Unlock();
 	}
 		break;
 	case FlagClientToServer::PrivateChat:
@@ -335,7 +339,7 @@ bool TcpServer::AnalyzeAndProcess(SOCKET clientSocket, std::string packet)
 		// tách thông tin file
 		_cwprintf(ConvertString::ConvertStringToCString(packet));
 		std::vector<std::string> info;
-		info = stringTokenizer(packet, '\0');
+		info = stringTokenizer(packet, '\0',10);
 
 		// lấy content
 		packet.pop_back(); // bỏ '\0' được thêm vào từ send packet raw
@@ -359,8 +363,9 @@ bool TcpServer::AnalyzeAndProcess(SOCKET clientSocket, std::string packet)
 
 		std::string content = sender + '\0' + info[1] + '\0' + info[2] + '\0' + info[3] + '\0' + fileContent + '\0'; // sender + receiver + filename + file size + content 
 
+		containerLock.Lock();
 		this->_container.push_back(content);
-
+		containerLock.Unlock();
 		
 		AfxBeginThread(Timer, this);
 	}
@@ -586,9 +591,26 @@ std::vector<std::string> stringTokenizer(std::string input, char delim)
 	std::stringstream check(input);
 	std::string intermediate;
 
+
 	while (getline(check, intermediate, delim))
 	{
 		tokens.push_back(intermediate);
+	}
+	return tokens;
+}
+
+std::vector<std::string> stringTokenizer(std::string input, char delim, int limit)
+{
+	std::vector <std::string> tokens;
+	std::stringstream check(input);
+	std::string intermediate;
+
+	int count = 0;
+
+	while (getline(check, intermediate, delim) && count < limit)
+	{
+		tokens.push_back(intermediate);
+		++count;
 	}
 	return tokens;
 }

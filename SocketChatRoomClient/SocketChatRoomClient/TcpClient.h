@@ -33,7 +33,8 @@ private:
 	
 	CSignUpLogInDlg* _signUpLogInDlg = nullptr;
 	
-
+	//tạm thời
+	CString _filePath = L"";
 public:
 	//TODO:
 	std::map<std::string, std::shared_ptr<CPrivateChatDialog> > _mapPrivateChatDialog;
@@ -71,5 +72,6 @@ public:
 };
 
 
+std::vector<std::string> stringTokenizer(std::string input, char delim, int limit);
 std::vector<std::string> stringTokenizer(std::string input, char delim);
 long long fileSize(CString add);

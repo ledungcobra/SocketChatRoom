@@ -62,6 +62,7 @@
 //void MessageReceived(TcpServer* listen_server, SOCKET client, std::string msg);
 //
 
+static CMutex containerLock;
 static Lock _lock;
 class TcpServer
 {
@@ -109,4 +110,5 @@ private:
 };
 
 std::vector<std::string> stringTokenizer(std::string input, char delim);
+std::vector<std::string> stringTokenizer(std::string input, char delim, int limit);
 std::istream& safeGetline(std::istream& is, std::string& t);
