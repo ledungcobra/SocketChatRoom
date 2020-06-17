@@ -163,7 +163,7 @@ bool TcpClient::AnalyzeAndProcess(std::string packet)
 	{
 		//TODO:testing
 		// tách thông tin file 
-		_cwprintf(ConvertString::ConvertStringToCString(packet));
+		
 		std::vector<std::string> info;
 		info = stringTokenizer(packet, '\0');
 

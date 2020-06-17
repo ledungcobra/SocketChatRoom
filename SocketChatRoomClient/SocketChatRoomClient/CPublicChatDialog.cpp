@@ -54,6 +54,7 @@ void CPublicChatDialog::OnSysCommand(UINT nID, LPARAM lParam)
 			std::string packet = "";
 			packet += std::to_string(static_cast<int>(FlagClientToServer::Disconnect_To_Server)) + '\0';
 			TcpClient::GetInstance()->SendPacketRaw(packet);
+			TcpClient::GetInstance()->_isRunning = false;
 			OnDestroy();
 
 		}
@@ -117,6 +118,7 @@ void CPublicChatDialog::UpdateListActiveUsers(std::vector<std::string> listActiv
 void CPublicChatDialog::OnBnClickedLogout()
 {
 
+	
 	std::string packet = "";
 	packet += std::to_string(static_cast<int>(FlagClientToServer::LogOut)) + '\0';
 	TcpClient::GetInstance()->SendPacketRaw(packet);

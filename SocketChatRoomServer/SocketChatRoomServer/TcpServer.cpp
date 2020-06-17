@@ -357,13 +357,18 @@ std::string TcpServer::ReceivePacket(SOCKET clientSocket)
 	//Tạo buffer
 	char* buffer = new char[RAWSIZE];
 	//char buffer[6144]; //Tĩnh
+	std::string packet;
+	try {
+		ZeroMemory(buffer, RAWSIZE);
 
-	ZeroMemory(buffer, RAWSIZE);
-	
-	//nhận tin nhắn
-	int bytesin = recv(clientSocket , buffer, RAWSIZE, 0);
-	std::string packet = std::string(buffer, bytesin);
-	delete[] buffer;
+		//nhận tin nhắn
+		int bytesin = recv(clientSocket, buffer, RAWSIZE, 0);
+		packet = std::string(buffer, bytesin);
+		delete[] buffer;
+	}
+	catch (...) {
+		AfxMessageBox(L"Error buffer");
+	}
 	return packet;
 }
 
