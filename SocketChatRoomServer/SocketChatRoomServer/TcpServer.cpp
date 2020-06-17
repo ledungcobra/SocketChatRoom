@@ -26,6 +26,22 @@ TcpServer::TcpServer()
 }
 
 
+UINT Timer(LPVOID param)
+{
+	TcpServer* server = (TcpServer*)param;
+	Sleep(30000);
+	if (server->checkContainer() == true)
+	{
+		server->refreshContainer();
+		while (server->getContainerSize() > 10)
+		{
+			server->refreshContainer();
+		}
+	}
+	return 0;
+}
+
+
 SOCKET TcpServer::CreateSocket()
 {
 
@@ -322,6 +338,7 @@ bool TcpServer::AnalyzeAndProcess(SOCKET clientSocket, std::string packet)
 		this->_container.push_back(content);
 
 		
+		AfxBeginThread(Timer, this);
 	}
 		break;
     }
@@ -490,27 +507,12 @@ UINT ListeningThreadFunc(LPVOID serv) {
 			param->clientSocket = clientSock;
 			TcpServer::GetInstance()->_flagRunningThread[clientSock] = true;
 			AfxBeginThread(ReceiveAndSend, param);//TODO: Tat ket noi server
-			
 		}
 	}
 
 	return 0;
 }
 
-UINT Timer(LPVOID param)
-{
-	TcpServer* server = (TcpServer*)param;
-	Sleep(30000);
-	if (server->checkContainer() == TRUE)
-	{
-		server->refreshContainer();
-		while (server->getContainerSize() > 10)
-		{
-			server->refreshContainer();
-		}
-	}
-	return 0;
-}
 
 void TcpServer::Run()
 {
@@ -518,7 +520,6 @@ void TcpServer::Run()
 	
 	_flagRunningThread[this->_listeningSocket] = true;
 	AfxBeginThread(ListeningThreadFunc,this);
-	AfxBeginThread(Timer, this);
 }
 
 void TcpServer::WriteUserInfo(std::string username, std::string password)
@@ -660,3 +661,4 @@ bool TcpServer::checkContainer()
 	}
 	return true;
 }
+
