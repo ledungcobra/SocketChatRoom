@@ -25,6 +25,23 @@ TcpServer::TcpServer()
 
 }
 
+
+UINT Timer(LPVOID param)
+{
+	TcpServer* server = (TcpServer*)param;
+	Sleep(30000);
+	if (server->checkContainer() == true)
+	{
+		server->refreshContainer();
+		while (server->getContainerSize() > 10)
+		{
+			server->refreshContainer();
+		}
+	}
+	return 0;
+}
+
+
 SOCKET TcpServer::CreateSocket()
 {
 
@@ -199,28 +216,29 @@ bool TcpServer::AnalyzeAndProcess(SOCKET clientSocket, std::string packet)
 		std::vector<std::string> info;
 		info = stringTokenizer(packet, '\0');
 
-		for (int i = 0; i < this->container.size(); i++)
+		for (int i = 0; i < this->_container.size(); i++)
 		{
-			std::vector<std::string> content = stringTokenizer((this->container[i]), '\0');
+			std::vector<std::string> content = stringTokenizer((this->_container[i]), '\0');
 			if (content[0] == info[1] && content[2] == info[2]) // sender - filename
 			{
 				// lấy receiver ra khỏi content 
-				int pos = this->container[i].find(content[1]);
-				this->container[i].erase(pos, content[1].length() + 1);
+				int pos = this->_container[i].find(content[1]);
+				this->_container[i].erase(pos, content[1].length() + 1);
 
 				// tạo gói tin gửi đi
 
-				std::string backMess = std::to_string(static_cast<int>(FlagServerToClient::Send_File_Content)) + '\0' + this->container[i];
+				std::string backMess = std::to_string(static_cast<int>(FlagServerToClient::Send_File_Content)) + '\0' + this->_container[i];
 				SendPacketRaw(clientSocket, backMess);
-				if (content[1] == "ALL")
-				{
-					// do nothing
-				}
-				else
-				{
-					this->container.erase(this->container.begin() + i);
-				}
-				break;
+				//if (content[1] == "ALL")
+				//{
+				//	//TODO:
+
+				//}
+				//else
+				//{
+				//	this->_container.erase(this->_container.begin() + i);
+				//}
+				//break;
 			}
 		}
 	}
@@ -341,8 +359,10 @@ bool TcpServer::AnalyzeAndProcess(SOCKET clientSocket, std::string packet)
 
 		std::string content = sender + '\0' + info[1] + '\0' + info[2] + '\0' + info[3] + '\0' + fileContent + '\0'; // sender + receiver + filename + file size + content 
 
-		this->container.push_back(content);
+		this->_container.push_back(content);
 
+		
+		AfxBeginThread(Timer, this);
 	}
 		break;
     }
@@ -502,6 +522,7 @@ UINT ReceiveAndSend(LPVOID params) {
 
 
 }
+
 UINT ListeningThreadFunc(LPVOID serv) {
 	TcpServer* server = (TcpServer*)serv;
 
@@ -514,13 +535,13 @@ UINT ListeningThreadFunc(LPVOID serv) {
 			param->tcpServer = server;
 			param->clientSocket = clientSock;
 			TcpServer::GetInstance()->_flagRunningThread[clientSock] = true;
-			 AfxBeginThread(ReceiveAndSend, param);//TODO: Tat ket noi server
-			
+			AfxBeginThread(ReceiveAndSend, param);//TODO: Tat ket noi server
 		}
 	}
 
 	return 0;
 }
+
 
 void TcpServer::Run()
 {
@@ -653,3 +674,23 @@ void TcpServer::SetDialog(SocketChatRoomServerDlg* dlg)
 	this->_serverDlg = dlg;
 
 }
+
+void TcpServer::refreshContainer()
+{
+	this->_container.erase(this->_container.begin());
+}
+
+int TcpServer::getContainerSize()
+{
+	return this->_container.size();
+}
+
+bool TcpServer::checkContainer()
+{
+	if (this->_container.empty())
+	{
+		return false;
+	}
+	return true;
+}
+

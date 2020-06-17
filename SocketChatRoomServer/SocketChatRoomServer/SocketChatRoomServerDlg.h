@@ -42,6 +42,4 @@ public:
 	void UpdateActiveUserListView();
 public:
 	CEdit mEdtLog;
-
-
 };

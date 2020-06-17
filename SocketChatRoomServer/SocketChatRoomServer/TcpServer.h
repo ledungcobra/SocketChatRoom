@@ -70,10 +70,7 @@ private:
 	int _port ;
 	std::string _ipAddress;
 	sockaddr_in _hint;
-	std::vector<std::string> container;
-	
-
-	 
+	std::vector<std::string> _container;
 
 public:
 	//TODO:
@@ -102,9 +99,13 @@ public:
 	static TcpServer* GetInstance();
 	~TcpServer();
 	void SetDialog(SocketChatRoomServerDlg* dlg);
+	void refreshContainer();
+	int getContainerSize();
+	bool checkContainer();
 private:
 	static TcpServer* _instance;
 	TcpServer();
+
 };
 
 std::vector<std::string> stringTokenizer(std::string input, char delim);

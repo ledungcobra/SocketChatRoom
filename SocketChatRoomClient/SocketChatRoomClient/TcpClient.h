@@ -16,6 +16,7 @@
 #include <memory>
 #include "ConvertString.h"
 #include <map>
+#include <iomanip>
 #pragma comment (lib,"ws2_32.lib")
 #define RAWSIZE 6000000
 
@@ -64,10 +65,11 @@ public:
 	CPrivateChatDialog* CreatePrivateChatDlg(CString partnerUsername);
 	
 
-
+public:
+	
 
 };
 
 
 std::vector<std::string> stringTokenizer(std::string input, char delim);
-long long fileSize(std::string add);
+long long fileSize(CString add);
