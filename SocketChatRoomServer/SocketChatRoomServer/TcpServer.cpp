@@ -306,7 +306,7 @@ bool TcpServer::AnalyzeAndProcess(SOCKET clientSocket, std::string packet)
 			SOCKET receiver = NULL;
 
 			for (auto it = this->listUser.begin(); it != this->listUser.end(); ++it)
-				if (it->second == info[1])
+				if (it->second == ConvertString::ConvertCStringToString(ConvertString::DecodeStringToCString(info[1])))
 				{
 					receiver = it->first;
 					break;

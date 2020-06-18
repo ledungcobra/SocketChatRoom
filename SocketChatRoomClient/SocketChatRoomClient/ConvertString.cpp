@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "ConvertString.h"
 #include "TcpClient.h"
-std::string ConvertString::ConvertCStringToString(CString cstring)
+std::string ConvertString::EncodeCStringToString(CString cstring)
 {
 	/*CT2A t(cstring);
 	std::string result(t);*/
@@ -12,11 +12,11 @@ std::string ConvertString::ConvertCStringToString(CString cstring)
 	return result;
 }
 
-CString ConvertString::ConvertStringToCString(std::string input)
+CString ConvertString::DecodeStringToCString(std::string input)
 {
 
 	CString result = L"";
-	auto charArr = stringTokenizer(input, '$');
+	auto charArr = stringTokenizer(input, '$', false);
 	for (int i = 0; i < charArr.size(); i++) {
 		try {
 			TCHAR temp(std::stoi(charArr[i]));
@@ -25,6 +25,20 @@ CString ConvertString::ConvertStringToCString(std::string input)
 		catch (...) {
 			//AfxMessageBox(L"Stoi error");
 		}
+
+
 	}
 	return result;
+}
+
+std::string ConvertString::ConvertCStringToString(CString cstring)
+{
+	CT2A t(cstring);
+	std::string result(t);
+	return result;
+}
+
+CString ConvertString::ConvertStringToCString(std::string input)
+{
+	return CString(input.c_str());
 }

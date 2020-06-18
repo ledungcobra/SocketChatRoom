@@ -70,53 +70,55 @@ void CPrivateChatDialog::OnBnClickedSendUploadFile()
 		CString filePath = fileDlg.GetPathName();
 		_cwprintf(fileDlg.GetPathName());
 
-		std::string comparison = ConvertString::ConvertCStringToString(filePath);
+		
+		// đọc file lên
+		std::ifstream file(filePath, std::ios::binary);
+		if (file.is_open())
+		{
 
-		if (ConvertString::ConvertStringToCString(comparison) != filePath)
-		{
-			AfxMessageBox(L"File name is not valid");
-			return;
-		}
-		else
-		{
-			// đọc file lên
-			std::ifstream file(filePath, std::ios::binary);
-			if (file.is_open())
+			std::ostringstream ostrm;
+			long long size = fileSize(filePath); // kich thuoc theo byte
+
+
+			if (size > 5242880 || size < 1048576)
 			{
+				AfxMessageBox(L"File must be between 2 and 5 MB");
+				return;
+			}
+			else
+			{
+				// ghi vào packet 
 
-				std::ostringstream ostrm;
-				long long size = fileSize(filePath); // kich thuoc theo byte
+				ostrm << file.rdbuf();
 
+				std::string content = std::string(ostrm.str());
 
-				if (size > 5242880 || size < 1048576)
+				std::string username = ConvertString::EncodeCStringToString(this->_partnerUsername);
+
+				// lấy tên file
+
+				int curPos = 0;
+				CString resToken = filePath.Tokenize(_T("\\"), curPos);
+				while (filePath.Find(L"\\", curPos) != -1)
 				{
-					AfxMessageBox(L"File must be between 2 and 5 MB");
-					return;
+					OutputDebugString(resToken);
+
+					resToken = filePath.Tokenize(_T("\\"), curPos);
 				}
-				else
-				{
-					// ghi vào packet 
+				OutputDebugString(resToken);
+				resToken = filePath.Tokenize(_T("\\"), curPos);
+				std::string filename = ConvertString::EncodeCStringToString(resToken);
 
-					ostrm << file.rdbuf();
-
-					std::string content = std::string(ostrm.str());
-
-					std::string username = ConvertString::ConvertCStringToString(this->_partnerUsername);
-
-					// lấy tên file
-					std::vector<std::string> info = stringTokenizer(ConvertString::ConvertCStringToString(filePath), '\\');
-					// gửi đi desc
-					std::string file_desc = std::to_string(static_cast<int>(FlagClientToServer::Send_File_Descriptor)) + '\0' + username + '\0' + info[info.size() - 1] + '\0' + std::to_string(size) + '\0'; // all + filename + filesize
-					TcpClient::GetInstance()->SendPacketRaw(file_desc);
-					// gửi đi content
-					std::string file_content = std::to_string(static_cast<int>(FlagClientToServer::Send_Content)) + '\0' + username + '\0' + info[info.size() - 1] + '\0' + std::to_string(size) + '\0' + content + '\0'; // all + filename + filesize +content
-					TcpClient::GetInstance()->SendPacketRaw(file_content);
-					file.close();
-				}
+				// gửi đi desc
+				std::string file_desc = std::to_string(static_cast<int>(FlagClientToServer::Send_File_Descriptor)) + '\0' + username + '\0' + filename + '\0' + std::to_string(size) + '\0'; // username + filename + filesize
+				TcpClient::GetInstance()->SendPacketRaw(file_desc);
+				// gửi đi content
+				std::string file_content = std::to_string(static_cast<int>(FlagClientToServer::Send_Content)) + '\0' + username + '\0' + filename + '\0' + std::to_string(size) + '\0' + content + '\0'; // username + filename + filesize +content
+				TcpClient::GetInstance()->SendPacketRaw(file_content);
+				file.close();
 			}
 		}
 	}
-	
 }
 
 
