@@ -146,7 +146,7 @@ bool TcpClient::AnalyzeAndProcess(std::string packet)
 
 		std::vector<std::string> info;
 		info = stringTokenizer(packet, '\0');
-		std::string backMess = std::to_string(static_cast<int>(FlagClientToServer::Download_Request)) + '\0' + info[1] + '\0' + info[2] + '\0';
+		std::string backMess = std::to_string(static_cast<int>(FlagClientToServer::Download_Request)) + '\0' + info[1] + '\0' + info[2] + '\0' + info[3] + '\0';
 
 		// xử kích thước file từ byte ra MB
 		double num = std::stod(info[3]);
@@ -180,12 +180,19 @@ bool TcpClient::AnalyzeAndProcess(std::string packet)
 	{
 		std::vector<std::string> info;
 		info = stringTokenizer(packet, '\0',5);
+		std::string fileContent;
 
 		// lấy content
 		packet.pop_back(); // bỏ '\0' được thêm vào từ send packet raw
 		packet.pop_back(); // bỏ '\0' tương đương với null trong mẫu tin
-		std::string fileContent = packet.substr(packet.length() - stoi(info[3]), stoi(info[3]));
-
+		try
+		{
+			fileContent = packet.substr(packet.length() - stoi(info[3]), stoi(info[3]));
+		}
+		catch (...)
+		{
+			_cwprintf(ConvertString::ConvertStringToCString(std::to_string(packet.length())) + L"\r\n" + ConvertString::ConvertStringToCString(info[3])  );
+		}
 	
 		std::ofstream file(this->_filePath, std::ios::binary);
 		if (file.is_open())

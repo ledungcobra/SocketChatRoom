@@ -14,9 +14,10 @@
 #pragma comment (lib,"ws2_32.lib")
 #define RAWSIZE 6000000
 #define TOKENIZERLIMIT 10
+#define USERINFO "data.bin"
+#define DOWNLOADFORMAT L".TCPD"
+#define DOWNLOADTOCLEAR 10 
 
-
-static CMutex containerLock; // khóa cho thread dùng container
 static Lock _lock; // khóa singleton
 
 
@@ -26,8 +27,7 @@ private:
 
 	int _port ; // số port
 	std::string _ipAddress; // địa chỉ ip
-	sockaddr_in _hint; // không biết
-	std::vector<std::string> _container; // chỗ chứa file
+	sockaddr_in _hint; // 
 
 public:
 	// biến public :)))
@@ -54,11 +54,7 @@ public:
 	void UpdateUserList(); // cập nhật danh sách user
 	void RemoveUserFromActiveList(SOCKET clientSocket); // xóa user khỏi dang sách online
 	static TcpServer* GetInstance(); // lấy thể hiện
-
-	void SetDialog(SocketChatRoomServerDlg* dlg); // liên quan tới dialog Dũng ko nói :<
-	void refreshContainer(); // làm mới container
-	int getContainerSize(); // lấy kích thước container
-	bool checkContainer(); // kiểm tra container có trống hay không
+	void SetDialog(SocketChatRoomServerDlg* dlg); // liên quan tới dialog 
 	~TcpServer(); // destructor :))
 private:
 	static TcpServer* _instance;
@@ -71,7 +67,6 @@ std::istream& safeGetline(std::istream& is, std::string& t); // lấy chuổi t�
 
 std::vector<std::string> stringTokenizer(std::string input, char delim, bool flag);
 // thread
-UINT Timer(LPVOID param); // bấm giờ 
 UINT ListeningThreadFunc(LPVOID serv); // nghe client kết nối
 UINT ReceiveAndSend(LPVOID params); // nhận packet và xử lí
 

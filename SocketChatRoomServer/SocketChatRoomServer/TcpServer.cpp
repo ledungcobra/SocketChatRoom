@@ -87,16 +87,16 @@ bool TcpServer::AnalyzeAndProcess(SOCKET clientSocket, std::string packet)
 			// có thì báo đăng ký fail
 			std::string backMess = std::to_string(static_cast<int>(FlagServerToClient::Fail_Sign_Up)) + '\0';
 			this->SendPacketRaw(clientSocket, backMess);
-			
+
 		}
 		else // không thì cho đăng ký
 		{
 			// ghi thông tin file 
 			WriteUserInfo(info[1], info[2]);
-			
+
 			// thông báo người dùng đã xuất hiện trong server
 			message = info[1] + ConvertString::EncodeCStringToString(ConvertString::ConvertStringToCString(" has signed up and logged in"));
-			
+
 			// báo về cho người dùng
 			std::string backMess = std::to_string(static_cast<int>(FlagServerToClient::SignUp_Success)) + '\0';
 			this->SendPacketRaw(clientSocket, backMess);
@@ -113,7 +113,7 @@ bool TcpServer::AnalyzeAndProcess(SOCKET clientSocket, std::string packet)
 			this->SendToAll(Another_logIn);
 		}
 	}
-		break;
+	break;
 	case FlagClientToServer::Login:
 	{
 		if (IsExists(info[1], info[2])) // nếu đúng mật khẩu và tên
@@ -140,16 +140,16 @@ bool TcpServer::AnalyzeAndProcess(SOCKET clientSocket, std::string packet)
 
 				// cho user đã đăng nhập vào list online
 				this->listUser[clientSocket] = info[1];
-				
+
 				// thông báo đã đăng nhập
 				message = info[1] + ConvertString::EncodeCStringToString(ConvertString::ConvertStringToCString(" has logged in"));
 				this->serverDlg->UpdateActiveUserListView();
-				
+
 				// cập nhật danh sách user
 				this->UpdateUserList();
 
 				// Gửi cờ để hiện log hoạt động bên client
-				std::string Another_logIn = std::to_string(static_cast<int>(FlagServerToClient::Another_Client_LogIn))+'\0';
+				std::string Another_logIn = std::to_string(static_cast<int>(FlagServerToClient::Another_Client_LogIn)) + '\0';
 				Another_logIn += info[1];
 				this->SendToAll(Another_logIn);
 			}
@@ -171,22 +171,22 @@ bool TcpServer::AnalyzeAndProcess(SOCKET clientSocket, std::string packet)
 		// Gửi cờ để hiện log hoạt động bên client
 		std::string Another_logOut = std::to_string(static_cast<int>(FlagServerToClient::Another_Client_LogOut)) + '\0';
 		Another_logOut += this->listUser[clientSocket] + '\0';
-		this->listUser[clientSocket]="";
-		
+		this->listUser[clientSocket] = "";
+
 		// cập nhật danh sách user
 
 		this->serverDlg->UpdateActiveUserListView();
 		this->UpdateUserList();
 
 		//Gửi cờ cập nhật log
-		
+
 		this->SendToAll(Another_logOut);
 	}
-		break;
+	break;
 
 	case FlagClientToServer::Disconnect_To_Server:
 	{
-		if (listUser[clientSocket] != "") 
+		if (listUser[clientSocket] != "")
 		{
 			message = listUser[clientSocket] + ConvertString::EncodeCStringToString(ConvertString::ConvertStringToCString(" has disconnected"));
 			//Gửi cờ cập nhật log
@@ -198,7 +198,7 @@ bool TcpServer::AnalyzeAndProcess(SOCKET clientSocket, std::string packet)
 		this->serverDlg->UpdateActiveUserListView();
 
 		//Handle thread 
-		if (flagRunningThread.find(clientSocket) != flagRunningThread.end()) 
+		if (flagRunningThread.find(clientSocket) != flagRunningThread.end())
 		{
 			flagRunningThread.erase(clientSocket);
 		}
@@ -209,31 +209,36 @@ bool TcpServer::AnalyzeAndProcess(SOCKET clientSocket, std::string packet)
 		return false;
 
 	}
-		break;
+	break;
 	case FlagClientToServer::Download_Request:
 	{
+		CString fileName = ConvertString::DecodeStringToCString(info[2]);
+		std::ifstream inFile(ConvertString::ConvertStringToCString(info[1]) + "-" + fileName + "-" + ConvertString::ConvertStringToCString(info[3]) + DOWNLOADFORMAT, std::ios::in|std::ios::binary);
 
-		containerLock.Lock();
-		for (int i = 0; i < this->_container.size(); i++)
+		if (inFile.is_open())
 		{
-			// lấy dữ liệu ra từ conatainer
-			std::vector<std::string> content = stringTokenizer((this->_container[i]), '\0');
+			// ghi vào content;
+			std::ostringstream ostrm;
+			ostrm << inFile.rdbuf();
+			
+			std::string fromFile(ostrm.str());
 
-			if (content[0] == info[1] && content[2] == info[2]) // sender - filename
-			{
-				// lấy receiver ra khỏi content 
+			// lấy dữ liệu ra từ file
+			std::vector<std::string> content = stringTokenizer(fromFile, '\0');
 
-				std::string temp = this->_container[i];
-				int pos = temp.find(content[1]);
-				temp.erase(pos, content[1].length() + 1);
 
-				// tạo gói tin gửi đi
+			// lấy receiver ra khỏi content 
 
-				std::string backMess = std::to_string(static_cast<int>(FlagServerToClient::Send_File_Content)) + '\0' + temp;
-				SendPacketRaw(clientSocket, backMess);
-			}
+			std::string temp = fromFile;
+			int pos = temp.find(content[1]);
+			temp.erase(pos, content[1].length() + 1);
+
+			// tạo gói tin gửi đi
+
+			std::string backMess = std::to_string(static_cast<int>(FlagServerToClient::Send_File_Content)) + '\0' + temp;
+			SendPacketRaw(clientSocket, backMess);
+			inFile.close();
 		}
-		containerLock.Unlock();
 	}
 		break;
 	case FlagClientToServer::PrivateChat:
@@ -318,6 +323,8 @@ bool TcpServer::AnalyzeAndProcess(SOCKET clientSocket, std::string packet)
 
 	case FlagClientToServer::Send_Content:
 	{
+
+
 		// tách thông tin file
 
 		// lấy content
@@ -342,13 +349,22 @@ bool TcpServer::AnalyzeAndProcess(SOCKET clientSocket, std::string packet)
 
 		std::string content = sender + '\0' + info[1] + '\0' + info[2] + '\0' + info[3] + '\0' + fileContent + '\0'; // sender + receiver + filename + file size + content 
 
-		// nhét content vào container
-		containerLock.Lock();
-		this->_container.push_back(content);
-		containerLock.Unlock();
-		
-		// chạy thread đếm thời gian để refresh container
-		AfxBeginThread(Timer, this);
+		//// nhét content vào container
+		//this->_container.push_back(content);
+		//
+		//// chạy thread đếm thời gian để refresh container
+		//AfxBeginThread(Timer, this);
+
+		CString fileName = ConvertString::ConvertStringToCString(sender) + "-" + ConvertString::DecodeStringToCString(info[2]) + "-" + ConvertString::ConvertStringToCString(info[3]) + DOWNLOADFORMAT;
+
+		std::ofstream outFile(fileName, std::ios::binary | std::ios::out);
+
+		if (outFile.is_open())
+		{
+			outFile << content;
+			outFile.close();
+		}
+
 	}
 		break;
     }
@@ -502,11 +518,13 @@ UINT ReceiveAndSend(LPVOID params)
 
 }
 
+
 UINT ListeningThreadFunc(LPVOID serv) 
 {
 	TcpServer* server = (TcpServer*)serv;
 
-	while (server->isRunning && TcpServer::GetInstance()->flagRunningThread[server->listeningSocket]) {
+	while (server->isRunning && TcpServer::GetInstance()->flagRunningThread[server->listeningSocket]) 
+	{
 		bool listen = server->Listen();
 
 		if (listen ) {
@@ -528,11 +546,12 @@ void TcpServer::Run()
 	isRunning = true;
 	flagRunningThread[this->listeningSocket] = true;
 	AfxBeginThread(ListeningThreadFunc,this);
+	
 }
 
 void TcpServer::WriteUserInfo(std::string username, std::string password)
 {
-	std::ofstream file("data.bin", std::ios::app | std::ios::binary);
+	std::ofstream file(USERINFO, std::ios::app | std::ios::binary);
 	if (file.is_open())
 	{
 		file << username << ";" << password << '\n';
@@ -654,6 +673,7 @@ TcpServer* TcpServer::GetInstance()
 }
 
 
+
 TcpServer::~TcpServer()
 {
 	delete _instance;
@@ -666,47 +686,3 @@ void TcpServer::SetDialog(SocketChatRoomServerDlg* dlg)
 
 }
 
-void TcpServer::refreshContainer()
-{
-	this->_container.erase(this->_container.begin());
-}
-
-int TcpServer::getContainerSize()
-{
-	return this->_container.size();
-}
-
-bool TcpServer::checkContainer()
-{
-	if (this->_container.empty())
-	{
-		return false;
-	}
-	return true;
-}
-
-
-UINT Timer(LPVOID param)
-{
-	TcpServer* server = (TcpServer*)param;
-	int time = clock();
-	while (true)
-	{
-		if (clock() - time > 120000)
-		{
-			break;
-		}
-	}
-
-	containerLock.Lock();
-	if (server->checkContainer() == true)
-	{
-		server->refreshContainer();
-		while (server->getContainerSize() > 10)
-		{
-			server->refreshContainer();
-		}
-	}
-	containerLock.Unlock();
-	return 0;
-}

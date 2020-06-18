@@ -172,7 +172,7 @@ void CPublicChatDialog::OnBnClickedUploadFile()
 
 				// lấy tên file
 
-				int curPos = 0;
+				int curPos = 0; 
 				CString resToken = filePath.Tokenize(_T("\\"), curPos);
 				while (filePath.Find(L"\\",curPos) != -1)
 				{
@@ -182,6 +182,7 @@ void CPublicChatDialog::OnBnClickedUploadFile()
 				}
 				OutputDebugString(resToken);
 				resToken = filePath.Tokenize(_T("\\"), curPos);
+
 				std::string filename = ConvertString::EncodeCStringToString(resToken);
 
 				// gửi đi desc
