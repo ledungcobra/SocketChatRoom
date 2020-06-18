@@ -157,7 +157,7 @@ void SocketChatRoomServerDlg::UpdateLogBox(std::string message)
 	CString buff;
 
 	mEdtLog.GetWindowText(buff);
-	buff += ConvertString::ConvertStringToCString(message) + L"\r\n";
+	buff += ConvertString::DecodeStringToCString(message) + L"\r\n";
 	mEdtLog.SetWindowText(buff);
 }
 
@@ -166,7 +166,7 @@ void SocketChatRoomServerDlg::UpdateActiveUserListView()
 	mListBox.ResetContent();
 	for (auto it = TcpServer::GetInstance()->listUser.begin(); it != TcpServer::GetInstance()->listUser.end(); it++) {
 		if (it->second != "") {
-			this->mListBox.AddString(ConvertString::ConvertStringToCString(it->second));
+			this->mListBox.AddString(ConvertString::DecodeStringToCString(it->second));
 		}
 		
 	}

@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "ConvertString.h"
 #include "TcpServer.h"
-std::string ConvertString::ConvertCStringToString(CString cstring)
+std::string ConvertString::EncodeCStringToString(CString cstring)
 {
 	/*CT2A t(cstring);
 	std::string result(t);*/
@@ -12,7 +12,7 @@ std::string ConvertString::ConvertCStringToString(CString cstring)
 	return result;
 }
 
-CString ConvertString::ConvertStringToCString(std::string input)
+CString ConvertString::DecodeStringToCString(std::string input)
 {
 
 	CString result = L"";
@@ -29,4 +29,16 @@ CString ConvertString::ConvertStringToCString(std::string input)
 		
 	}
 	return result;
+}
+
+std::string ConvertString::ConvertCStringToString(CString cstring)
+{
+	CT2A t(cstring);
+	std::string result(t);
+	return result;
+}
+
+CString ConvertString::ConvertStringToCString(std::string input)
+{
+	return CString(input.c_str());
 }

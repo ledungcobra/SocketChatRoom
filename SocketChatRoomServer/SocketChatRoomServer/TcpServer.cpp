@@ -95,7 +95,7 @@ bool TcpServer::AnalyzeAndProcess(SOCKET clientSocket, std::string packet)
 			WriteUserInfo(info[1], info[2]);
 			
 			// thông báo người dùng đã xuất hiện trong server
-			message = info[1] + " has signed up and logged in";
+			message = info[1] + ConvertString::EncodeCStringToString(ConvertString::ConvertStringToCString(" has signed up and logged in"));
 			
 			// báo về cho người dùng
 			std::string backMess = std::to_string(static_cast<int>(FlagServerToClient::SignUp_Success)) + '\0';
@@ -142,7 +142,7 @@ bool TcpServer::AnalyzeAndProcess(SOCKET clientSocket, std::string packet)
 				this->listUser[clientSocket] = info[1];
 				
 				// thông báo đã đăng nhập
-				message = info[1] + " has logged in";
+				message = info[1] + ConvertString::EncodeCStringToString(ConvertString::ConvertStringToCString(" has logged in"));
 				this->serverDlg->UpdateActiveUserListView();
 				
 				// cập nhật danh sách user
@@ -166,7 +166,7 @@ bool TcpServer::AnalyzeAndProcess(SOCKET clientSocket, std::string packet)
 	case FlagClientToServer::LogOut:
 	{
 		// thông báo user đã log out
-		message = listUser[clientSocket] + " has logged out";
+		message = listUser[clientSocket] + ConvertString::EncodeCStringToString(ConvertString::ConvertStringToCString(" has logged out"));
 
 		// Gửi cờ để hiện log hoạt động bên client
 		std::string Another_logOut = std::to_string(static_cast<int>(FlagServerToClient::Another_Client_LogOut)) + '\0';
@@ -188,7 +188,7 @@ bool TcpServer::AnalyzeAndProcess(SOCKET clientSocket, std::string packet)
 	{
 		if (listUser[clientSocket] != "") 
 		{
-			message = listUser[clientSocket] + " has disconnected";
+			message = listUser[clientSocket] + ConvertString::EncodeCStringToString(ConvertString::ConvertStringToCString(" has disconnected"));
 			//Gửi cờ cập nhật log
 			std::string Another_logOut = std::to_string(static_cast<int>(FlagServerToClient::Another_Client_LogOut)) + '\0';
 			Another_logOut += this->listUser[clientSocket];
@@ -240,7 +240,8 @@ bool TcpServer::AnalyzeAndProcess(SOCKET clientSocket, std::string packet)
 	{
 
 		//info[2] là username người nhận, info[3] là nội dung tin nhắn
-		message = listUser[clientSocket] + " -> " + info[2] + ": " + info[3];
+		message = listUser[clientSocket] + ConvertString::EncodeCStringToString(ConvertString::ConvertStringToCString(" -> ")) + info[2] 
+			+ ConvertString::EncodeCStringToString(ConvertString::ConvertStringToCString(": ")) + info[3];
 
 		std::string private_msg = std::to_string(static_cast<int>(FlagServerToClient::Send_Private_Message)) + '\0'; //Gửi cờ 
 		private_msg += this->listUser[clientSocket] + '\0' + info[3] +'\0';
@@ -262,7 +263,10 @@ bool TcpServer::AnalyzeAndProcess(SOCKET clientSocket, std::string packet)
 
 		//info[2] là nội dung tin nhắn
 		//flagNULL sender NULL content NULL
-		message = listUser[clientSocket] + " -> " + "PUBLIC: " + info[2];
+		std::string extraMessage = " -> PUBLIC: " + info[2];
+		//CString extraMessage;
+		//extraMessage.Format("-> PUBLIC %s", info[2].c_str());
+		//message = listUser[clientSocket] + ConvertString::EncodeCStringToString(ConvertString::ConvertStringToCString(extraMessage));
 		std::string public_msg = std::to_string(static_cast<int>(FlagServerToClient::Send_Public_Message)) + '\0'; //Gửi cờ 
 		public_msg += this->listUser[clientSocket] + '\0' + info[2] + '\0';
 		this->SendToAll(public_msg);
@@ -688,7 +692,7 @@ UINT Timer(LPVOID param)
 	int time = clock();
 	while (true)
 	{
-		if (clock() - time > 30000)
+		if (clock() - time > 120000)
 		{
 			break;
 		}

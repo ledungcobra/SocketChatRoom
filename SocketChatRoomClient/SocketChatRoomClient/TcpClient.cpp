@@ -170,7 +170,7 @@ bool TcpClient::AnalyzeAndProcess(std::string packet)
 			CFileDialog fileDlg(FALSE);
 			fileDlg.DoModal();
 			CString filePath = fileDlg.GetPathName();
-			_cwprintf(filePath);
+		
 			this->_filePath = filePath;
 			this->SendPacketRaw(backMess);
 		}
