@@ -69,7 +69,7 @@ private:
 std::vector<std::string> stringTokenizer(std::string input, char delim); // string tokenizer 
 std::istream& safeGetline(std::istream& is, std::string& t); // lấy chuổi từ file mà không dính \r \n v.v kiểu vậy
 
-
+std::vector<std::string> stringTokenizer(std::string input, char delim, bool flag);
 // thread
 UINT Timer(LPVOID param); // bấm giờ 
 UINT ListeningThreadFunc(LPVOID serv); // nghe client kết nối

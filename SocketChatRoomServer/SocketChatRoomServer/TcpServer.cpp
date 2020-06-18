@@ -571,6 +571,21 @@ std::vector<std::string> stringTokenizer(std::string input, char delim)
 	return tokens;
 }
 
+std::vector<std::string> stringTokenizer(std::string input, char delim,bool flag )
+{
+	std::vector <std::string> tokens;
+	std::stringstream check(input);
+	std::string intermediate;
+
+	int count = 0;
+
+	while (getline(check, intermediate, delim))
+	{
+		tokens.push_back(intermediate);
+		++count;
+	}
+	return tokens;
+}
 
 std::istream& safeGetline(std::istream& is, std::string& t)
 {
