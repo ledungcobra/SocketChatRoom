@@ -146,7 +146,7 @@ bool TcpClient::AnalyzeAndProcess(std::string packet)
 
 		std::vector<std::string> info;
 		info = stringTokenizer(packet, '\0');
-		std::string backMess = std::to_string(static_cast<int>(FlagClientToServer::Download_Request)) + '\0' + info[1] + '\0' + info[2] + '\0' + info[3] + '\0';
+		std::string backMess = std::to_string(static_cast<int>(FlagClientToServer::Download_Request)) + '\0' + info[1] + '\0' + info[2] + '\0';
 
 		// xử kích thước file từ byte ra MB
 		double num = std::stod(info[3]);
@@ -162,12 +162,12 @@ bool TcpClient::AnalyzeAndProcess(std::string packet)
 
 		// hiện thông báo
 		
-		CString notificationMessage = _T("Do you want to keep \"") + ConvertString::DecodeStringToCString(info[2]) + _T("\" from: ") + ConvertString::DecodeStringToCString(info[1]) + _T(" size: ") + ConvertString::ConvertStringToCString(size) + _T(" MB");
+		CString notificationMessage = _T("Do you want to keep \"") + ConvertString::ConvertStringToCString(info[2]) + _T("\" from: ") + ConvertString::ConvertStringToCString(info[1]) + _T(" size: ") + ConvertString::ConvertStringToCString(size) + _T(" MB");
 
 		auto i = AfxMessageBox(notificationMessage, 1, 1);
 		if (i == IDOK) 
 		{	
-			CFileDialog fileDlg(FALSE, 0, ConvertString::DecodeStringToCString(info[2]));
+			CFileDialog fileDlg(FALSE);
 			fileDlg.DoModal();
 			CString filePath = fileDlg.GetPathName();
 		
@@ -180,19 +180,11 @@ bool TcpClient::AnalyzeAndProcess(std::string packet)
 	{
 		std::vector<std::string> info;
 		info = stringTokenizer(packet, '\0',5);
-		std::string fileContent;
 
 		// lấy content
 		packet.pop_back(); // bỏ '\0' được thêm vào từ send packet raw
 		packet.pop_back(); // bỏ '\0' tương đương với null trong mẫu tin
-		try
-		{
-			fileContent = packet.substr(packet.length() - stoi(info[3]), stoi(info[3]));
-		}
-		catch (...)
-		{
-			_cwprintf(ConvertString::ConvertStringToCString(std::to_string(packet.length())) + L"\r\n" + ConvertString::ConvertStringToCString(info[3])  );
-		}
+		std::string fileContent = packet.substr(packet.length() - stoi(info[3]), stoi(info[3]));
 	
 		std::ofstream file(this->_filePath, std::ios::binary);
 		if (file.is_open())
@@ -415,19 +407,6 @@ long long fileSize(CString add)
 	return size;
 }
 
-std::vector<std::string> stringTokenizer(std::string input, char delim, bool flag)
-{
-	std::vector <std::string> tokens;
-	std::stringstream check(input);
-	std::string intermediate;
 
-	int count = 0;
 
-	while (getline(check, intermediate, delim))
-	{
-		tokens.push_back(intermediate);
-		++count;
-	}
-	return tokens;
-}
 

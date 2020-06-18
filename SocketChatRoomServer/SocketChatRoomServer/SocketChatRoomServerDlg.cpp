@@ -154,6 +154,7 @@ HCURSOR SocketChatRoomServerDlg::OnQueryDragIcon()
 
 void SocketChatRoomServerDlg::UpdateLogBox(std::string message)
 {
+	if (message == "") return;
 	CString buff;
 
 	mEdtLog.GetWindowText(buff);

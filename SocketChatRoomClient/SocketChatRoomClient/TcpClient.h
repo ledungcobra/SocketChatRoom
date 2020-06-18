@@ -51,7 +51,7 @@ public:
 	CPrivateChatDialog* CreatePrivateChatDlg(CString partnerUsername);
 };
 
-std::vector<std::string> stringTokenizer(std::string input, char delim, bool flag);
+
 std::vector<std::string> stringTokenizer(std::string input, char delim);
 std::vector<std::string> stringTokenizer(std::string input, char delim, int lim);
 long long fileSize(CString add);

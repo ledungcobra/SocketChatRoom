@@ -268,10 +268,8 @@ bool TcpServer::AnalyzeAndProcess(SOCKET clientSocket, std::string packet)
 
 		//info[2] là nội dung tin nhắn
 		//flagNULL sender NULL content NULL
-		std::string extraMessage = " -> PUBLIC: " + info[2];
-		//CString extraMessage;
-		//extraMessage.Format("-> PUBLIC %s", info[2].c_str());
-		//message = listUser[clientSocket] + ConvertString::EncodeCStringToString(ConvertString::ConvertStringToCString(extraMessage));
+		std::string extraMessage = " -> PUBLIC: ";
+		message = listUser[clientSocket] + ConvertString::EncodeCStringToString(ConvertString::ConvertStringToCString(extraMessage)) + info[2];
 		std::string public_msg = std::to_string(static_cast<int>(FlagServerToClient::Send_Public_Message)) + '\0'; //Gửi cờ 
 		public_msg += this->listUser[clientSocket] + '\0' + info[2] + '\0';
 		this->SendToAll(public_msg);
