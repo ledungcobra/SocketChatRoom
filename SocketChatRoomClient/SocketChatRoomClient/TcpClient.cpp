@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "TcpClient.h"
 #include "resource.h"
-TcpClient* TcpClient::_instance = NULL;
+std::shared_ptr<TcpClient> TcpClient::_instance = NULL;
 
 TcpClient::TcpClient()
 {
@@ -285,12 +285,12 @@ void TcpClient::CloseConnection() // Close dùng trong analyze
 	WSACleanup();
 }
 
-TcpClient* TcpClient::GetInstance()
+std::shared_ptr<TcpClient> TcpClient::GetInstance()
 {
 	if (_instance == NULL) {
 		_lock.acquire();
 		if (_instance == NULL) {
-			_instance = new TcpClient();
+			_instance = std::shared_ptr<TcpClient>(new TcpClient());
 		}
 		_lock.release();
 
@@ -366,6 +366,11 @@ CPrivateChatDialog* TcpClient::CreatePrivateChatDlg(CString _partnerUsername)
 	}
 	return dlg.get();
 
+}
+
+TcpClient::~TcpClient()
+{
+	_cwprintf(L"Call destructor");
 }
 
 

@@ -29,7 +29,7 @@ private:
 	sockaddr_in _sockAddr;
 	CPublicChatDialog* _publicChatDialog = nullptr;
 	CSignUpLogInDlg* _signUpLogInDlg = nullptr;
-	static TcpClient* _instance;
+	static std::shared_ptr<TcpClient> _instance;
 	TcpClient();
 	// dùng cho đọc và ghi file
 	CString _filePath = L"";
@@ -44,11 +44,12 @@ public:
 	std::string ReceivePacket(); // nhận gói tin 
 	bool Connect(); // kết nối với server
 	void CloseConnection(); // đóng kết nối
-    static TcpClient *GetInstance(); // lấy thể hiện
+    static std::shared_ptr<TcpClient> GetInstance(); // lấy thể hiện
 	void Run(); // chạy client
 	void SetDialog(CDialog* dialog); //
 	void ShowSignUpLoginDialog(); //
 	CPrivateChatDialog* CreatePrivateChatDlg(CString partnerUsername);
+	~TcpClient();
 };
 
 

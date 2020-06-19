@@ -115,9 +115,10 @@ BOOL CSignUpLogInDlg::OnInitDialog()
 
 	// TODO: Add extra initialization here
 	SetWindowText(L"Socket Chat Room");
-	TcpClient::GetInstance()->SetDialog(this);
-	TcpClient::GetInstance()->Run();
-
+	auto tcpClient = TcpClient::GetInstance();
+	tcpClient->SetDialog(this);
+	tcpClient->Run();
+	
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }
 
@@ -200,6 +201,11 @@ void CSignUpLogInDlg::OnBnClickedSignUp()
 	
 	mEdtUsername.GetWindowTextW(username);
 	mEdtPassword.GetWindowTextW(password);
+	
+	if (password == L"") {
+		AfxMessageBox(L"Please type in password");
+		return;
+	}
 
 	packet += std::to_string(static_cast<int>(FlagClientToServer::SignUp)) + '\0' + ConvertString::EncodeCStringToString(username) + '\0' + ConvertString::EncodeCStringToString(password) + '\0';
 	TcpClient::GetInstance()->SendPacketRaw(packet);
@@ -213,16 +219,6 @@ void CSignUpLogInDlg::OnBnClickedSignUp()
 void CSignUpLogInDlg::OnBnClickedLogIn()
 {
 
-	
-	// TODO: Add your control notification handler code here
-	//CPublicChatDialog *dialog = new CPublicChatDialog(nullptr, CString("ABC"));
-
-	//TEST
-	//EndDialog(IDOK);
-	//dialog.ShowWindow(SW_NORMAL);
-	//CPublicChatDialog*dialog = new CPublicChatDialog(nullptr,_T("ABC"));
-	//dialog->Create(IDD_PUBLIC_CHAT);
-	//dialog->ShowWindow(SW_SHOWNORMAL);
 	std::string packet = "";
 	CString username;
 	CString password;
@@ -258,7 +254,7 @@ void CSignUpLogInDlg::AccountAlreadyUsed()
 
 LRESULT CSignUpLogInDlg::LoginSuccess(WPARAM wParam, LPARAM lParam)
 {
-	//TODO:
+	
 	CString username;
 	mEdtUsername.GetWindowTextW(username);
 	ShowWindow(SW_HIDE);

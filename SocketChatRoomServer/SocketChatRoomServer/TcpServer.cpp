@@ -366,9 +366,9 @@ bool TcpServer::AnalyzeAndProcess(SOCKET clientSocket, std::string packet)
 		break;
 	}
 
-	this->serverDlg->UpdateLogBox(message);
+	
 	}
-
+	this->serverDlg->UpdateLogBox(message);
 	return true;
 }
 
