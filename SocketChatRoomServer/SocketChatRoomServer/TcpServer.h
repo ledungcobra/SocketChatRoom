@@ -16,6 +16,7 @@
 #define TOKENIZERLIMIT 10
 #define USERINFO "data.bin"
 #define DOWNLOADFORMAT L".TCPD"
+#define DOWNLOADDIR L".\\downloads\\"
 
 static Lock _lock; // khóa singleton
 

@@ -214,7 +214,7 @@ bool TcpServer::AnalyzeAndProcess(SOCKET clientSocket, std::string packet)
 	{
 		CString fileName = ConvertString::DecodeStringToCString(info[1]) + "-" + ConvertString::DecodeStringToCString(info[2]) + "-" + ConvertString::ConvertStringToCString(info[3]) + DOWNLOADFORMAT;
 
-		std::ifstream inFile(fileName, std::ios::in | std::ios::binary);
+		std::ifstream inFile(DOWNLOADDIR + fileName, std::ios::in | std::ios::binary);
 
 		if (inFile.is_open())
 		{
@@ -354,7 +354,9 @@ bool TcpServer::AnalyzeAndProcess(SOCKET clientSocket, std::string packet)
 
 		CString fileName = ConvertString::DecodeStringToCString(sender) + "-" + ConvertString::DecodeStringToCString(info[2]) + "-" + ConvertString::ConvertStringToCString(info[3]) + DOWNLOADFORMAT;
 
-		std::ofstream outFile(fileName, std::ios::binary | std::ios::out);
+		CreateDirectory(DOWNLOADDIR, NULL);
+
+		std::ofstream outFile( DOWNLOADDIR + fileName, std::ios::binary | std::ios::out);
 
 		if (outFile.is_open())
 		{
