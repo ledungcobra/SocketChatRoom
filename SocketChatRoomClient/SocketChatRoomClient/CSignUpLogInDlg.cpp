@@ -201,7 +201,7 @@ void CSignUpLogInDlg::OnBnClickedSignUp()
 	mEdtUsername.GetWindowTextW(username);
 	mEdtPassword.GetWindowTextW(password);
 
-	packet += std::to_string(static_cast<int>(FlagClientToServer::SignUp)) + '\0' + ConvertString::ConvertCStringToString(username) + '\0' + ConvertString::ConvertCStringToString(password) + '\0';
+	packet += std::to_string(static_cast<int>(FlagClientToServer::SignUp)) + '\0' + ConvertString::EncodeCStringToString(username) + '\0' + ConvertString::EncodeCStringToString(password) + '\0';
 	TcpClient::GetInstance()->SendPacketRaw(packet);
 
 	
@@ -230,7 +230,7 @@ void CSignUpLogInDlg::OnBnClickedLogIn()
 	mEdtUsername.GetWindowTextW(username);
 	mEdtPassword.GetWindowTextW(password);
 
-	packet += std::to_string(static_cast<int>(FlagClientToServer::Login)) + '\0' + ConvertString::ConvertCStringToString(username) + '\0' + ConvertString::ConvertCStringToString(password) + '\0';
+	packet += std::to_string(static_cast<int>(FlagClientToServer::Login)) + '\0' + ConvertString::EncodeCStringToString(username) + '\0' + ConvertString::EncodeCStringToString(password) + '\0';
 
 
 	TcpClient::GetInstance()->SendPacketRaw(packet);

@@ -93,9 +93,9 @@ void CPublicChatDialog::OnBnClickedSend()
 	mEdtChat.GetWindowTextW(message);
 
 	std::string packet = std::to_string(static_cast<int>
-	(FlagClientToServer::PublicChat)) + '\0' + ConvertString::ConvertCStringToString(username) + '\0' +
-		ConvertString::ConvertCStringToString(message) + '\0';
-	_cwprintf(ConvertString::ConvertStringToCString(packet));
+	(FlagClientToServer::PublicChat)) + '\0' + ConvertString::EncodeCStringToString(username) + '\0' +
+		ConvertString::EncodeCStringToString(message) + '\0';
+	_cwprintf(ConvertString::DecodeStringToCString(packet));
 
 	TcpClient::GetInstance()->SendPacketRaw(packet);
 	//TODO: update local message
@@ -107,8 +107,8 @@ void CPublicChatDialog::UpdateListActiveUsers(std::vector<std::string> listActiv
 {
 	mActiveUsersList.ResetContent();
 	for (int i = 0; i < listActiveUsers.size();i++) {
-		//if (ConvertString::ConvertCStringToString(username) != listActiveUsers.at(i)) {
-			mActiveUsersList.InsertString(i, ConvertString::ConvertStringToCString(listActiveUsers.at(i)));
+		//if (ConvertString::EncodeCStringToString(username) != listActiveUsers.at(i)) {
+			mActiveUsersList.InsertString(i, ConvertString::DecodeStringToCString(listActiveUsers.at(i)));
 		///}
 	}
 
@@ -147,49 +147,54 @@ void CPublicChatDialog::OnBnClickedUploadFile()
 		CString filePath = fileDlg.GetPathName();
 		_cwprintf(fileDlg.GetPathName());
 
-		std::string comparison = ConvertString::ConvertCStringToString(filePath);
-		
-		if (ConvertString::ConvertStringToCString(comparison) != filePath)
+
+		// đọc file lên
+		std::ifstream file(filePath, std::ios::binary);
+		if (file.is_open())
 		{
-			AfxMessageBox(L"File name is not valid");
-			return;
-		}
-		else
-		{
-			// đọc file lên
-			std::ifstream file(filePath, std::ios::binary);
-			if (file.is_open())
+
+			std::ostringstream ostrm;
+			long long size = fileSize(filePath); // kich thuoc theo byte
+
+			if (size > 5242880 || size < 1048576)
+			{
+				AfxMessageBox(L"File must be between 2 and 5 MB");
+				return;
+			}
+			else
 			{
 
-				std::ostringstream ostrm;
-				long long size = fileSize(filePath); // kich thuoc theo byte
+				// ghi vào packet
 
-				if (size > 5242880 || size < 1048576)
+				ostrm << file.rdbuf();
+
+				std::string content = std::string(ostrm.str());
+
+				// lấy tên file
+
+				int curPos = 0;
+				CString resToken = filePath.Tokenize(_T("\\"), curPos);
+				while (filePath.Find(L"\\", curPos) != -1)
 				{
-					AfxMessageBox(L"File must be between 2 and 5 MB");
-					return;
+					OutputDebugString(resToken);
+
+					resToken = filePath.Tokenize(_T("\\"), curPos);
 				}
-				else
-				{
+				OutputDebugString(resToken);
+				resToken = filePath.Tokenize(_T("\\"), curPos);
 
-					// ghi vào packet
+				std::string filename = ConvertString::EncodeCStringToString(resToken);
 
-					ostrm << file.rdbuf();
-
-					std::string content = std::string(ostrm.str());
-
-					// lấy tên file
-					std::vector<std::string> info = stringTokenizer(ConvertString::ConvertCStringToString(filePath), '\\');
-					// gửi đi desc
-					std::string file_desc = std::to_string(static_cast<int>(FlagClientToServer::Send_File_Descriptor)) + '\0' + "ALL" + '\0' + info[info.size() - 1] + '\0' + std::to_string(size) + '\0'; // all + filename + filesize
-					TcpClient::GetInstance()->SendPacketRaw(file_desc);
-					// gửi đi content
-					std::string file_content = std::to_string(static_cast<int>(FlagClientToServer::Send_Content)) + '\0' + "ALL" + '\0' + info[info.size() - 1] + '\0' + std::to_string(size) + '\0' + content + '\0'; // all + filename + filesize +content
-					TcpClient::GetInstance()->SendPacketRaw(file_content);
-					file.close();
-				}
+				// gửi đi desc
+				std::string file_desc = std::to_string(static_cast<int>(FlagClientToServer::Send_File_Descriptor)) + '\0' + "ALL" + '\0' + filename + '\0' + std::to_string(size) + '\0'; // all + filename + filesize
+				TcpClient::GetInstance()->SendPacketRaw(file_desc);
+				// gửi đi content
+				std::string file_content = std::to_string(static_cast<int>(FlagClientToServer::Send_Content)) + '\0' + "ALL" + '\0' + filename + '\0' + std::to_string(size) + '\0' + content + '\0'; // all + filename + filesize +content
+				TcpClient::GetInstance()->SendPacketRaw(file_content);
+				file.close();
 			}
 		}
+
 	}
 }
 
@@ -224,7 +229,7 @@ LRESULT CPublicChatDialog::OpenDialog(WPARAM wParam, LPARAM lParam)
 	_cwprintf(username);
 	auto dlg = TcpClient::GetInstance()->CreatePrivateChatDlg(username);
 	dlg->ShowWindow(SW_SHOW);
-	dlg->UpdateChatView(ConvertString::ConvertCStringToString(message));
+	dlg->UpdateChatView(ConvertString::EncodeCStringToString(message));
 	return 0;
 }
 
@@ -232,8 +237,8 @@ void CPublicChatDialog::UpdateMessage(std::string partnerUsername, std::string c
 {
 	CString messages;
 	mMessageBox.GetWindowTextW(messages);
-	messages += ConvertString::ConvertStringToCString(partnerUsername) + L": " +
-		ConvertString::ConvertStringToCString(content) + L"\r\n";
+	messages += ConvertString::DecodeStringToCString(partnerUsername) + L": " +
+		ConvertString::DecodeStringToCString(content) + L"\r\n";
 	mMessageBox.SetWindowTextW(messages);
 	mEdtChat.SetWindowTextW(L"");
 
@@ -247,13 +252,13 @@ void CPublicChatDialog::UpdateLogMessage(std::string message,int flag)
 
 	if (flag == 0) {
 		mEdtActiveLog.GetWindowTextW(buffer);
-		buffer += ConvertString::ConvertStringToCString(message) + L" has logged in\r\n";
+		buffer += ConvertString::DecodeStringToCString(message) + L" has logged in\r\n";
 		
 
 	}
 	else if (flag == 1) {
 		mEdtActiveLog.GetWindowTextW(buffer);
-		buffer += ConvertString::ConvertStringToCString(message) + L" has logged out\r\n";
+		buffer += ConvertString::DecodeStringToCString(message) + L" has logged out\r\n";
 	}
 	mEdtActiveLog.SetWindowTextW(buffer);
 }

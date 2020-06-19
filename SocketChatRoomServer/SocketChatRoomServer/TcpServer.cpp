@@ -212,15 +212,16 @@ bool TcpServer::AnalyzeAndProcess(SOCKET clientSocket, std::string packet)
 	break;
 	case FlagClientToServer::Download_Request:
 	{
-		CString fileName = ConvertString::DecodeStringToCString(info[2]);
-		std::ifstream inFile(ConvertString::ConvertStringToCString(info[1]) + "-" + fileName + "-" + ConvertString::ConvertStringToCString(info[3]) + DOWNLOADFORMAT, std::ios::in|std::ios::binary);
+		CString fileName = ConvertString::DecodeStringToCString(info[1]) + "-" + ConvertString::DecodeStringToCString(info[2]) + "-" + ConvertString::ConvertStringToCString(info[3]) + DOWNLOADFORMAT;
+
+		std::ifstream inFile(fileName, std::ios::in | std::ios::binary);
 
 		if (inFile.is_open())
 		{
 			// ghi vào content;
 			std::ostringstream ostrm;
 			ostrm << inFile.rdbuf();
-			
+
 			std::string fromFile(ostrm.str());
 
 			// lấy dữ liệu ra từ file
@@ -240,16 +241,16 @@ bool TcpServer::AnalyzeAndProcess(SOCKET clientSocket, std::string packet)
 			inFile.close();
 		}
 	}
-		break;
+	break;
 	case FlagClientToServer::PrivateChat:
 	{
 
 		//info[2] là username người nhận, info[3] là nội dung tin nhắn
-		message = listUser[clientSocket] + ConvertString::EncodeCStringToString(ConvertString::ConvertStringToCString(" -> ")) + info[2] 
+		message = listUser[clientSocket] + ConvertString::EncodeCStringToString(ConvertString::ConvertStringToCString(" -> ")) + info[2]
 			+ ConvertString::EncodeCStringToString(ConvertString::ConvertStringToCString(": ")) + info[3];
 
 		std::string private_msg = std::to_string(static_cast<int>(FlagServerToClient::Send_Private_Message)) + '\0'; //Gửi cờ 
-		private_msg += this->listUser[clientSocket] + '\0' + info[3] +'\0';
+		private_msg += this->listUser[clientSocket] + '\0' + info[3] + '\0';
 		SOCKET receiver = NULL;
 
 		for (auto it = this->listUser.begin(); it != this->listUser.end(); it++)
@@ -261,7 +262,7 @@ bool TcpServer::AnalyzeAndProcess(SOCKET clientSocket, std::string packet)
 		}
 		this->SendPacketRaw(receiver, private_msg);
 	}
-		break;
+	break;
 
 	case FlagClientToServer::PublicChat:
 	{
@@ -274,7 +275,7 @@ bool TcpServer::AnalyzeAndProcess(SOCKET clientSocket, std::string packet)
 		public_msg += this->listUser[clientSocket] + '\0' + info[2] + '\0';
 		this->SendToAll(public_msg);
 	}
-		break;
+	break;
 
 	case FlagClientToServer::Send_File_Descriptor:
 	{
@@ -303,13 +304,13 @@ bool TcpServer::AnalyzeAndProcess(SOCKET clientSocket, std::string packet)
 			SendToAllExcept(backMess, sender);
 		}
 		else
-		{	
+		{
 			// lấy thông tin socket từ username
 
 			SOCKET receiver = NULL;
 
 			for (auto it = this->listUser.begin(); it != this->listUser.end(); ++it)
-				if (it->second == ConvertString::ConvertCStringToString(ConvertString::DecodeStringToCString(info[1])))
+				if (it->second == info[1])
 				{
 					receiver = it->first;
 					break;
@@ -317,15 +318,13 @@ bool TcpServer::AnalyzeAndProcess(SOCKET clientSocket, std::string packet)
 			SendPacketRaw(receiver, backMess);
 		}
 	}
-		break;
+	break;
 
 	case FlagClientToServer::Send_Content:
 	{
-
-
 		// tách thông tin file
 
-		// lấy content
+				// lấy content
 		packet.pop_back(); // bỏ '\0' được thêm vào từ send packet raw
 		packet.pop_back(); // bỏ '\0' tương đương với null trong mẫu tin
 		int size = packet.length();
@@ -353,7 +352,7 @@ bool TcpServer::AnalyzeAndProcess(SOCKET clientSocket, std::string packet)
 		//// chạy thread đếm thời gian để refresh container
 		//AfxBeginThread(Timer, this);
 
-		CString fileName = ConvertString::ConvertStringToCString(sender) + "-" + ConvertString::DecodeStringToCString(info[2]) + "-" + ConvertString::ConvertStringToCString(info[3]) + DOWNLOADFORMAT;
+		CString fileName = ConvertString::DecodeStringToCString(sender) + "-" + ConvertString::DecodeStringToCString(info[2]) + "-" + ConvertString::ConvertStringToCString(info[3]) + DOWNLOADFORMAT;
 
 		std::ofstream outFile(fileName, std::ios::binary | std::ios::out);
 
@@ -362,12 +361,11 @@ bool TcpServer::AnalyzeAndProcess(SOCKET clientSocket, std::string packet)
 			outFile << content;
 			outFile.close();
 		}
-
-	}
 		break;
-    }
-	
+	}
+
 	this->serverDlg->UpdateLogBox(message);
+	}
 
 	return true;
 }

@@ -146,31 +146,31 @@ bool TcpClient::AnalyzeAndProcess(std::string packet)
 
 		std::vector<std::string> info;
 		info = stringTokenizer(packet, '\0');
-		std::string backMess = std::to_string(static_cast<int>(FlagClientToServer::Download_Request)) + '\0' + info[1] + '\0' + info[2] + '\0';
+		std::string backMess = std::to_string(static_cast<int>(FlagClientToServer::Download_Request)) + '\0' + info[1] + '\0' + info[2] + '\0' + info[3] + '\0';
 
 		// xử kích thước file từ byte ra MB
 		double num = std::stod(info[3]);
 
 		num /= 1000000;
-		
+
 		std::ostringstream ostrm;
 		ostrm << std::fixed;
 		ostrm << std::setprecision(2);
 		ostrm << num;
-	 
+
 		std::string size = ostrm.str();
 
 		// hiện thông báo
-		
-		CString notificationMessage = _T("Do you want to keep \"") + ConvertString::ConvertStringToCString(info[2]) + _T("\" from: ") + ConvertString::ConvertStringToCString(info[1]) + _T(" size: ") + ConvertString::ConvertStringToCString(size) + _T(" MB");
+
+		CString notificationMessage = _T("Do you want to keep \"") + ConvertString::DecodeStringToCString(info[2]) + _T("\" from: ") + ConvertString::DecodeStringToCString(info[1]) + _T(" size: ") + ConvertString::ConvertStringToCString(size) + _T(" MB");
 
 		auto i = AfxMessageBox(notificationMessage, 1, 1);
-		if (i == IDOK) 
-		{	
-			CFileDialog fileDlg(FALSE);
+		if (i == IDOK)
+		{
+			CFileDialog fileDlg(FALSE, 0, ConvertString::DecodeStringToCString(info[2]));
 			fileDlg.DoModal();
 			CString filePath = fileDlg.GetPathName();
-		
+
 			this->_filePath = filePath;
 			this->SendPacketRaw(backMess);
 		}
@@ -179,13 +179,15 @@ bool TcpClient::AnalyzeAndProcess(std::string packet)
 	case FlagServerToClient::Send_File_Content:
 	{
 		std::vector<std::string> info;
-		info = stringTokenizer(packet, '\0',5);
+		info = stringTokenizer(packet, '\0', 5);
+		std::string fileContent;
 
 		// lấy content
 		packet.pop_back(); // bỏ '\0' được thêm vào từ send packet raw
 		packet.pop_back(); // bỏ '\0' tương đương với null trong mẫu tin
-		std::string fileContent = packet.substr(packet.length() - stoi(info[3]), stoi(info[3]));
-	
+
+		fileContent = packet.substr(packet.length() - stoi(info[3]), stoi(info[3]));
+
 		std::ofstream file(this->_filePath, std::ios::binary);
 		if (file.is_open())
 		{
@@ -211,7 +213,7 @@ bool TcpClient::AnalyzeAndProcess(std::string packet)
 		if (_mapPrivateChatDialog.find(info[1]) == _mapPrivateChatDialog.end()) {
 
 
-			SendMessage(_publicChatDialog->GetSafeHwnd(), OPEN_PRIVATE_CHAT_DIALOG,(WPARAM)(LPCTSTR)ConvertString::ConvertStringToCString(info[2]), (LPARAM)(LPCTSTR)ConvertString::ConvertStringToCString(info[1]));
+			SendMessage(_publicChatDialog->GetSafeHwnd(), OPEN_PRIVATE_CHAT_DIALOG,(WPARAM)(LPCTSTR)ConvertString::DecodeStringToCString(info[2]), (LPARAM)(LPCTSTR)ConvertString::DecodeStringToCString(info[1]));
 
 
 		}
@@ -351,7 +353,7 @@ CPrivateChatDialog* TcpClient::CreatePrivateChatDlg(CString _partnerUsername)
 {
 	std::shared_ptr<CPrivateChatDialog> dlg;
 
-	auto partner = ConvertString::ConvertCStringToString(_partnerUsername);
+	auto partner = ConvertString::EncodeCStringToString(_partnerUsername);
 	if (_mapPrivateChatDialog.find(partner) == _mapPrivateChatDialog.end()) {
 		dlg = std::shared_ptr<CPrivateChatDialog>(new CPrivateChatDialog(nullptr, _partnerUsername));
 		dlg->Create(ID_PRIVATE_CHAT);
