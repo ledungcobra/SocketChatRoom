@@ -49,6 +49,8 @@ public:
 	void SetDialog(CDialog* dialog); //
 	void ShowSignUpLoginDialog(); //
 	CPrivateChatDialog* CreatePrivateChatDlg(CString partnerUsername);
+	void SetIPAddress(std::string ipaddr);
+	void Init();
 	~TcpClient();
 };
 

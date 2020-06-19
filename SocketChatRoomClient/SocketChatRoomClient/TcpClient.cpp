@@ -7,9 +7,12 @@ TcpClient::TcpClient()
 {
 	this->isRunning = false;
 	this->_serverPort = 54000;
-	this->_serverIpaddress = "10.0.130.251";
+	//this->_serverIpaddress = "10.0.130.251";
 
 	// Tạo winsock
+	
+}
+void TcpClient::Init() {
 	WSADATA data;
 	WORD ver = MAKEWORD(2, 2); // version 2,2
 
@@ -21,7 +24,6 @@ TcpClient::TcpClient()
 	}
 	this->serverSocket = this->CreateSocket();
 }
-
 std::string TcpClient::ReceivePacket()
 {
 	//Tạo buffer
@@ -365,6 +367,12 @@ CPrivateChatDialog* TcpClient::CreatePrivateChatDlg(CString _partnerUsername)
 		dlg = _mapPrivateChatDialog[partner];
 	}
 	return dlg.get();
+
+}
+
+void TcpClient::SetIPAddress(std::string ipaddr)
+{
+	this -> _serverIpaddress = ipaddr;
 
 }
 

@@ -10,6 +10,7 @@
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
+#include "CInputIPDialog.h"
 
 
 // CSocketChatRoomClientApp
@@ -76,7 +77,7 @@ BOOL CSocketChatRoomClientApp::InitInstance()
 	// such as the name of your company or organization
 	SetRegistryKey(_T("Local AppWizard-Generated Applications"));
 
-	CSignUpLogInDlg dlg;
+	CInputIPDialog dlg;
 	m_pMainWnd = &dlg;
 	INT_PTR nResponse = dlg.DoModal();
 	if (nResponse == IDOK)
