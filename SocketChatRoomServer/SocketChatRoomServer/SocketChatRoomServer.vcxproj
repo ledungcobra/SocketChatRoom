@@ -187,6 +187,7 @@
     <ClInclude Include="FlagClientToServer.h" />
     <ClInclude Include="FlagServerToClient.h" />
     <ClInclude Include="framework.h" />
+    <ClInclude Include="HelperFunction.h" />
     <ClInclude Include="Lock.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Resource.h" />

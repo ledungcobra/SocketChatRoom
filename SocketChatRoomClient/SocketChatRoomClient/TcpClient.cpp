@@ -7,7 +7,7 @@ TcpClient::TcpClient()
 {
 	this->isRunning = false;
 	this->_serverPort = 54000;
-	this->_serverIpaddress = "127.0.0.1";
+	this->_serverIpaddress = "10.0.130.251";
 
 	// Tạo winsock
 	WSADATA data;

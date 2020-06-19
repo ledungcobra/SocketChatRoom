@@ -1,8 +1,8 @@
 
 // SocketChatRoomClientDlg.h : header file
 //
-
 #pragma once
+#include <iostream>
 #define SIGNUP_SUCCESS_MSG WM_APP+1
 #define LOGIN_SUCCESS_MSG WM_APP+2
 

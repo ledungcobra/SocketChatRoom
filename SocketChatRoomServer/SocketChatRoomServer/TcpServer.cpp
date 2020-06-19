@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "TcpServer.h"
 #include "ConvertString.h"
-
+#include "HelperFunction.h"
 TcpServer* TcpServer::_instance = 0;
 std::map<SOCKET, bool> TcpServer::flagRunningThread = std::map<SOCKET, bool>(); 
 
@@ -9,8 +9,8 @@ TcpServer::TcpServer()
 {
 	this->_port = 54000;
 	this->isRunning = false;
-	this->_ipAddress = "127.0.0.1"; //TODO: sửa lại sau
-
+	this->_ipAddress = GetIPAddress();
+	_cwprintf(ConvertString::ConvertStringToCString(_ipAddress));
 	// Tạo winsock
 	WSADATA data;
 	WORD ver = MAKEWORD(2, 2); // version 2,2
@@ -26,7 +26,6 @@ TcpServer::TcpServer()
 
 }
 
-
 SOCKET TcpServer::CreateSocket()
 {
 
@@ -38,6 +37,8 @@ SOCKET TcpServer::CreateSocket()
 		this->_hint.sin_family = AF_INET;
 		this->_hint.sin_port = htons(this->_port);
 		inet_pton(AF_INET, this->_ipAddress.c_str(), &this->_hint.sin_addr);
+
+		
 		
 		// Bind ipaddress và port vào socket
 		int bind_check = bind(sock_server, (sockaddr*)&this->_hint, sizeof(this->_hint));
@@ -46,6 +47,7 @@ SOCKET TcpServer::CreateSocket()
 	{
 		std::cerr << "Can't Create Socket ! Error # " << WSAGetLastError() << std::endl;
 	}
+	
 	return sock_server;
 
 }
