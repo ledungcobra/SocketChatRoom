@@ -69,6 +69,7 @@ void CSignUpLogInDlg::DoDataExchange(CDataExchange* pDX)
 	CDialogEx::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_EDIT1, mEdtUsername);
 	DDX_Control(pDX, IDC_EDIT2, mEdtPassword);
+	DDX_Control(pDX, IDC_BUTTON1, mBtnLogIn);
 }
 
 BEGIN_MESSAGE_MAP(CSignUpLogInDlg, CDialogEx)
@@ -114,7 +115,6 @@ BOOL CSignUpLogInDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// Set small icon
 
 	// TODO: Add extra initialization here
-
 	SetWindowText(L"Socket Chat Room");
 	auto tcpClient = TcpClient::GetInstance();
 	tcpClient->SetDialog(this);

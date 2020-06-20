@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "TcpClient.h"
 #include "resource.h"
+#include <mmsystem.h>
 std::shared_ptr<TcpClient> TcpClient::_instance = NULL;
 
 TcpClient::TcpClient()
@@ -209,6 +210,7 @@ bool TcpClient::AnalyzeAndProcess(std::string packet)
 
 	case FlagServerToClient::Send_Private_Message:
 	{
+		PlaySound(L"sound.wav", NULL, SND_FILENAME | SND_ASYNC);
 		std::vector<std::string> info;
 		info = stringTokenizer(packet, '\0');
 		
@@ -230,6 +232,7 @@ bool TcpClient::AnalyzeAndProcess(std::string packet)
 		break;
 	case FlagServerToClient::Send_Public_Message:
 	{
+		PlaySound(L"sound.wav", NULL, SND_FILENAME | SND_ASYNC);
 		std::vector<std::string> info;
 		info = stringTokenizer(packet, '\0');
 		_publicChatDialog->UpdateMessage(info[1],info[2]);

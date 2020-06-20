@@ -46,7 +46,6 @@ public:
 	void FailLogin();
 	afx_msg LRESULT LoginSuccess(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT SignUpSuccess(WPARAM wParam, LPARAM lParam);
-	
-
 	void AccountAlreadyUsed();
+	CMFCButton  mBtnLogIn;
 };
