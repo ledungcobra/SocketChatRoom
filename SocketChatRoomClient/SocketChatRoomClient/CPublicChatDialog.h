@@ -1,6 +1,7 @@
 #pragma once
 #include<vector>
 #include <string>
+#include "ScrollEdit.h"
 #define OPEN_PRIVATE_CHAT_DIALOG WM_APP+3
 // CPublicChatDialog dialog
 
@@ -43,8 +44,8 @@ public:
 
 	afx_msg void OnLbnSelchangeListActiveUsers();
 	void UpdateMessage(std::string partnerUsername, std::string content);
-	CEdit mMessageBox;
-	CEdit mEdtActiveLog;
+	CScrollEdit mMessageBox;
+	CScrollEdit mEdtActiveLog;
 	//flag = 0 -> logged in/ flag = 1 logged out
 	void UpdateLogMessage(std::string message,int flag);
 };

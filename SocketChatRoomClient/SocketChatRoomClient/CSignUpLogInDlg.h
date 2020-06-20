@@ -5,6 +5,7 @@
 #include <iostream>
 #include "CPublicChatDialog.h"
 #include <memory>
+#include "ScrollEdit.h"
 #define SIGNUP_SUCCESS_MSG WM_APP+1
 #define LOGIN_SUCCESS_MSG WM_APP+2
 
@@ -39,7 +40,7 @@ protected:
 public:
 	afx_msg void OnBnClickedSignUp();
 	afx_msg void OnBnClickedLogIn();
-	CEdit mEdtUsername;
+	CScrollEdit mEdtUsername;
 	CEdit mEdtPassword;
 	void FailSignUp();
 	void FailLogin();

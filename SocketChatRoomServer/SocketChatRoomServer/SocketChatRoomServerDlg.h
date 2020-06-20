@@ -7,6 +7,7 @@
 #include <vector>
 #include <map>
 #include <string>
+#include "ScrollEdit.h"
 //#define PORT 54000
 //#define WM_SOCKET WM_USER+1
 class SocketChatRoomServerDlg : public CDialogEx
@@ -40,5 +41,5 @@ public:
 	void UpdateLogBox(std::string message);
 	void UpdateActiveUserListView();
 public:
-	CEdit mEdtLog;
+	CScrollEdit mEdtLog;
 };
