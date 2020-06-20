@@ -98,7 +98,7 @@ bool TcpClient::AnalyzeAndProcess(std::string packet)
 	{
 		std::vector<std::string> listActiveUsers = stringTokenizer(packet, '\0');
 		listActiveUsers = stringTokenizer(listActiveUsers[1], '|');
-		if (_publicChatDialog) 
+		if (_publicChatDialog!=nullptr) 
 		{
 
 			_publicChatDialog->UpdateListActiveUsers(listActiveUsers);
@@ -126,7 +126,7 @@ bool TcpClient::AnalyzeAndProcess(std::string packet)
 		break;
 
 	case FlagServerToClient::Login_Success:
-		if (_signUpLogInDlg)
+		if (_signUpLogInDlg!=nullptr)
 			//_signUpLogInDlg->LoginSuccess();
 			SendMessage(_signUpLogInDlg->GetSafeHwnd(), LOGIN_SUCCESS_MSG, 0, 0);
 		else
@@ -306,12 +306,18 @@ struct Param {
 };
 
 UINT ReceiveThreadFunc(LPVOID param) {
-
-	TcpClient* pTcpClient = (TcpClient*)param;
-	bool connect=true;
-	while (pTcpClient->isRunning && connect) {
-		std::string packet = pTcpClient->ReceivePacket();
-		connect = pTcpClient->AnalyzeAndProcess(packet);
+	try {
+		TcpClient* pTcpClient = (TcpClient*)param;
+		bool connect = true;
+		while (pTcpClient->isRunning && connect) {
+			std::string packet = pTcpClient->ReceivePacket();
+			connect = pTcpClient->AnalyzeAndProcess(packet);
+		}
+	}
+	catch (...) {
+		AfxMessageBox(L"Error while receiving, the program will turn off in 2s");
+		Sleep(2000);
+		exit(0);
 	}
 	return 0;
 
@@ -332,13 +338,14 @@ void TcpClient::Run()
 void TcpClient::SetDialog(CDialog* dialog)
  {
 	const char* name = typeid(*dialog).name();
+	
 	if (strcmp(name, "class CPublicChatDialog") == 0) {
 		
-		_publicChatDialog = dynamic_cast<CPublicChatDialog*> (dialog);
+		_publicChatDialog =dynamic_cast<CPublicChatDialog*> (dialog);
 	}
 	else if (strcmp(name, "class CSignUpLogInDlg") == 0) {
 		
-		_signUpLogInDlg = dynamic_cast<CSignUpLogInDlg*> (dialog);
+		_signUpLogInDlg = dynamic_cast<CSignUpLogInDlg*>(dialog);
 
 	}
 	
@@ -378,7 +385,11 @@ void TcpClient::SetIPAddress(std::string ipaddr)
 
 TcpClient::~TcpClient()
 {
-	_cwprintf(L"Call destructor");
+	if (_publicChatDialog != nullptr) delete _publicChatDialog;
+	if (_signUpLogInDlg != nullptr) delete _signUpLogInDlg;
+	_publicChatDialog = nullptr;
+	_signUpLogInDlg = nullptr;
+
 }
 
 

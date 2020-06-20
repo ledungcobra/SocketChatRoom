@@ -70,7 +70,9 @@ BOOL SocketChatRoomServerDlg::OnInitDialog()
 	SetIcon(m_hIcon, TRUE);			// Set big icon
 	SetIcon(m_hIcon, FALSE);		// Set small icon
 
+	
 	// TODO: Add extra initialization here
+	mEdtLog.ShowScrollBar(WS_VSCROLL);
 	SetWindowText(L"Server");
 	TcpServer::GetInstance()->SetDialog(this);
 	TcpServer::GetInstance()->Run();
@@ -158,7 +160,8 @@ void SocketChatRoomServerDlg::UpdateLogBox(std::string message)
 	CString buff;
 
 	mEdtLog.GetWindowText(buff);
-	buff += ConvertString::DecodeStringToCString(message) + L"\r\n";
+	auto newMessage = ConvertString::DecodeStringToCString(message);
+	buff += newMessage + L"\r\n";
 	mEdtLog.SetWindowText(buff);
 }
 

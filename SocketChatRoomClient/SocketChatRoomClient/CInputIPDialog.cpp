@@ -50,7 +50,7 @@ void CInputIPDialog::OnBnClickedOk()
 	mEdtIPAddress.GetWindowTextW(buff);
 	//TODO:CHECK
 
-	std::regex pattern("\\d{1,4}\\.\\d{1,4}.\\d{1,4}.\\d{1,4}");
+	std::regex pattern("\\b\\d{1,4}\\.\\d{1,4}.\\d{1,4}.\\d{1,4}\\b");
 	if (!std::regex_match(ConvertString::ConvertCStringToString(buff), pattern)) {
 		AfxMessageBox(L"Your ip is wrong");
 		exit(0);
@@ -58,9 +58,9 @@ void CInputIPDialog::OnBnClickedOk()
 	
 	TcpClient::GetInstance()->SetIPAddress(ConvertString::ConvertCStringToString(buff));
 	TcpClient::GetInstance()->Init();
-	CSignUpLogInDlg* dialog = new CSignUpLogInDlg();
+	std::shared_ptr<CSignUpLogInDlg> dialog = std::make_shared<CSignUpLogInDlg>();
 	ShowWindow(SW_HIDE);
 	dialog->DoModal();
-
-	//OnDestroy();
 }
+
+

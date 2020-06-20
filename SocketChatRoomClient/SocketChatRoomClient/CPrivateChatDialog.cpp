@@ -139,6 +139,9 @@ void CPrivateChatDialog::OnBnClickedSend()
 	std::string packet;
 	CString message;
 	mEdtMessage.GetWindowTextW(message);
+	if (message == L"") {
+		return;
+	}
 	packet = std::to_string(static_cast<int>(FlagClientToServer::PrivateChat)) +
 		'\0'+ConvertString::
 		EncodeCStringToString(TcpClient::GetInstance()->username)+'\0'+ ConvertString::

@@ -24,4 +24,5 @@ protected:
 public:
 	afx_msg void OnBnClickedOk();
 	CEdit mEdtIPAddress;
+
 };

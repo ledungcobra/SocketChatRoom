@@ -114,6 +114,7 @@ BOOL CSignUpLogInDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// Set small icon
 
 	// TODO: Add extra initialization here
+
 	SetWindowText(L"Socket Chat Room");
 	auto tcpClient = TcpClient::GetInstance();
 	tcpClient->SetDialog(this);
@@ -259,13 +260,13 @@ LRESULT CSignUpLogInDlg::LoginSuccess(WPARAM wParam, LPARAM lParam)
 	mEdtUsername.GetWindowTextW(username);
 	ShowWindow(SW_HIDE);
 
-	CPublicChatDialog* p = new CPublicChatDialog(nullptr, username);
+	auto _publicChatDialog = new CPublicChatDialog(nullptr, username);
 	TcpClient::GetInstance()->username = username;
 
 	auto client = TcpClient::GetInstance();
-	p->Create(IDD_PUBLIC_CHAT);
-	p->ShowWindow(SW_SHOWNORMAL);
-	client->SetDialog(p);
+	_publicChatDialog->Create(IDD_PUBLIC_CHAT);
+	_publicChatDialog->ShowWindow(SW_SHOWNORMAL);
+	client->SetDialog(_publicChatDialog);
 
 	return 0;
 	
@@ -278,12 +279,14 @@ LRESULT CSignUpLogInDlg::SignUpSuccess(WPARAM wParam, LPARAM lParam)
 	mEdtUsername.GetWindowTextW(username);
 	ShowWindow(SW_HIDE);
 
-	CPublicChatDialog* p = new CPublicChatDialog(nullptr,username);
-	TcpClient::GetInstance()->username = username;
-	auto client = TcpClient::GetInstance();
-	p->Create(IDD_PUBLIC_CHAT);
-	p->ShowWindow(SW_SHOWNORMAL);
-	client->SetDialog(p);
+	auto _publicChatDialog =new CPublicChatDialog(nullptr, username);
+	auto client = TcpClient::GetInstance();	
+	TcpClient::GetInstance()->username = username;	
+	_publicChatDialog->Create(IDD_PUBLIC_CHAT);
+	client->SetDialog(_publicChatDialog);
+	_publicChatDialog->ShowWindow(SW_SHOWNORMAL);
+
+	
 
 	
 	return 0;

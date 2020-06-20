@@ -41,6 +41,8 @@ BOOL CPublicChatDialog::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 	SetWindowText(L"Public Chat");
+	mMessageBox.ShowScrollBar(WS_VSCROLL);
+	 mEdtActiveLog.ShowScrollBar(WS_VSCROLL);
 	return 0; 
 }
 
@@ -91,7 +93,9 @@ void CPublicChatDialog::OnBnClickedSend()
 {
 	CString message;
 	mEdtChat.GetWindowTextW(message);
-
+	if (message == L"") {
+		return;
+	}
 	std::string packet = std::to_string(static_cast<int>
 	(FlagClientToServer::PublicChat)) + '\0' + ConvertString::EncodeCStringToString(username) + '\0' +
 		ConvertString::EncodeCStringToString(message) + '\0';

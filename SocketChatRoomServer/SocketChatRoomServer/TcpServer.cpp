@@ -388,7 +388,7 @@ std::string TcpServer::ReceivePacket(SOCKET clientSocket)
 		delete[] buffer;
 	}
 	catch (...) {
-		AfxMessageBox(L"Error buffer");
+		packet = "-1";
 	}
 	return packet;
 }
@@ -493,24 +493,31 @@ UINT ReceiveAndSend(LPVOID params)
 	MSG msg;
 	
 	if (p != NULL) {
-		while (isConnect && TcpServer::GetInstance()->flagRunningThread[p->clientSocket]) {
-			
-			std::string packet = p->tcpServer->ReceivePacket(p->clientSocket);
-			if (packet == "-1") {
-				p->tcpServer->RemoveUserFromActiveList(p->clientSocket);
-				isConnect = false;
-				if (TcpServer::GetInstance()->flagRunningThread.find(p->clientSocket) != TcpServer::GetInstance()->flagRunningThread.end()) {
-					TcpServer::GetInstance()->flagRunningThread.erase(p->clientSocket);
-				}
-				break;
-			}
-			isConnect = p->tcpServer->AnalyzeAndProcess(p->clientSocket, packet);
+		try {
+			while (isConnect && TcpServer::GetInstance()->flagRunningThread[p->clientSocket]) {
 
+				std::string packet = p->tcpServer->ReceivePacket(p->clientSocket);
+				if (packet == "-1") {
+					p->tcpServer->RemoveUserFromActiveList(p->clientSocket);
+					isConnect = false;
+					if (TcpServer::GetInstance()->flagRunningThread.find(p->clientSocket) != TcpServer::GetInstance()->flagRunningThread.end()) {
+						TcpServer::GetInstance()->flagRunningThread.erase(p->clientSocket);
+					}
+					break;
+				}
+				isConnect = p->tcpServer->AnalyzeAndProcess(p->clientSocket, packet);
+
+			}
+			if (p != nullptr)
+			{
+				//TODO:
+				delete p;
+			}
 		}
-		if (p != nullptr)
-		{
-			//TODO:
-			delete p;
+		catch (...) {
+			AfxMessageBox(L"Error while receiving, the program will turn off in 2s");
+			Sleep(2000);
+			exit(0);
 		}
 	}
 	return 0;

@@ -26,10 +26,12 @@ public:
 	
 private:
 	CString _partnerUsername;
+
 public:
 	void UpdateChatView(std::string incommingMessage);
 	CEdit mMessageBox;
 	
 	afx_msg void OnBnClickedSend();
 	CEdit mEdtMessage;
+
 };

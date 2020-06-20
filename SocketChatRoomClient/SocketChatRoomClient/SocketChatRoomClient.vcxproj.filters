@@ -60,6 +60,9 @@
     <ClInclude Include="CInputIPDialog.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ScrollEdit.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="SocketChatRoomClient.cpp">
@@ -96,6 +99,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="CInputIPDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ScrollEdit.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

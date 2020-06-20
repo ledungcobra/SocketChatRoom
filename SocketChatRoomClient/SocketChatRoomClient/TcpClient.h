@@ -46,7 +46,7 @@ public:
 	void CloseConnection(); // đóng kết nối
     static std::shared_ptr<TcpClient> GetInstance(); // lấy thể hiện
 	void Run(); // chạy client
-	void SetDialog(CDialog* dialog); //
+	void SetDialog(CDialog *dialog); //
 	void ShowSignUpLoginDialog(); //
 	CPrivateChatDialog* CreatePrivateChatDlg(CString partnerUsername);
 	void SetIPAddress(std::string ipaddr);
