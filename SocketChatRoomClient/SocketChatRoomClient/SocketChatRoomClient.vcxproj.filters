@@ -63,6 +63,9 @@
     <ClInclude Include="ScrollEdit.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="HelperFunction.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="SocketChatRoomClient.cpp">

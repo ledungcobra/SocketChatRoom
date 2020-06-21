@@ -203,7 +203,6 @@ bool TcpClient::AnalyzeAndProcess(std::string packet)
 	case FlagServerToClient::Already_Login:
 		if (_signUpLogInDlg)
 			_signUpLogInDlg->AccountAlreadyUsed();
-			//_signUpLogInDlg->FailLogin();
 		else
 			AfxMessageBox(L"Couldnt find Login Dialog");
 		break;

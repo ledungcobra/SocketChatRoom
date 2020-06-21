@@ -99,10 +99,16 @@ void CPublicChatDialog::OnBnClickedSend()
 	std::string packet = std::to_string(static_cast<int>
 	(FlagClientToServer::PublicChat)) + '\0' + ConvertString::EncodeCStringToString(username) + '\0' +
 		ConvertString::EncodeCStringToString(message) + '\0';
-	_cwprintf(ConvertString::DecodeStringToCString(packet));
+	
+	//UpdateUI
+	CString buff;
+	mMessageBox.GetWindowTextW(buff);
+	buff += username + L": " +message+L"\r\n";
+	mMessageBox.SetWindowTextW(buff);
+	mEdtChat.SetWindowTextW(L"");
 
 	TcpClient::GetInstance()->SendPacketRaw(packet);
-	//TODO: update local message
+	
 
 
 }

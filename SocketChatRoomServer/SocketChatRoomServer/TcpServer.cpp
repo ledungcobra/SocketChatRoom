@@ -275,7 +275,7 @@ bool TcpServer::AnalyzeAndProcess(SOCKET clientSocket, std::string packet)
 		message = listUser[clientSocket] + ConvertString::EncodeCStringToString(ConvertString::ConvertStringToCString(extraMessage)) + info[2];
 		std::string public_msg = std::to_string(static_cast<int>(FlagServerToClient::Send_Public_Message)) + '\0'; //Gửi cờ 
 		public_msg += this->listUser[clientSocket] + '\0' + info[2] + '\0';
-		this->SendToAll(public_msg);
+		this->SendToAllExcept(public_msg,this->listUser[clientSocket]);
 	}
 	break;
 

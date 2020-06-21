@@ -7,6 +7,7 @@
 #include "afxdialogex.h"
 #include "TcpClient.h"
 #include <regex>
+#include "HelperFunction.h"
 
 // CInputIPDialog dialog
 
@@ -31,7 +32,8 @@ void CInputIPDialog::DoDataExchange(CDataExchange* pDX)
 BOOL CInputIPDialog::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
-	mEdtIPAddress.SetWindowTextW(L"127.0.0.1");
+	std::string ip = GetIPAddress();
+	mEdtIPAddress.SetWindowTextW(ConvertString::ConvertStringToCString(ip));
 	return 0;
 }
 
