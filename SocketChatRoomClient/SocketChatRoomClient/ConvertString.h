@@ -8,5 +8,6 @@ public:
 	static CString DecodeStringToCString(std::string input);
 	static std::string ConvertCStringToString(CString cstring);
 	static CString ConvertStringToCString(std::string input);
+	static CString EmojiConverter(CString input);
 };
 

@@ -40,3 +40,22 @@ CString ConvertString::ConvertStringToCString(std::string input)
 {
 	return CString(input.c_str());
 }
+
+CString ConvertString::EmojiConverter(CString input)
+{
+	
+	CString pattern[] = {L":)",L":D",L"<3"};
+	CString unicodeEmoji[] = {L"\U0001F600",L"\U0001F601",L"\U00002764"};
+	int startIndex = 0;
+	for (int i = 0; i < 3;i++ ) {
+
+		auto pos = input.Find(pattern[i],startIndex);
+		if (pos != -1) {
+			input.Replace(pattern[i], unicodeEmoji[i]);
+		}
+		
+	}
+	
+
+	return input;
+}
