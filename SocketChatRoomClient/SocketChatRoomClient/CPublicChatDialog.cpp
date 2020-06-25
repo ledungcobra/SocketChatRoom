@@ -40,7 +40,10 @@ void CPublicChatDialog::DoDataExchange(CDataExchange* pDX)
 BOOL CPublicChatDialog::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
-	SetWindowText(L"Public Chat");
+	if (messageFont.CreatePointFont(150, L"Arial")) {
+		mMessageBox.SetFont(&messageFont);
+	}
+	SetWindowText(L"Public Chat ");
 	mMessageBox.ShowScrollBar(WS_VSCROLL);
 	 mEdtActiveLog.ShowScrollBar(WS_VSCROLL);
 	return 0; 
@@ -96,6 +99,7 @@ void CPublicChatDialog::OnBnClickedSend()
 	if (message == L"") {
 		return;
 	}
+	message = ConvertString::EmojiConverter(message);
 	std::string packet = std::to_string(static_cast<int>
 	(FlagClientToServer::PublicChat)) + '\0' + ConvertString::EncodeCStringToString(username) + '\0' +
 		ConvertString::EncodeCStringToString(message) + '\0';
@@ -106,6 +110,7 @@ void CPublicChatDialog::OnBnClickedSend()
 	buff += username + L": " +message+L"\r\n";
 	mMessageBox.SetWindowTextW(buff);
 	mEdtChat.SetWindowTextW(L"");
+	
 
 	TcpClient::GetInstance()->SendPacketRaw(packet);
 	
@@ -270,5 +275,5 @@ void CPublicChatDialog::UpdateLogMessage(std::string message,int flag)
 		mEdtActiveLog.GetWindowTextW(buffer);
 		buffer += ConvertString::DecodeStringToCString(message) + L" has logged out\r\n";
 	}
-	mEdtActiveLog.SetWindowTextW(buffer);
+	
 }

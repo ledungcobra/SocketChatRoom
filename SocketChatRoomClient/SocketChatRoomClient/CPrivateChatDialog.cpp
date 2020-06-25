@@ -131,6 +131,7 @@ void CPrivateChatDialog::UpdateChatView(std::string incommingMessage)
 	currentContent += _partnerUsername + L":" + ConvertString::DecodeStringToCString(incommingMessage) +L"\r\n";
 	mMessageBox.SetWindowTextW(currentContent);
 
+
 }
 
 
@@ -142,6 +143,7 @@ void CPrivateChatDialog::OnBnClickedSend()
 	if (message == L"") {
 		return;
 	}
+	message = ConvertString::EmojiConverter(message);
 	packet = std::to_string(static_cast<int>(FlagClientToServer::PrivateChat)) +
 		'\0'+ConvertString::
 		EncodeCStringToString(TcpClient::GetInstance()->username)+'\0'+ ConvertString::
