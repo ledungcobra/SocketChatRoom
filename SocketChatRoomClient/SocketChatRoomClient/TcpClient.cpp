@@ -331,7 +331,7 @@ void TcpClient::Run()
 	
 	this->isRunning = true;
 	bool success = this->Connect();	
-	AfxBeginThread(ReceiveThreadFunc, this);
+	thread = AfxBeginThread(ReceiveThreadFunc, this);
 
 	
 }
@@ -392,6 +392,14 @@ TcpClient::~TcpClient()
 	_publicChatDialog = nullptr;
 	_signUpLogInDlg = nullptr;
 
+}
+
+void TcpClient::KillThread()
+{
+	if (thread) {
+		delete thread;
+		thread = nullptr;
+	}
 }
 
 

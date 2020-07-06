@@ -134,8 +134,10 @@ void CSignUpLogInDlg::OnSysCommand(UINT nID, LPARAM lParam)
 			packet += std::to_string(static_cast<int>(FlagClientToServer::Disconnect_To_Server)) + '\0';
 			TcpClient::GetInstance()->SendPacketRaw(packet);
 			TcpClient::GetInstance()->isRunning = false;
+			TcpClient::GetInstance()->KillThread();
+			PostQuitMessage(WM_DESTROY);
 			OnDestroy();
-
+			
 		}
 
 

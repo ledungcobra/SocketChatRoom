@@ -60,7 +60,10 @@ void CPublicChatDialog::OnSysCommand(UINT nID, LPARAM lParam)
 			packet += std::to_string(static_cast<int>(FlagClientToServer::Disconnect_To_Server)) + '\0';
 			TcpClient::GetInstance()->SendPacketRaw(packet);
 			TcpClient::GetInstance()->isRunning = false;
+			TcpClient::GetInstance()->KillThread();
+			PostQuitMessage(WM_DESTROY);
 			OnDestroy();
+
 
 		}
 		
@@ -275,6 +278,6 @@ void CPublicChatDialog::UpdateLogMessage(std::string message,int flag)
 		mEdtActiveLog.GetWindowTextW(buffer);
 		buffer += ConvertString::DecodeStringToCString(message) + L" has logged out\r\n";
 	}
-
+	mEdtActiveLog.SetWindowTextW(buffer);
 	
 }

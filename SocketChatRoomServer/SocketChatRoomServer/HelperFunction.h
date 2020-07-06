@@ -49,7 +49,7 @@ std::string GetIPAddress() {
     }
     if (pAdapterInfo)
         FREE(pAdapterInfo);
-     if (result == "0.0.0.0") {
+    if (result == "0.0.0.0") {
         result = "127.0.0.1";
     }
     return result;

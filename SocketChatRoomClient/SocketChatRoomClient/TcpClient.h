@@ -33,6 +33,7 @@ private:
 	TcpClient();
 	// dùng cho đọc và ghi file
 	CString _filePath = L"";
+	CWinThread* thread = nullptr;
 public:
 	std::map<std::string, std::shared_ptr<CPrivateChatDialog> > _mapPrivateChatDialog; //
 	bool isRunning; // kiểm tra có đang chạy hay không
@@ -52,6 +53,7 @@ public:
 	void SetIPAddress(std::string ipaddr);
 	void Init();
 	~TcpClient();
+	void KillThread();
 };
 
 
