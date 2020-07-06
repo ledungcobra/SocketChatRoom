@@ -275,5 +275,6 @@ void CPublicChatDialog::UpdateLogMessage(std::string message,int flag)
 		mEdtActiveLog.GetWindowTextW(buffer);
 		buffer += ConvertString::DecodeStringToCString(message) + L" has logged out\r\n";
 	}
+
 	
 }

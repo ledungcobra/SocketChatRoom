@@ -163,6 +163,9 @@ void SocketChatRoomServerDlg::UpdateLogBox(std::string message)
 	auto newMessage = ConvertString::DecodeStringToCString(message);
 	buff += newMessage + L"\r\n";
 	mEdtLog.SetWindowText(buff);
+
+	mEdtLog.LineScroll(mEdtLog.GetLineCount());
+	
 }
 
 void SocketChatRoomServerDlg::UpdateActiveUserListView()
